@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+echo "=== Pre-commit hook starting ==="
+npx lint-staged

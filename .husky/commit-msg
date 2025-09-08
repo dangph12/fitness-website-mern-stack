@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+echo "=== Commit-msg hook starting ==="
+npx --no -- commitlint --edit "$1"
