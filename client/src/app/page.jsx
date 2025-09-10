@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '~/components/ui/button';
 import { FaFistRaised, FaHeartbeat, FaRunning, FaDumbbell, FaBicycle, FaUsers, FaSwimmer, FaFire, FaChild, FaSpa } from 'react-icons/fa';
+import BannerLayout from '~/layouts/BannerLayout';
 
 const categories = [
   { name: 'Boxing', trainers: 12, color: 'bg-red-300', icon: <FaFistRaised className="h-8 w-8 text-white" /> },
@@ -19,7 +20,9 @@ const categories = [
 
 const Page = () => {
   return (
-    <div className="text-white min-h-screen p-10">
+   <>
+    <BannerLayout/>
+    <div className="text-white min-h-screen p-30">
       <h1 className="text-4xl font-bold text-center mb-10 text-[#3067B6]">Workout Categories</h1>
       <p className="text-center mb-10 text-xl text-[#3067B6]">Find workouts tailored to your fitness goals. Choose a category and get started today!</p>
       
@@ -36,6 +39,7 @@ const Page = () => {
         ))}
       </div>
     </div>
+   </>
   );
 };
 
