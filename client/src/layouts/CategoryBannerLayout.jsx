@@ -17,7 +17,7 @@ const categories = [
   { name: 'Stretching', trainers: 15, color: 'bg-green-300', icon: <FaSpa className="h-8 w-8 text-white" /> },
   { name: 'Swimming', trainers: 10, color: 'bg-blue-300', icon: <FaSwimmer className="h-8 w-8 text-white" /> },
 ];
-function CategoryBanner() {
+function CategoryBannerLayout() {
   return (
      <div className="text-white min-h-screen p-30">
           <h1 className="text-4xl font-bold text-center mb-10 text-[#3067B6]">Workout Categories</h1>
@@ -39,4 +39,4 @@ function CategoryBanner() {
   )
 }
 
-export default CategoryBanner
+export default CategoryBannerLayout
