@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Toaster } from '~/components/ui/sonner';
 import { fetchAvatar } from '~/store/features/avatar-slice';
 import HeaderLayout from './HeaderLayout';
+import FooterLayout from './FooterLayout';
 
 const RootLayout = () => {
   const dispatch = useDispatch();
@@ -30,7 +31,9 @@ const RootLayout = () => {
         </Avatar>
       </div>
       <Outlet />
-      <div>Footer</div>
+      <div>
+        <FooterLayout/>
+      </div>
       <Toaster position='top-right' theme={theme} />
     </div>
   );
