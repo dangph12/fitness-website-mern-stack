@@ -1,14 +1,15 @@
 import React from 'react';
 import logo from '../assets/logo.png';
 import { Link } from 'react-router';
+import { Button } from '~/components/ui/button';
 
 function HeaderLayout() {
   return (
     <header className="bg-[#F5F2EC] text-[#3067B6] px-6 py-3 flex items-center justify-between rounded-2xl">
-     <Link to="/" className="flex items-center space-x-0.5">
+      <Link to="/" className="flex items-center space-x-0.5">
         <img src={logo} alt="Logo" className="w-28 h-28" />
         <span className="font-bold text-2xl mb-2">F-Fitness</span>
-     </Link>
+      </Link>
 
       <nav className="flex space-x-10 font-bold relative">
         <div className="relative group">
@@ -49,9 +50,15 @@ function HeaderLayout() {
         <div className="hover:text-gray-300">About</div>
       </nav>
 
-      <button className="bg-yellow-400 text-black px-5 py-2 rounded-full font-medium hover:bg-yellow-500 transition">
-        Join Now
-      </button>
+      <div className='flex space-x-5'>
+        <Button className="bg-yellow-400 text-black px-5 py-2 rounded-full font-medium hover:bg-yellow-500 transition">
+          <Link to="/auth/login">Login</Link>
+        </Button>
+
+        <Button className="bg-[#3067B6] text-[#F5F2EC] px-5 py-2 rounded-full font-medium transition">
+          <Link to="/auth/sign-up">Sign Up</Link>
+        </Button>
+      </div>
     </header>
   );
 }
