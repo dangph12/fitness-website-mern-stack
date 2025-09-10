@@ -1,36 +1,17 @@
-import { useTheme } from 'next-themes';
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { Link } from 'react-router';
-
+import banner from '../assets/banner-1.png';
 import { Button } from '~/components/ui/button';
-import { logout } from '~/store/features/auth-slice';
-import { clearAvatar } from '~/store/features/avatar-slice';
 
 const Page = () => {
-  const dispatch = useDispatch();
-  const { theme, setTheme } = useTheme();
-
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
-
-  const handleLogout = () => {
-    dispatch(logout());
-    dispatch(clearAvatar());
-  };
-
   return (
-    <>
-      <div>HomePage with {theme} theme</div>
-      <div className='flex flex-col space-y-4'>
-        <Link to='/profile'>Profile</Link>
-        <Link to='/auth/login'>Login</Link>
-        <Link to='/auth/sign-up'>Sign Up</Link>
-        <Button onClick={handleLogout}>Logout</Button>
-        <Button onClick={toggleTheme}>Toggle Theme</Button>
-      </div>
-    </>
+    <div className="relative text-center p-19">
+      <img src={banner} alt="Healthy Lifestyle" className="w-full h-auto" />
+      <Button 
+        className="absolute top-7/9 left-7/9 transform -translate-x-10/50 -translate-y-/50 py-8 px-8 bg-[#F5F2EC] text-[#3067B6] rounded-2xl cursor-pointer text-xl font-bold"
+      >
+        Join Now
+      </Button>
+    </div>
   );
 };
 

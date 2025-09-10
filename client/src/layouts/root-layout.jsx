@@ -25,10 +25,10 @@ const RootLayout = () => {
         <div>
           <HeaderLayout/>
         </div>
-        <Avatar>
+        {/* <Avatar>
           <AvatarImage src={avatarUrl} alt='User Avatar' />
           <AvatarFallback>U</AvatarFallback>
-        </Avatar>
+        </Avatar> */}
       </div>
       <Outlet />
       <div>
