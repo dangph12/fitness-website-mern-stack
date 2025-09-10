@@ -9,11 +9,43 @@ function HeaderLayout() {
         <span className="font-bold text-2xl mb-2">F-Fitness</span>
       </div>
 
-      <nav className="flex space-x-9 font-bold">
-        <div href="#features" className="hover:text-gray-300">Features</div>
-        <div href="#solutions" className="hover:text-gray-300">Solutions</div>
-        <div href="#resources" className="hover:text-gray-300">Resources</div>
-        <div href="#pricing" className="hover:text-gray-300">Pricing</div>
+      <nav className="flex space-x-10 font-bold relative">
+        <div className="relative group">
+          <button className="hover:text-gray-300 focus:outline-none">
+            Workout
+          </button>
+          <div className="absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-40">
+            <a href="#abs" className="block px-4 py-2 hover:bg-gray-100">Abs Training</a>
+            <a href="#legs" className="block px-4 py-2 hover:bg-gray-100">Legs Training</a>
+            <a href="#arms" className="block px-4 py-2 hover:bg-gray-100">Arms Training</a>
+          </div>
+        </div>
+
+        <div className="relative group">
+          <button className="hover:text-gray-300 focus:outline-none">
+            Courses
+          </button>
+          <div className="absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-40">
+            <a href="#beginner" className="block px-4 py-2 hover:bg-gray-100">Beginner</a>
+            <a href="#intermediate" className="block px-4 py-2 hover:bg-gray-100">Intermediate</a>
+            <a href="#advanced" className="block px-4 py-2 hover:bg-gray-100">Advanced</a>
+          </div>
+        </div>
+
+        <div className="relative group">
+          <button className="hover:text-gray-300 focus:outline-none">
+            Healthy Living
+          </button>
+          <div className="absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-48">
+            <a href="#nutrition" className="block px-4 py-2 hover:bg-gray-100">Nutrition</a>
+            <a href="#lifestyle" className="block px-4 py-2 hover:bg-gray-100">Lifestyle</a>
+            <a href="#mental" className="block px-4 py-2 hover:bg-gray-100">Mental Health</a>
+          </div>
+        </div>
+
+        <div className="hover:text-gray-300">Community</div>
+        <div className="hover:text-gray-300">Challenging</div>
+        <div className="hover:text-gray-300">About</div>
       </nav>
 
       <button className="bg-yellow-400 text-black px-5 py-2 rounded-full font-medium hover:bg-yellow-500 transition">
