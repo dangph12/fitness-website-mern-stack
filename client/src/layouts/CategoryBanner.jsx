@@ -17,14 +17,26 @@ const categories = [
   { name: 'Stretching', trainers: 15, color: 'bg-green-300', icon: <FaSpa className="h-8 w-8 text-white" /> },
   { name: 'Swimming', trainers: 10, color: 'bg-blue-300', icon: <FaSwimmer className="h-8 w-8 text-white" /> },
 ];
-
-const Page = () => {
+function CategoryBanner() {
   return (
-   <>
-    <BannerLayout/>
-   
-   </>
-  );
-};
+     <div className="text-white min-h-screen p-30">
+          <h1 className="text-4xl font-bold text-center mb-10 text-[#3067B6]">Workout Categories</h1>
+          <p className="text-center mb-10 text-xl text-[#3067B6]">Find workouts tailored to your fitness goals. Choose a category and get started today!</p>
+          
+          <div className="grid grid-cols-3 gap-8">
+            {categories.map((category, index) => (
+              <div key={index} className={`flex flex-col items-center ${category.color} p-6 rounded-lg`}>
+                {category.icon}
+                <h2 className="text-2xl font-semibold mt-4">{category.name}</h2>
+                <p className="text-xl mt-2">{category.trainers} Trainers</p>
+                <Button className="mt-4 px-6 py-2 bg-white text-black rounded-full">
+                  Join Now
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+  )
+}
 
-export default Page;
+export default CategoryBanner
