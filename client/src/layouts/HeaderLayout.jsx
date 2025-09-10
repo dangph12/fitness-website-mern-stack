@@ -2,6 +2,7 @@ import React from 'react';
 import logo from '../assets/logo.png';
 import { Link } from 'react-router';
 import { Button } from '~/components/ui/button';
+import { FaUser } from 'react-icons/fa'; 
 
 function HeaderLayout() {
   return (
@@ -58,6 +59,10 @@ function HeaderLayout() {
         <Button className="bg-[#3067B6] text-[#F5F2EC] px-5 py-2 rounded-full font-medium transition">
           <Link to="/auth/sign-up">Sign Up</Link>
         </Button>
+
+        <Link to="/profile" className="text-[#3067B6] hover:text-gray-500">
+          <FaUser size={30} />
+        </Link>
       </div>
     </header>
   );
