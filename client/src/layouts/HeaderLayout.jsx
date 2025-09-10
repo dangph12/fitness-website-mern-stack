@@ -1,13 +1,14 @@
 import React from 'react';
 import logo from '../assets/logo.png';
+import { Link } from 'react-router';
 
 function HeaderLayout() {
   return (
     <header className="bg-[#F5F2EC] text-[#3067B6] px-6 py-3 flex items-center justify-between rounded-2xl">
-      <div className="flex items-center space-x-0.5">
+     <Link to="/" className="flex items-center space-x-0.5">
         <img src={logo} alt="Logo" className="w-28 h-28" />
         <span className="font-bold text-2xl mb-2">F-Fitness</span>
-      </div>
+     </Link>
 
       <nav className="flex space-x-10 font-bold relative">
         <div className="relative group">
