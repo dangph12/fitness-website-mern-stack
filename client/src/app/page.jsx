@@ -1,6 +1,7 @@
 import React from 'react';
 import BannerLayout from '~/layouts/BannerLayout';
 import CategoryBannerLayout from '~/layouts/CategoryBannerLayout';
+import PlanCoursesLayout from '~/layouts/PlanCoursesLayout';
 import UserFeedbackLayout from '~/layouts/UserFeedbackLayout';
 
 const Page = () => {
@@ -9,6 +10,7 @@ const Page = () => {
     <BannerLayout/>
     <CategoryBannerLayout/>
     <UserFeedbackLayout/>
+    <PlanCoursesLayout/>
    </>
   );
 };
