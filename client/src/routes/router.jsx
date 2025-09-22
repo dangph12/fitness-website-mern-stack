@@ -6,6 +6,7 @@ const AuthLayout = lazy(() => import('~/layouts/auth-layout'));
 const AdminLayout = lazy(() => import('~/layouts/admin-layout'));
 
 const ErrorComponent = lazy(() => import('~/components/error'));
+const PrivateRoute = lazy(() => import('~/components/private-route'));
 
 const router = createBrowserRouter([
   {
@@ -55,15 +56,34 @@ const router = createBrowserRouter([
   },
   {
     path: '/admin',
-    Component: AdminLayout,
     children: [
       {
-        index: true,
-        Component: lazy(() => import('~/app/admin/page'))
+        path: 'login',
+        Component: AuthLayout,
+        children: [
+          {
+            index: true,
+            Component: lazy(() => import('~/app/admin/login/page'))
+          }
+        ]
       },
       {
-        path: 'manage-users',
-        Component: lazy(() => import('~/app/admin/manage-users/page'))
+        path: '',
+        Component: () => (
+          <PrivateRoute allowedRoles={['admin']}>
+            <AdminLayout />
+          </PrivateRoute>
+        ),
+        children: [
+          {
+            index: true,
+            Component: lazy(() => import('~/app/admin/page'))
+          },
+          {
+            path: 'manage-users',
+            Component: lazy(() => import('~/app/admin/manage-users/page'))
+          }
+        ]
       }
     ]
   }
