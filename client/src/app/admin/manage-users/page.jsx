@@ -63,7 +63,6 @@ const Page = () => {
   const [roleFilter, setRoleFilter] = useState(filters.role || '');
   const [genderFilter, setGenderFilter] = useState(filters.gender || '');
 
-  // Fetch users on component mount and when filters/pagination change
   useEffect(() => {
     dispatch(
       fetchUsers({
@@ -76,7 +75,6 @@ const Page = () => {
     );
   }, [dispatch, currentPage, limit, filters]);
 
-  // Show error toasts
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -92,7 +90,6 @@ const Page = () => {
     }
   }, [error, deleteError, userDetailsError, dispatch]);
 
-  // Remove auto-submit search - now manual only
   const handleSearch = () => {
     dispatch(
       setFilters({
@@ -172,7 +169,6 @@ const Page = () => {
   return (
     <div className='min-h-screen bg-background p-6'>
       <div className='max-w-7xl mx-auto'>
-        {/* Header */}
         <div className='mb-8'>
           <h1 className='text-3xl font-bold text-gray-900 mb-2'>
             User Management
@@ -180,11 +176,9 @@ const Page = () => {
           <p className='text-gray-600'>Manage and monitor user accounts</p>
         </div>
 
-        {/* Filters and Search */}
         <Card className='p-6 mb-6'>
-          <div className='flex flex-col lg:flex-row gap-4 items-end'>
-            {/* Search Bar */}
-            <div className='flex-1'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
+            <div className='md:col-span-2 xl:col-span-2'>
               <label className='block text-sm font-medium mb-2'>
                 Search by name
               </label>
@@ -200,8 +194,7 @@ const Page = () => {
               </div>
             </div>
 
-            {/* Role Filter */}
-            <div className='min-w-[120px]'>
+            <div>
               <label className='block text-sm font-medium mb-2'>Role</label>
               <select
                 value={roleFilter}
@@ -214,8 +207,7 @@ const Page = () => {
               </select>
             </div>
 
-            {/* Gender Filter */}
-            <div className='min-w-[120px]'>
+            <div>
               <label className='block text-sm font-medium mb-2'>Gender</label>
               <select
                 value={genderFilter}
@@ -228,23 +220,23 @@ const Page = () => {
               </select>
             </div>
 
-            {/* Search Button */}
-            <div className='flex gap-2'>
-              <Button onClick={handleSearch} className='min-w-[80px]'>
-                Search
-              </Button>
-              <Button
-                variant='outline'
-                onClick={handleClearFilters}
-                className='min-w-[80px]'
-              >
-                Clear
-              </Button>
+            <div className='flex flex-col justify-end'>
+              <div className='flex gap-2'>
+                <Button onClick={handleSearch} className='flex-1'>
+                  Search
+                </Button>
+                <Button
+                  variant='outline'
+                  onClick={handleClearFilters}
+                  className='flex-1'
+                >
+                  Clear
+                </Button>
+              </div>
             </div>
           </div>
         </Card>
 
-        {/* Results Info */}
         <div className='mb-4 flex justify-between items-center'>
           <p className='text-sm text-gray-600'>
             Showing {users.length} of {totalUsers} users
@@ -265,7 +257,6 @@ const Page = () => {
           </div>
         </div>
 
-        {/* Users Table */}
         <Card className='overflow-hidden'>
           {loading ? (
             <div className='flex justify-center items-center p-8'>
@@ -363,7 +354,6 @@ const Page = () => {
           )}
         </Card>
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className='mt-6 flex justify-center'>
             <div className='flex items-center gap-2'>
@@ -413,7 +403,6 @@ const Page = () => {
           </div>
         )}
 
-        {/* User Details Modal */}
         {showUserModal && (
           <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
             <div className='bg-white rounded-lg p-6 w-full max-w-md'>
@@ -504,7 +493,6 @@ const Page = () => {
           </div>
         )}
 
-        {/* Delete Confirmation Modal */}
         {showDeleteModal && userToDelete && (
           <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
             <div className='bg-white rounded-lg p-6 w-full max-w-sm'>
