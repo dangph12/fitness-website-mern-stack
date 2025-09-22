@@ -75,4 +75,10 @@ router.get(
   asyncHandler(AuthController.loginWithProvider)
 );
 
+router.post(
+  '/admin/login',
+  validate(LocalLogin.shape),
+  asyncHandler(AuthController.loginByAdmin)
+);
+
 export default router;

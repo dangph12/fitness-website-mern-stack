@@ -15,7 +15,7 @@ import UserService from '../users/user-service';
 import { IUser } from '../users/user-type';
 
 const AuthService = {
-  login: async (email: string, password: string) => {
+  login: async (email: string, password: string, role: string) => {
     const user = await UserService.findByEmail(email);
 
     const auth = await AuthModel.findOne({ user: user._id, provider: 'local' });
@@ -28,6 +28,14 @@ const AuthService = {
 
     if (!isPasswordValid) {
       throw createHttpError(401, 'Password is incorrect');
+    }
+
+    if (user.role !== role) {
+      throw createHttpError(403, 'Access denied');
+    }
+
+    if (!user.isActive) {
+      throw createHttpError(403, 'User account is deactivated');
     }
 
     const { accessToken, refreshToken } = generateToken({

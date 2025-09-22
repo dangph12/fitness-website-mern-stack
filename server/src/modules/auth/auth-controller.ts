@@ -13,7 +13,8 @@ const AuthController = {
 
     const { user, accessToken, refreshToken } = await AuthService.login(
       email,
-      password
+      password,
+      'user'
     );
 
     res.cookie('refreshToken', refreshToken, {
@@ -112,6 +113,26 @@ const AuthController = {
 
     return res.redirect(
       `${process.env.CLIENT_URL}/auth/callback?accessToken=${accessToken}`
+    );
+  },
+  loginByAdmin: async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+
+    const { user, accessToken, refreshToken } = await AuthService.login(
+      email,
+      password,
+      'admin'
+    );
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production'
+    });
+
+    return res.status(200).json(
+      ApiResponse.success('User logged in successfully', {
+        accessToken
+      })
     );
   }
 };
