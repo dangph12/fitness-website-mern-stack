@@ -1,8 +1,10 @@
 export interface IUser {
-  email: string;
   name: string;
+  email: string;
   avatar: string;
-  gender?: string;
   role: 'user' | 'admin';
+  dob?: Date;
+  height?: number;
+  gender?: string;
   isActive?: boolean;
 }
