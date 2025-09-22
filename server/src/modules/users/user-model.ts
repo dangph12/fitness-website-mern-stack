@@ -14,6 +14,8 @@ const UserSchema = new Schema<IUser>(
       enum: ['user', 'admin'],
       default: 'user'
     },
+    dob: { type: Date },
+    height: { type: Number },
     isActive: { type: Boolean, default: true }
   },
   { timestamps: true }
