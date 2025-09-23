@@ -26,12 +26,8 @@ const AuthService = {
 
     const isPasswordValid = await comparePassword(password, auth.localPassword);
 
-    if (!isPasswordValid) {
-      throw createHttpError(401, 'Password is incorrect');
-    }
-
-    if (user.role !== role) {
-      throw createHttpError(403, 'Access denied');
+    if (!isPasswordValid || user.role !== role) {
+      throw createHttpError(401, 'Username or password is incorrect');
     }
 
     if (!user.isActive) {
