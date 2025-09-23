@@ -9,36 +9,35 @@ const UserService = {
   find: async ({
     page = 1,
     limit = 10,
-    filter = '',
+    filterParams = {},
     sortBy = 'createdAt',
     sortOrder = 'desc'
   }) => {
-    const filterRecord: Record<string, { $regex: string; $options: string }> =
-      {};
+    const filterRecord: Record<string, any> = {};
 
-    if (filter) {
-      filter.split('&').forEach(pair => {
-        const [key, value] = pair.split('=');
-        if (key && value) {
-          // Use regex for case-insensitive search
-          filterRecord[key] = { $regex: value, $options: 'i' };
-        }
-      });
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value && value !== '') {
+        // options for case-insensitive
+        filterRecord[key] = { $regex: value, $options: 'i' };
+      }
     }
 
-    const users = await UserModel.find({
-      page,
-      limit,
-      filterRecord,
-      sortBy,
-      sortOrder
-    });
+    const skip = (page - 1) * limit;
+    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as any;
 
-    if (!users || users.length === 0) {
-      throw createHttpError(404, 'Not found users');
-    }
+    const totalUsers = await UserModel.countDocuments(filterRecord);
+    const totalPages = Math.ceil(totalUsers / limit);
 
-    return users;
+    const users = await UserModel.find(filterRecord)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
+
+    return {
+      users,
+      totalUsers,
+      totalPages
+    };
   },
   findById: async (userId: string) => {
     const user = await UserModel.findById(userId);

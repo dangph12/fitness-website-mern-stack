@@ -3,8 +3,10 @@ import { createBrowserRouter } from 'react-router';
 
 const RootLayout = lazy(() => import('~/layouts/root-layout'));
 const AuthLayout = lazy(() => import('~/layouts/auth-layout'));
+const AdminLayout = lazy(() => import('~/layouts/admin-layout'));
 
 const ErrorComponent = lazy(() => import('~/components/error'));
+const PrivateRoute = lazy(() => import('~/components/private-route'));
 
 const router = createBrowserRouter([
   {
@@ -49,6 +51,39 @@ const router = createBrowserRouter([
       {
         path: 'reset-password',
         Component: lazy(() => import('~/app/auth/reset-password/page'))
+      }
+    ]
+  },
+  {
+    path: '/admin',
+    children: [
+      {
+        path: 'login',
+        Component: AuthLayout,
+        children: [
+          {
+            index: true,
+            Component: lazy(() => import('~/app/admin/login/page'))
+          }
+        ]
+      },
+      {
+        path: '',
+        Component: () => (
+          <PrivateRoute allowedRoles={['admin']}>
+            <AdminLayout />
+          </PrivateRoute>
+        ),
+        children: [
+          {
+            index: true,
+            Component: lazy(() => import('~/app/admin/page'))
+          },
+          {
+            path: 'manage-users',
+            Component: lazy(() => import('~/app/admin/manage-users/page'))
+          }
+        ]
       }
     ]
   }

@@ -54,6 +54,12 @@ const configurePassport = () => {
               email: profile.emails?.[0]?.value || ''
             });
 
+            if (!user || !user.isActive) {
+              return done(null, false, {
+                message: 'User not found or inactive'
+              });
+            }
+
             if (!user) {
               user = await UserService.create({
                 email: profile.emails?.[0]?.value || '',
@@ -87,6 +93,12 @@ const configurePassport = () => {
             let user = await UserModel.findOne({
               email: profile.emails?.[0]?.value || ''
             });
+
+            if (!user || !user.isActive) {
+              return done(null, false, {
+                message: 'User not found or inactive'
+              });
+            }
 
             if (!user) {
               user = await UserService.create({

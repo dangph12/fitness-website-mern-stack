@@ -6,11 +6,18 @@ import UserService from './user-service';
 
 const UserController = {
   find: async (req: Request, res: Response) => {
-    const { page = 1, limit = 10, filter, sortBy, sortOrder } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy,
+      sortOrder,
+      ...filterParams
+    } = req.query;
+
     const users = await UserService.find({
       page: Number(page),
       limit: Number(limit),
-      filter: filter as string,
+      filterParams: filterParams,
       sortBy: sortBy as string,
       sortOrder: sortOrder as string
     });

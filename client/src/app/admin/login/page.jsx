@@ -1,7 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -45,10 +44,13 @@ const Login = () => {
   const onSubmit = async data => {
     try {
       const { isRemember, ...loginData } = data;
-      const response = await axiosInstance.post('/api/auth/login', loginData);
+      const response = await axiosInstance.post(
+        '/api/auth/admin/login',
+        loginData
+      );
       const { accessToken } = response.data.data;
       dispatch(loadUser({ accessToken, isRemember }));
-      navigate('/');
+      navigate('/admin');
       toast.success('Login successful!');
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Login failed.');
@@ -64,39 +66,6 @@ const Login = () => {
         </CardHeader>
 
         <CardContent className='space-y-4'>
-          <Button
-            variant='outline'
-            className='w-full'
-            onClick={() => {
-              window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
-            }}
-          >
-            <FaGoogle className='mr-2' />
-            Continue with Google
-          </Button>
-
-          <Button
-            variant='outline'
-            className='w-full'
-            onClick={() => {
-              window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/facebook`;
-            }}
-          >
-            <FaFacebook className='mr-2' />
-            Continue with Facebook
-          </Button>
-
-          <div className='relative'>
-            <div className='absolute inset-0 flex items-center'>
-              <span className='w-full border-t' />
-            </div>
-            <div className='relative flex justify-center text-xs uppercase'>
-              <span className='bg-background px-2 text-muted-foreground'>
-                Or continue with email
-              </span>
-            </div>
-          </div>
-
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
               <FormField
@@ -157,25 +126,6 @@ const Login = () => {
             </form>
           </Form>
         </CardContent>
-
-        <CardFooter className='pt-6'>
-          <p className='text-sm text-muted-foreground flex flex-col gap-2'>
-            <span>
-              Don't have an account?{' '}
-              <Link to='/auth/sign-up' className='text-primary hover:underline'>
-                Sign up
-              </Link>
-            </span>
-            <span>
-              <Link
-                to='/auth/forgot-password'
-                className='text-primary hover:underline'
-              >
-                Forgot password?
-              </Link>
-            </span>
-          </p>
-        </CardFooter>
       </Card>
     </div>
   );
