@@ -5,8 +5,7 @@ import { IHistory } from './history-type';
 const HistorySchema = new Schema<IHistory>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    // Ref to the History item (could be Exercise, Meal, Plan, etc.)
-    itemId: { type: Schema.Types.ObjectId, required: true }
+    workoutId: { type: Schema.Types.ObjectId, ref: 'Workout', required: true }
   },
   { timestamps: true }
 );

@@ -9,22 +9,7 @@ const PlanSchema = new Schema<IPlan>(
     image: { type: String, default: '' },
     isPublic: { type: Boolean, default: false },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    days: [
-      {
-        exercises: [
-          {
-            exerciseId: {
-              type: Schema.Types.ObjectId,
-              ref: 'Exercise',
-              required: true
-            },
-            sets: { type: Number, required: true },
-            reps: { type: Number, required: true },
-            rest: { type: Number }
-          }
-        ]
-      }
-    ]
+    workouts: [{ type: Schema.Types.ObjectId, ref: 'Workout' }]
   },
   { timestamps: true }
 );

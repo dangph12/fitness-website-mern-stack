@@ -6,16 +6,5 @@ export interface IPlan {
   isPublic: boolean;
   description: string;
   userId: Types.ObjectId;
-  days: [
-    {
-      exercises: [
-        {
-          exerciseId: Types.ObjectId;
-          sets: number;
-          reps: number;
-          rest?: number;
-        }
-      ];
-    }
-  ];
+  workouts: Types.ObjectId[];
 }
