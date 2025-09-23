@@ -6,6 +6,8 @@ import { Outlet } from 'react-router';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Toaster } from '~/components/ui/sonner';
 import { fetchAvatar } from '~/store/features/avatar-slice';
+import HeaderLayout from './HeaderLayout';
+import FooterLayout from './FooterLayout';
 
 const RootLayout = () => {
   const dispatch = useDispatch();
@@ -20,14 +22,18 @@ const RootLayout = () => {
   return (
     <div>
       <div>
-        <div>Header</div>
-        <Avatar>
+        <div>
+          <HeaderLayout/>
+        </div>
+        {/* <Avatar>
           <AvatarImage src={avatarUrl} alt='User Avatar' />
           <AvatarFallback>U</AvatarFallback>
-        </Avatar>
+        </Avatar> */}
       </div>
       <Outlet />
-      <div>Footer</div>
+      <div>
+        <FooterLayout/>
+      </div>
       <Toaster position='top-right' theme={theme} />
     </div>
   );
