@@ -3,11 +3,11 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router';
 
+import Footer from '~/components/footer';
+import Header from '~/components/header';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Toaster } from '~/components/ui/sonner';
 import { fetchAvatar } from '~/store/features/avatar-slice';
-import HeaderLayout from './HeaderLayout';
-import FooterLayout from './FooterLayout';
 
 const RootLayout = () => {
   const dispatch = useDispatch();
@@ -23,7 +23,7 @@ const RootLayout = () => {
     <div>
       <div>
         <div>
-          <HeaderLayout/>
+          <Header />
         </div>
         {/* <Avatar>
           <AvatarImage src={avatarUrl} alt='User Avatar' />
@@ -32,7 +32,7 @@ const RootLayout = () => {
       </div>
       <Outlet />
       <div>
-        <FooterLayout/>
+        <Footer />
       </div>
       <Toaster position='top-right' theme={theme} />
     </div>

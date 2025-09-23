@@ -1,18 +1,19 @@
 import React from 'react';
-import BannerLayout from '~/layouts/BannerLayout';
-import CategoryBannerLayout from '~/layouts/CategoryBannerLayout';
-import PlanCoursesLayout from '~/layouts/PlanCoursesLayout';
-import UserFeedbackLayout from '~/layouts/UserFeedbackLayout';
 
-const Page = () => {
+import Banner from '~/components/banner';
+import CategoryBanner from '~/components/category-banner';
+import Feedback from '~/components/feedback';
+import PlanCourses from '~/components/plan-courses';
+
+function Page() {
   return (
-   <>
-    <BannerLayout/>
-    <CategoryBannerLayout/>
-    <UserFeedbackLayout/>
-    <PlanCoursesLayout/>
-   </>
+    <div>
+      <Banner />
+      <CategoryBanner />
+      <Feedback />
+      <PlanCourses />
+    </div>
   );
-};
+}
 
 export default Page;

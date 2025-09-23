@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Button } from '~/components/ui/button';
 
 const plans = [
@@ -55,7 +56,7 @@ const plans = [
   }
 ];
 
-const PlanCoursesLayout = () => {
+const PlanCourses = () => {
   return (
     <div className='bg-white text-gray-800 min-h-screen py-16'>
       <div className='text-center mb-12'>
@@ -106,4 +107,4 @@ const PlanCoursesLayout = () => {
   );
 };
 
-export default PlanCoursesLayout;
+export default PlanCourses;
