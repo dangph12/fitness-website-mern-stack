@@ -1,4 +1,10 @@
 #!/bin/bash
 set -e
 echo "=== Pre-commit hook starting ==="
-npx lint-staged
+
+# Use npx.cmd if it exists (Windows), otherwise use npx
+if command -v npx.cmd &> /dev/null; then
+    npx.cmd lint-staged
+else
+    npx lint-staged
+fi
