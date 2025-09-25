@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React from 'react';
 
 import { Button } from '~/components/ui/button';
@@ -70,16 +71,24 @@ const PlanCourses = () => {
         </p>
       </div>
 
-      <div className='flex justify-center gap-12 px-6 lg:px-24'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6 lg:px-24'>
         {plans.map((plan, index) => (
-          <div
+          <motion.div
             key={index}
-            className='bg-white p-8 rounded-xl shadow-lg w-80 transform transition-all hover:scale-105 hover:shadow-2xl'
+            className='bg-white p-8 rounded-xl shadow-lg w-full transform transition-all hover:scale-105 hover:shadow-2xl'
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true, amount: 0.2 }}
           >
             <h2 className='text-3xl font-semibold text-[#2F4A7E] mb-6'>
               {plan.title}
             </h2>
-            <p className='text-2xl font-bold text={plan.color} mb-6'>
+            <p
+              className='text-2xl font-bold'
+              style={{ color: plan.color }}
+              mb-6
+            >
               {plan.price}
             </p>
             <ul className='text-lg space-y-4 text-gray-600 mb-6'>
@@ -87,20 +96,26 @@ const PlanCourses = () => {
                 <li key={featureIndex}>{feature}</li>
               ))}
             </ul>
-            <Button
-              to={plan.buttonLink}
-              style={{ backgroundColor: plan.buttonColor }}
-              className='text-white py-3 px-8 rounded-full text-center w-full transition-transform duration-300'
-              onMouseEnter={e =>
-                (e.currentTarget.style.backgroundColor = plan.buttonHoverColor)
-              }
-              onMouseLeave={e =>
-                (e.currentTarget.style.backgroundColor = plan.buttonColor)
-              }
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
             >
-              {plan.buttonText}
-            </Button>
-          </div>
+              <Button
+                to={plan.buttonLink}
+                style={{ backgroundColor: plan.buttonColor }}
+                className='text-white py-3 px-8 rounded-full text-center w-full transition-transform duration-300'
+                onMouseEnter={e =>
+                  (e.currentTarget.style.backgroundColor =
+                    plan.buttonHoverColor)
+                }
+                onMouseLeave={e =>
+                  (e.currentTarget.style.backgroundColor = plan.buttonColor)
+                }
+              >
+                {plan.buttonText}
+              </Button>
+            </motion.div>
+          </motion.div>
         ))}
       </div>
     </div>
