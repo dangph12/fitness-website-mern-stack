@@ -1,16 +1,48 @@
 import { motion } from 'framer-motion';
-import React from 'react';
-import { FaUser } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaBars, FaTimes, FaUser } from 'react-icons/fa';
 import { Link } from 'react-router';
 
 import { Button } from '~/components/ui/button';
 
 import logo from '../assets/logo.png';
 
+const MenuItem = ({ label, links, isDropdown }) => (
+  <div
+    className={`relative group ${isDropdown ? 'lg:inline-block' : 'lg:inline-block'}`}
+  >
+    <motion.button
+      className='hover:text-gray-300 focus:outline-none text-lg'
+      whileHover={{ scale: 1.1 }}
+      transition={{ duration: 0.3 }}
+    >
+      {label}
+    </motion.button>
+    {isDropdown && (
+      <div className='absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-40 z-10'>
+        {links.map((link, index) => (
+          <Link
+            key={index}
+            to={link.href}
+            className='block px-4 py-2 hover:bg-gray-100'
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
   return (
     <header className='bg-[#F5F2EC] text-[#3067B6] px-6 py-3 flex items-center justify-between rounded-2xl'>
-      {/* Logo */}
       <motion.div
         className='flex items-center space-x-0.5'
         initial={{ opacity: 0, x: -50 }}
@@ -23,83 +55,46 @@ function Header() {
         </Link>
       </motion.div>
 
-      {/* Navigation Menu */}
+      <div className='lg:hidden flex items-center'>
+        <button onClick={toggleMenu} className='text-3xl'>
+          {menuOpen ? <FaTimes /> : <FaBars />}
+        </button>
+      </div>
+
       <motion.nav
-        className='flex space-x-10 font-bold relative'
+        className={`lg:flex space-x-10 font-bold relative ${menuOpen ? 'block' : 'hidden'} lg:block`}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        {/* Workout Dropdown */}
-        <div className='relative group'>
-          <motion.button
-            className='hover:text-gray-300 focus:outline-none text-lg'
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.3 }}
-          >
-            Workout
-          </motion.button>
-          <div className='absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-40'>
-            <a href='#abs' className='block px-4 py-2 hover:bg-gray-100'>
-              Abs Training
-            </a>
-            <a href='#legs' className='block px-4 py-2 hover:bg-gray-100'>
-              Legs Training
-            </a>
-            <a href='#arms' className='block px-4 py-2 hover:bg-gray-100'>
-              Arms Training
-            </a>
-          </div>
-        </div>
+        <MenuItem
+          label='Workout'
+          isDropdown={true}
+          links={[
+            { label: 'Abs Training', href: '#abs' },
+            { label: 'Legs Training', href: '#legs' },
+            { label: 'Arms Training', href: '#arms' }
+          ]}
+        />
+        <MenuItem
+          label='Courses'
+          isDropdown={true}
+          links={[
+            { label: 'Beginner', href: '#beginner' },
+            { label: 'Intermediate', href: '#intermediate' },
+            { label: 'Advanced', href: '#advanced' }
+          ]}
+        />
+        <MenuItem
+          label='Healthy Living'
+          isDropdown={true}
+          links={[
+            { label: 'Nutrition', href: '#nutrition' },
+            { label: 'Lifestyle', href: '#lifestyle' },
+            { label: 'Mental Health', href: '#mental' }
+          ]}
+        />
 
-        {/* Courses Dropdown */}
-        <div className='relative group'>
-          <motion.button
-            className='hover:text-gray-300 focus:outline-none text-lg'
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.3 }}
-          >
-            Courses
-          </motion.button>
-          <div className='absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-40'>
-            <a href='#beginner' className='block px-4 py-2 hover:bg-gray-100'>
-              Beginner
-            </a>
-            <a
-              href='#intermediate'
-              className='block px-4 py-2 hover:bg-gray-100'
-            >
-              Intermediate
-            </a>
-            <a href='#advanced' className='block px-4 py-2 hover:bg-gray-100'>
-              Advanced
-            </a>
-          </div>
-        </div>
-
-        {/* Healthy Living Dropdown */}
-        <div className='relative group'>
-          <motion.button
-            className='hover:text-gray-300 focus:outline-none text-lg'
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.3 }}
-          >
-            Healthy Living
-          </motion.button>
-          <div className='absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-48'>
-            <a href='#nutrition' className='block px-4 py-2 hover:bg-gray-100'>
-              Nutrition
-            </a>
-            <a href='#lifestyle' className='block px-4 py-2 hover:bg-gray-100'>
-              Lifestyle
-            </a>
-            <a href='#mental' className='block px-4 py-2 hover:bg-gray-100'>
-              Mental Health
-            </a>
-          </div>
-        </div>
-
-        {/* Other Menu Items */}
         <motion.div
           className='hover:text-gray-300 text-lg'
           whileHover={{ scale: 1.1 }}
@@ -123,7 +118,6 @@ function Header() {
         </motion.div>
       </motion.nav>
 
-      {/* Buttons */}
       <div className='flex space-x-5'>
         <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
           <Button className='bg-yellow-400 text-black px-5 py-2 rounded-full font-medium hover:bg-yellow-500 transition'>
