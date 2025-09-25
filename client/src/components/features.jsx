@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FaDumbbell, FaHeart, FaLemon, FaVideo } from 'react-icons/fa'; // Import icons từ React Icons
+import { FaDumbbell, FaHeart, FaLemon, FaVideo } from 'react-icons/fa';
 
 export default function Features() {
   return (
