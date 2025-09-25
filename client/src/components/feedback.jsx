@@ -23,7 +23,6 @@ export default function Feedback() {
         transition={{ duration: 1 }}
         viewport={{ once: true, amount: 0.5 }}
       >
-        {/* Testimonial 1 */}
         <div className='flex items-center bg-white p-6 rounded-xl shadow-lg w-100'>
           <div className='w-24 h-24 rounded-full bg-teal-200 flex items-center justify-center mr-6'>
             <FaUserAlt className='text-4xl text-teal-500' />
@@ -41,7 +40,6 @@ export default function Feedback() {
           </div>
         </div>
 
-        {/* Testimonial 2 */}
         <div className='flex items-center bg-white p-6 rounded-xl shadow-lg w-100'>
           <div className='w-24 h-24 rounded-full bg-teal-200 flex items-center justify-center mr-6'>
             <FaUserAlt className='text-4xl text-teal-500' />
@@ -59,7 +57,6 @@ export default function Feedback() {
           </div>
         </div>
 
-        {/* Testimonial 3 */}
         <div className='flex items-center bg-white p-6 rounded-xl shadow-lg w-100'>
           <div className='w-24 h-24 rounded-full bg-teal-200 flex items-center justify-center mr-6'>
             <FaUserAlt className='text-4xl text-teal-500' />
