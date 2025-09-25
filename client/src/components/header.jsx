@@ -11,12 +11,13 @@ function Header() {
     <header className='bg-[#F5F2EC] text-[#3067B6] px-6 py-3 flex items-center justify-between rounded-2xl'>
       <Link to='/' className='flex items-center space-x-0.5'>
         <img src={logo} alt='Logo' className='w-28 h-28' />
-        <span className='font-bold text-2xl mb-2'>F-Fitness</span>
+        <span className='font-bold text-3xl mb-2'>F-Fitness</span>{' '}
       </Link>
 
-      <nav className='flex space-x-10 font-bold relative'>
+      <nav className='flex space-x-10 font-bold text-lg relative'>
+        {' '}
         <div className='relative group'>
-          <button className='hover:text-gray-300 focus:outline-none'>
+          <button className='hover:text-gray-300 focus:outline-none text-lg'>
             Workout
           </button>
           <div className='absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-40'>
@@ -31,9 +32,8 @@ function Header() {
             </a>
           </div>
         </div>
-
         <div className='relative group'>
-          <button className='hover:text-gray-300 focus:outline-none'>
+          <button className='hover:text-gray-300 focus:outline-none text-lg'>
             Courses
           </button>
           <div className='absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-40'>
@@ -51,9 +51,8 @@ function Header() {
             </a>
           </div>
         </div>
-
         <div className='relative group'>
-          <button className='hover:text-gray-300 focus:outline-none'>
+          <button className='hover:text-gray-300 focus:outline-none text-lg'>
             Healthy Living
           </button>
           <div className='absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-48'>
@@ -68,10 +67,9 @@ function Header() {
             </a>
           </div>
         </div>
-
-        <div className='hover:text-gray-300'>Community</div>
-        <div className='hover:text-gray-300'>Challenging</div>
-        <div className='hover:text-gray-300'>About</div>
+        <div className='hover:text-gray-300 text-lg'>Community</div>{' '}
+        <div className='hover:text-gray-300 text-lg'>Challenging</div>{' '}
+        <div className='hover:text-gray-300 text-lg'>About</div>{' '}
       </nav>
 
       <div className='flex space-x-5'>
