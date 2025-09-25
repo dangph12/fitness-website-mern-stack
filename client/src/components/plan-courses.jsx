@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'; // Import Framer Motion
+import { motion } from 'framer-motion';
 import React from 'react';
 
 import { Button } from '~/components/ui/button';
@@ -71,15 +71,15 @@ const PlanCourses = () => {
         </p>
       </div>
 
-      <div className='flex justify-center gap-12 px-6 lg:px-24'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6 lg:px-24'>
         {plans.map((plan, index) => (
           <motion.div
             key={index}
-            className='bg-white p-8 rounded-xl shadow-lg w-80 transform transition-all hover:scale-105 hover:shadow-2xl'
-            initial={{ opacity: 0, y: 50 }} // initial fade-in effect
-            whileInView={{ opacity: 1, y: 0 }} // fade-in and slide-up effect when the element is in view
-            transition={{ duration: 0.8 }} // transition duration
-            viewport={{ once: true, amount: 0.2 }} // Trigger once the element enters the viewport
+            className='bg-white p-8 rounded-xl shadow-lg w-full transform transition-all hover:scale-105 hover:shadow-2xl'
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true, amount: 0.2 }}
           >
             <h2 className='text-3xl font-semibold text-[#2F4A7E] mb-6'>
               {plan.title}
@@ -97,7 +97,7 @@ const PlanCourses = () => {
               ))}
             </ul>
             <motion.div
-              whileHover={{ scale: 1.05 }} // Scale effect on hover
+              whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.3 }}
             >
               <Button
