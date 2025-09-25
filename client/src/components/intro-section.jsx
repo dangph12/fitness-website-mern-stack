@@ -4,16 +4,16 @@ import yoga from '../assets/yoga.png';
 
 export default function IntroSection() {
   return (
-    <div className='flex items-center justify-center py-20 px-8 bg-white'>
+    <div className='flex items-center justify-center py-12 sm:py-20 px-8 bg-white'>
       <motion.div
-        className='flex items-center max-w-screen-xl mx-auto'
+        className='flex flex-col lg:flex-row items-center max-w-screen-xl mx-auto'
         initial={{ opacity: 0, x: -50 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true, amount: 0.5 }}
       >
-        <div className='w-1/2 p-4'>
-          <div className='relative w-full h-[500px] mx-auto rounded-full overflow-hidden bg-teal-200'>
+        <div className='w-full lg:w-1/2 p-4'>
+          <div className='relative w-full h-[350px] sm:h-[450px] lg:h-[500px] mx-auto rounded-full overflow-hidden bg-teal-200'>
             <img
               src={yoga}
               alt='Yoga Image'
@@ -23,11 +23,11 @@ export default function IntroSection() {
           </div>
         </div>
 
-        <div className='w-1/2 p-8'>
-          <h2 className='text-4xl font-bold text-gray-900 mb-4'>
+        <div className='w-full lg:w-1/2 p-8'>
+          <h2 className='text-3xl sm:text-4xl font-bold text-gray-900 mb-4'>
             Bring The Healthiest Change in Your Life by Yoga
           </h2>
-          <p className='text-lg text-gray-600 mb-6'>
+          <p className='text-base sm:text-lg text-gray-600 mb-6'>
             Aenean auctor wisi et urna. Aliquam erat volutpat. Duis ac turpis.
             Integer rutrum ante eu lacus. Vivamus eget nibh.
           </p>
