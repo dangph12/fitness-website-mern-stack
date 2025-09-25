@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React from 'react';
 import {
   FaBicycle,
@@ -88,9 +89,10 @@ const categories = [
     icon: <FaSwimmer className='h-8 w-8 text-white' />
   }
 ];
+
 function CategoryBanner() {
   return (
-    <div className='text-white min-h-screen p-30'>
+    <div className='text-white min-h-screen p-8'>
       <h1 className='text-4xl font-bold text-center mb-10 text-[#3067B6]'>
         Workout Categories
       </h1>
@@ -99,11 +101,20 @@ function CategoryBanner() {
         started today!
       </p>
 
-      <div className='grid grid-cols-3 gap-8'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'>
         {categories.map((category, index) => (
-          <div
+          <motion.div
             key={index}
             className={`flex flex-col items-center ${category.color} p-6 rounded-lg`}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true, amount: 0.2 }}
+            whileHover={{
+              scale: 1.05,
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+              backgroundColor: `${category.color}`
+            }}
           >
             {category.icon}
             <h2 className='text-2xl font-semibold mt-4'>{category.name}</h2>
@@ -111,7 +122,7 @@ function CategoryBanner() {
             <Button className='mt-4 px-6 py-2 bg-white text-black rounded-full'>
               Join Now
             </Button>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
