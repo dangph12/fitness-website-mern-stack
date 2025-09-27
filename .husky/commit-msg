@@ -1,4 +1,10 @@
 #!/bin/bash
 set -e
 echo "=== Commit-msg hook starting ==="
-npx --no -- commitlint --edit "$1"
+
+# Use npx.cmd if it exists (Windows), otherwise use npx
+if command -v npx.cmd &> /dev/null; then
+    npx.cmd --no -- commitlint --edit "$1"
+else
+    npx --no -- commitlint --edit "$1"
+fi

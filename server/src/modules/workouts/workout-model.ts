@@ -7,7 +7,7 @@ const WorkoutSchema = new Schema<IWorkout>(
     title: { type: String, required: true },
     image: { type: String, default: '' },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    planId: { type: Schema.Types.ObjectId, ref: 'Plan', required: true },
+    planId: { type: Schema.Types.ObjectId, ref: 'Plan' },
     exercises: [
       {
         exerciseId: {
