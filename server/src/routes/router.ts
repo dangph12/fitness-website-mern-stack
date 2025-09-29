@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import authorize from '~/middleware/authorize';
 import AuthRoutes from '~/modules/auth/auth-route';
+import EquipmentRoute from '~/modules/equipments/equipment-route';
 import FoodRoute from '~/modules/foods/food-route';
 import UserRoute from '~/modules/users/user-route';
 
@@ -14,5 +15,8 @@ router.use('/users', UserRoute);
 
 // Food routes
 router.use('/foods', FoodRoute);
+
+// Equipment routes
+router.use('/equipments', EquipmentRoute);
 
 export default router;
