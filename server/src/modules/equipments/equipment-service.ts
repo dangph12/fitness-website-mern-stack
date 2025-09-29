@@ -4,7 +4,7 @@ import EquipmentModel from './equipment-model';
 import { IEquipment } from './equipment-type';
 
 const EquipmentService = {
-  find: async () => {
+  findAll: async () => {
     const equipments = await EquipmentModel.find();
     if (!equipments) {
       throw createHttpError(404, 'No equipments found');

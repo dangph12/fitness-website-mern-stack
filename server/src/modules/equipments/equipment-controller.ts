@@ -5,8 +5,8 @@ import ApiResponse from '~/types/api-response';
 import EquipmentService from './equipment-service';
 
 const EquipmentController = {
-  find: async (req: Request, res: Response) => {
-    const equipments = await EquipmentService.find();
+  findAll: async (req: Request, res: Response) => {
+    const equipments = await EquipmentService.findAll();
 
     return res
       .status(200)
