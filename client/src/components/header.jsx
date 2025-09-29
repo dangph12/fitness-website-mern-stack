@@ -85,16 +85,13 @@ function Header() {
             { label: 'Advanced', href: '#advanced' }
           ]}
         />
-        <MenuItem
-          label='Healthy Living'
-          isDropdown={true}
-          links={[
-            { label: 'Nutrition', href: '#nutrition' },
-            { label: 'Lifestyle', href: '#lifestyle' },
-            { label: 'Mental Health', href: '#mental' }
-          ]}
-        />
-
+        <motion.div
+          className='hover:text-gray-300 text-lg'
+          whileHover={{ scale: 1.1 }}
+          transition={{ duration: 0.3 }}
+        >
+          Nutrition
+        </motion.div>
         <motion.div
           className='hover:text-gray-300 text-lg'
           whileHover={{ scale: 1.1 }}
