@@ -8,7 +8,9 @@ const MuscleController = {
   findAll: async (req: Request, res: Response) => {
     const muscles = await MuscleService.findAll();
 
-    return muscles;
+    return res
+      .status(200)
+      .json(ApiResponse.success('Muscles retrieved successfully', muscles));
   },
 
   findById: async (req: Request, res: Response) => {
