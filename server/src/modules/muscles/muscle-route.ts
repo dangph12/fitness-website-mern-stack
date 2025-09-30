@@ -8,7 +8,22 @@ import MuscleValidationSchema from './muscle-validation';
 
 const router: Router = express.Router();
 
-// Get a single food
+router.get('/', asyncHandler(MuscleController.findAll));
+
 router.get('/:id', asyncHandler(MuscleController.findById));
+
+router.post(
+  '/',
+  validate(MuscleValidationSchema.shape),
+  asyncHandler(MuscleController.create)
+);
+
+router.put(
+  '/',
+  validate(MuscleValidationSchema.shape),
+  asyncHandler(MuscleController.update)
+);
+
+router.delete('/:id', asyncHandler(MuscleController.remove));
 
 export default router;
