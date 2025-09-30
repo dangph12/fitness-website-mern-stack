@@ -1,8 +1,10 @@
 import createHttpError from 'http-errors';
+import { Types } from 'mongoose';
+
+import { uploadImage } from '~/utils/cloudinary';
 
 import MuscleModel from './muscle-model';
 import { IMuscle } from './muscle-type';
-import { uploadImage } from '~/utils/cloudinary';
 
 const MuscleService = {
   findAll: async () => {
@@ -12,6 +14,10 @@ const MuscleService = {
   },
 
   findById: async (muscleId: string) => {
+    if (!Types.ObjectId.isValid(muscleId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
     const muscle = await MuscleModel.findById(muscleId);
 
     if (!muscle) {
@@ -60,6 +66,10 @@ const MuscleService = {
     updateData: Partial<IMuscle>,
     file?: Express.Multer.File
   ) => {
+    if (!Types.ObjectId.isValid(muscleId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
     const existingMuscle = await MuscleModel.findById(muscleId);
     if (!existingMuscle) {
       throw createHttpError(404, 'Muscle not found');
@@ -101,6 +111,10 @@ const MuscleService = {
   },
 
   remove: async (muscleId: string) => {
+    if (!Types.ObjectId.isValid(muscleId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
     const muscle = await MuscleModel.findByIdAndDelete(muscleId);
 
     if (!muscle) {
