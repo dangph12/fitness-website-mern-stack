@@ -1,10 +1,8 @@
-#!/bin/bash
-set -e
-echo "=== Commit-msg hook starting ==="
+#!/bin/sh
+. "$(dirname -- "$0")/_/husky.sh"
 
-# Use npx.cmd if it exists (Windows), otherwise use npx
-if command -v npx.cmd &> /dev/null; then
-    npx.cmd --no -- commitlint --edit "$1"
+if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "win32" ]]; then
+  npx.cmd --no -- commitlint --edit $1
 else
-    npx --no -- commitlint --edit "$1"
+  npx --no -- commitlint --edit $1
 fi
