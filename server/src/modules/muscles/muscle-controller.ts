@@ -32,7 +32,11 @@ const MuscleController = {
   update: async (req: Request, res: Response) => {
     const muscleId = req.params.id;
     const updateData = req.body;
-    const updatedMuscle = await MuscleService.update(muscleId, updateData);
+    const updatedMuscle = await MuscleService.update(
+      muscleId,
+      updateData,
+      req.file
+    );
     return res
       .status(200)
       .json(ApiResponse.success('Muscle updated successfully', updatedMuscle));
