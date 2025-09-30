@@ -9,7 +9,7 @@ import EquipmentValidationSchema from './equipment-validation';
 const router: Router = express.Router();
 
 // Get All Equipments
-router.get('/', asyncHandler(EquipmentController.find));
+router.get('/', asyncHandler(EquipmentController.findAll));
 
 // Create Equipment
 router.post(
@@ -22,7 +22,7 @@ router.post(
 router.get('/:id', asyncHandler(EquipmentController.findById));
 
 // Update equipment, because some fields are optional, we use partial validation
-router.patch(
+router.put(
   '/:id',
   validate(EquipmentValidationSchema.partial().shape),
   asyncHandler(EquipmentController.update)
