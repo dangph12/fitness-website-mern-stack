@@ -46,8 +46,8 @@ const MuscleController = {
     const muscleId = req.params.id;
     await MuscleService.remove(muscleId);
     return res
-      .status(204)
-      .json(ApiResponse.success('Muscle deleted successfully', null));
+      .status(200)
+      .json(ApiResponse.success('Muscle deleted successfully'));
   }
 };
 
