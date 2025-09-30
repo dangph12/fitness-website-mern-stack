@@ -15,15 +15,15 @@ router.get('/:id', asyncHandler(MuscleController.findById));
 
 router.post(
   '/',
-  validate(MuscleValidationSchema.shape),
   uploadSingle('image'),
+  validate(MuscleValidationSchema.shape),
   asyncHandler(MuscleController.create)
 );
 
 router.put(
   '/',
-  validate(MuscleValidationSchema.shape),
   uploadSingle('image'),
+  validate(MuscleValidationSchema.shape),
   asyncHandler(MuscleController.update)
 );
 

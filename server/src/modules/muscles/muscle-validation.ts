@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
 const MuscleValidation = {
-  title: z.string(),
-  image: z.string(),
+  title: z.string()
 };
 
 const MuscleValidationSchema = z.object(MuscleValidation);
