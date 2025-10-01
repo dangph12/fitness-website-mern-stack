@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router'; // Import useNavigate
+import { useNavigate } from 'react-router';
 
 import { fetchMeals } from '~/store/features/meal-slice';
 
@@ -27,6 +27,17 @@ const MealsList = () => {
 
   const handleCloseDetails = () => {
     setSelectedMeal(null);
+  };
+
+  const getTotalNutrients = foods => {
+    return foods.reduce(
+      (totals, food) => {
+        totals.calories += food.foodId.calories * food.quantity;
+        totals.fats += food.foodId.fats * food.quantity;
+        return totals;
+      },
+      { calories: 0, fats: 0 }
+    );
   };
 
   if (loading)
@@ -113,6 +124,25 @@ const MealsList = () => {
                 </li>
               ))}
             </ul>
+
+            {selectedMeal.foods && (
+              <div className='text-center mb-6 mt-10'>
+                <div className='flex justify-center space-x-8 bg-gradient-to-r from-blue-400 to-blue-300 p-4 rounded-lg shadow-lg'>
+                  <div className='text-white font-medium'>
+                    <p className='text-xl'>Total Calories</p>
+                    <p className='text-2xl'>
+                      {getTotalNutrients(selectedMeal.foods).calories} kcal
+                    </p>
+                  </div>
+                  <div className='text-white font-medium'>
+                    <p className='text-xl'>Total Fat</p>
+                    <p className='text-2xl'>
+                      {getTotalNutrients(selectedMeal.foods).fats} g
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
