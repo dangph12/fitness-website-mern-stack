@@ -11,9 +11,13 @@ const MealSchema = new Schema<IMeal>(
       enum: ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Brunch', 'Dessert'],
       required: true
     },
-    quantity: { type: Number, required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    foods: [{ type: Schema.Types.ObjectId, ref: 'Food' }]
+    foods: [
+      {
+        foodId: { type: Schema.Types.ObjectId, ref: 'Food', required: true },
+        quantity: { type: Number, required: true }
+      }
+    ]
   },
   { timestamps: true }
 );

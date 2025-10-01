@@ -15,10 +15,25 @@ const MealValidationSchema = z.object({
     return val;
   }, z.number()),
   userId: z.string(),
-  foods: z.preprocess(val => {
-    if (typeof val === 'string') return val.split(',');
-    return val;
-  }, z.array(z.string()))
+  foods: z.preprocess(
+    val => {
+      if (Array.isArray(val)) {
+        return val.map(food => {
+          return {
+            foodId: z.string().parse(food.foodId),
+            quantity: z.number().parse(food.quantity)
+          };
+        });
+      }
+      return val;
+    },
+    z.array(
+      z.object({
+        foodId: z.string(),
+        quantity: z.number().positive()
+      })
+    )
+  )
 });
 
 export default MealValidationSchema;
