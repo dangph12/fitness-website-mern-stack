@@ -1,8 +1,6 @@
 import React from 'react';
 import { FaBarcode, FaBook, FaRunning } from 'react-icons/fa';
 
-import NutriBanner from './nutri-banner';
-
 const NutriBanner2 = () => {
   return (
     <div className='bg-white py-16 px-6 flex flex-col items-center justify-center text-center'>
