@@ -85,34 +85,18 @@ function Header() {
             { label: 'Advanced', href: '#advanced' }
           ]}
         />
-        <motion.div
-          className='hover:text-gray-300 text-lg'
-          whileHover={{ scale: 1.1 }}
-          transition={{ duration: 0.3 }}
-        >
+        <Link to='/nutrition' className='hover:text-gray-300 text-lg'>
           Nutrition
-        </motion.div>
-        <motion.div
-          className='hover:text-gray-300 text-lg'
-          whileHover={{ scale: 1.1 }}
-          transition={{ duration: 0.3 }}
-        >
+        </Link>
+        <Link to='/community' className='hover:text-gray-300 text-lg'>
           Community
-        </motion.div>
-        <motion.div
-          className='hover:text-gray-300 text-lg'
-          whileHover={{ scale: 1.1 }}
-          transition={{ duration: 0.3 }}
-        >
+        </Link>
+        <Link to='/challenging' className='hover:text-gray-300 text-lg'>
           Challenging
-        </motion.div>
-        <motion.div
-          className='hover:text-gray-300 text-lg'
-          whileHover={{ scale: 1.1 }}
-          transition={{ duration: 0.3 }}
-        >
+        </Link>
+        <Link to='/about' className='hover:text-gray-300 text-lg'>
           About
-        </motion.div>
+        </Link>
       </motion.nav>
 
       <div className='flex space-x-5'>
