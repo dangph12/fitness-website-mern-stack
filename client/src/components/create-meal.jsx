@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { createMeal } from '~/store/features/meal-slice'; // Import action createMeal
+import { createMeal } from '~/store/features/meal-slice';
 
-import FoodList from './food-list'; // Import component FoodList
+import FoodList from './food-list';
 
 const CreateMeal = () => {
   const dispatch = useDispatch();
-  const userId = useSelector(state => state.auth.user.id); // Get userId from Redux
-  const { foods } = useSelector(state => state.foods.foods); // Get foods from Redux
+  const userId = useSelector(state => state.auth.user.id);
+  const { foods } = useSelector(state => state.foods.foods);
 
   const [title, setTitle] = useState('');
   const [mealType, setMealType] = useState('Breakfast');
@@ -17,11 +17,10 @@ const CreateMeal = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Function to handle meal creation when the "Create Meal" button is clicked
   const handleCreateMeal = async () => {
     if (selectedFoods.length === 0) {
       alert('Please select some foods before creating the meal!');
-      return; // Don't proceed if no food is selected
+      return;
     }
 
     const formData = new FormData();
@@ -39,15 +38,13 @@ const CreateMeal = () => {
     setError(null);
 
     try {
-      // Dispatch the meal creation action
       await dispatch(createMeal(formData));
       alert('Meal created successfully!');
 
-      // Reset the form after meal creation
       setTitle('');
       setMealType('Breakfast');
       setImage(null);
-      setSelectedFoods([]); // Clear selected foods after successful creation
+      setSelectedFoods([]);
     } catch (err) {
       setError('Failed to create meal');
       console.error('Error:', err);
@@ -56,7 +53,6 @@ const CreateMeal = () => {
     }
   };
 
-  // Handle image change for meal creation
   const handleImageChange = e => {
     setImage(e.target.files[0]);
   };
@@ -100,7 +96,6 @@ const CreateMeal = () => {
           </select>
         </div>
 
-        {/* Food Selection */}
         <FoodList
           selectedFoods={selectedFoods}
           setSelectedFoods={setSelectedFoods}
@@ -132,7 +127,6 @@ const CreateMeal = () => {
           </div>
         )}
 
-        {/* Create Meal Button */}
         <button
           type='button'
           onClick={handleCreateMeal}
