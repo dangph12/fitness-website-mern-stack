@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { FaClipboardList, FaHamburger, FaPhotoVideo } from 'react-icons/fa'; // Import icons
-import { MdFileUpload } from 'react-icons/md'; // Import file upload icon
+import { FaClipboardList, FaHamburger, FaPhotoVideo } from 'react-icons/fa';
+import { MdFileUpload } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { createMeal } from '~/store/features/meal-slice';
