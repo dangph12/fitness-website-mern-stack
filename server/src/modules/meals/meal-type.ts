@@ -6,5 +6,5 @@ export interface IMeal {
   mealType: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Brunch' | 'Dessert';
   quantity: number;
   userId: Types.ObjectId;
-  foods: [Types.ObjectId];
+  foods: { foodId: Types.ObjectId; quantity: number }[];
 }
