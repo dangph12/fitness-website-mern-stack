@@ -28,6 +28,17 @@ const MealService = {
   },
 
   create: async (mealData: IMeal, file?: Express.Multer.File) => {
+    if (!Types.ObjectId.isValid(mealData.userId)) {
+      throw createHttpError(400, 'Invalid userId');
+    }
+
+    if (
+      mealData.foods &&
+      !mealData.foods.every(foodId => Types.ObjectId.isValid(foodId))
+    ) {
+      throw createHttpError(400, 'One or more food IDs are invalid');
+    }
+
     const existingMeal = await MealModel.findOne({
       title: mealData.title
     });
@@ -66,6 +77,17 @@ const MealService = {
   ) => {
     if (!Types.ObjectId.isValid(mealId)) {
       throw createHttpError(400, 'Invalid ObjectId');
+    }
+
+    if (updateData.userId && !Types.ObjectId.isValid(updateData.userId)) {
+      throw createHttpError(400, 'Invalid userId');
+    }
+
+    if (
+      updateData.foods &&
+      !updateData.foods.every(foodId => Types.ObjectId.isValid(foodId))
+    ) {
+      throw createHttpError(400, 'One or more food IDs are invalid');
     }
 
     const existingMeal = await MealModel.findById(mealId);
