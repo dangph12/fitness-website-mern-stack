@@ -1,4 +1,7 @@
 import createHttpError from 'http-errors';
+import { Types } from 'mongoose';
+
+import { uploadImage } from '~/utils/cloudinary';
 
 import FoodModel from './food-model';
 import { IFood } from './food-type';
@@ -39,6 +42,10 @@ const FoodService = {
   },
 
   findById: async (foodId: string) => {
+    if (!Types.ObjectId.isValid(foodId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
     const food = await FoodModel.findById(foodId);
 
     if (!food) {
@@ -48,13 +55,30 @@ const FoodService = {
     return food;
   },
 
-  create: async (foodData: IFood) => {
+  create: async (foodData: IFood, file?: Express.Multer.File) => {
+    if (!file) {
+      throw createHttpError(400, 'No file provided');
+    }
+
     const existingFood = await FoodModel.findOne({ title: foodData.title });
     if (existingFood) {
       throw createHttpError(409, 'Food with this title already exists');
     }
 
-    const newFood = FoodModel.create(foodData);
+    const uploadResult = await uploadImage(file.buffer);
+
+    if (!uploadResult.success || !uploadResult.data) {
+      throw createHttpError(
+        500,
+        uploadResult.error || 'Failed to upload image'
+      );
+    }
+
+    const imageUrl = uploadResult.data.secure_url;
+
+    const newFoodData = { ...foodData, image: imageUrl };
+
+    const newFood = await FoodModel.create(newFoodData);
     if (!newFood) {
       throw createHttpError(500, 'Failed to create food');
     }
@@ -62,11 +86,46 @@ const FoodService = {
     return newFood;
   },
 
-  update: async (foodId: string, updateData: Partial<IFood>) => {
-    const updatedFood = await FoodModel.findByIdAndUpdate(foodId, updateData, {
-      new: true,
-      runValidators: true
-    });
+  update: async (
+    foodId: string,
+    updateData: Partial<IFood>,
+    file?: Express.Multer.File
+  ) => {
+    if (!Types.ObjectId.isValid(foodId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
+    const existingFood = await FoodModel.findById(foodId);
+    if (!existingFood) {
+      throw createHttpError(404, 'Food not found');
+    }
+
+    let imageUrl: string | undefined;
+    if (file) {
+      const uploadResult = await uploadImage(file.buffer);
+
+      if (!uploadResult.success || !uploadResult.data) {
+        throw createHttpError(
+          500,
+          uploadResult.error || 'Failed to upload image'
+        );
+      }
+
+      imageUrl = uploadResult.data.secure_url;
+    }
+
+    const updatedFoodData = {
+      ...updateData,
+      image: imageUrl || existingFood.image
+    };
+    const updatedFood = await FoodModel.findByIdAndUpdate(
+      foodId,
+      updatedFoodData,
+      {
+        new: true,
+        runValidators: true
+      }
+    );
 
     if (!updatedFood) {
       throw createHttpError(404, 'Food not found');
@@ -76,6 +135,10 @@ const FoodService = {
   },
 
   remove: async (foodId: string) => {
+    if (!Types.ObjectId.isValid(foodId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
     const food = await FoodModel.findByIdAndDelete(foodId);
 
     if (!food) {
