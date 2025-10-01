@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import { deleteMeal, fetchMeals } from '~/store/features/meal-slice'; // Import deleteMeal action
+import { deleteMeal, fetchMeals } from '~/store/features/meal-slice';
 
 import UserCard from './user-card';
 
@@ -42,7 +42,7 @@ const MealsList = () => {
 
   const handleDeleteMeal = mealId => {
     if (window.confirm('Are you sure you want to delete this meal?')) {
-      dispatch(deleteMeal(mealId)); // Dispatch delete action
+      dispatch(deleteMeal(mealId));
     }
   };
 
@@ -58,7 +58,6 @@ const MealsList = () => {
     <div className='max-w-7xl mx-auto p-6'>
       <h1 className='text-3xl font-semibold mb-8'>Meals List</h1>
 
-      {/* Displaying meal cards */}
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
         {meals.map(meal => (
           <div
@@ -75,17 +74,16 @@ const MealsList = () => {
               <h2 className='text-xl font-semibold'>{meal.title}</h2>
               <p className='text-sm text-gray-500 mt-2'>{meal.mealType}</p>
 
-              {/* Buttons for Edit and Delete */}
               <div className='mt-4 flex justify-between space-x-2'>
                 <button
                   className='w-full bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500'
-                  onClick={() => handleSelectMeal(meal)} // Edit button
+                  onClick={() => handleSelectMeal(meal)}
                 >
                   Edit
                 </button>
                 <button
                   className='w-full bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600'
-                  onClick={() => handleDeleteMeal(meal._id)} // Delete button
+                  onClick={() => handleDeleteMeal(meal._id)}
                 >
                   Delete
                 </button>
@@ -95,7 +93,6 @@ const MealsList = () => {
         ))}
       </div>
 
-      {/* Show details of selected meal */}
       {selectedMeal && (
         <div className='fixed inset-0 bg-opacity-30 backdrop-blur-xs flex justify-center items-center z-50'>
           <div className='bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl relative'>
