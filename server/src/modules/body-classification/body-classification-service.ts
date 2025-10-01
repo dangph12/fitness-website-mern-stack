@@ -58,7 +58,7 @@ const BodyClassificationService = {
     const existingBodyClassification =
       await BodyClassificationModel.findById(bodyClassificationId);
     if (!existingBodyClassification) {
-      throw createHttpError(404, 'BodyClassification not found');
+      throw createHttpError(404, 'Body classification not found');
     }
 
     const updatedBodyClassification =
