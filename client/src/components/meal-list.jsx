@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import { fetchMeals } from '~/store/features/meal-slice';
+import { deleteMeal, fetchMeals } from '~/store/features/meal-slice'; // Import deleteMeal action
 
 import UserCard from './user-card';
 
 const MealsList = () => {
   const dispatch = useDispatch();
-  const { meals, loading, error } = useSelector(state => state.meals);
-
-  const [selectedMeal, setSelectedMeal] = useState(null);
   const navigate = useNavigate();
+
+  const { meals, loading, error } = useSelector(state => state.meals);
+  const [selectedMeal, setSelectedMeal] = useState(null);
 
   useEffect(() => {
     dispatch(fetchMeals({ page: 1, limit: 10 }));
@@ -40,6 +40,12 @@ const MealsList = () => {
     );
   };
 
+  const handleDeleteMeal = mealId => {
+    if (window.confirm('Are you sure you want to delete this meal?')) {
+      dispatch(deleteMeal(mealId)); // Dispatch delete action
+    }
+  };
+
   if (loading)
     return (
       <div className='flex justify-center items-center min-h-screen'>
@@ -52,26 +58,44 @@ const MealsList = () => {
     <div className='max-w-7xl mx-auto p-6'>
       <h1 className='text-3xl font-semibold mb-8'>Meals List</h1>
 
+      {/* Displaying meal cards */}
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
         {meals.map(meal => (
           <div
             key={meal._id}
-            className='bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow duration-300'
-            onClick={() => handleSelectMeal(meal)}
+            className='bg-white rounded-lg shadow-lg overflow-hidden transition-shadow duration-300 hover:shadow-2xl'
           >
             <img
               src={meal.image}
               alt={meal.title}
               className='w-full h-48 object-cover rounded-t-lg'
+              onClick={() => handleSelectMeal(meal)}
             />
             <div className='p-4'>
               <h2 className='text-xl font-semibold'>{meal.title}</h2>
               <p className='text-sm text-gray-500 mt-2'>{meal.mealType}</p>
+
+              {/* Buttons for Edit and Delete */}
+              <div className='mt-4 flex justify-between space-x-2'>
+                <button
+                  className='w-full bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500'
+                  onClick={() => handleSelectMeal(meal)} // Edit button
+                >
+                  Edit
+                </button>
+                <button
+                  className='w-full bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600'
+                  onClick={() => handleDeleteMeal(meal._id)} // Delete button
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
+      {/* Show details of selected meal */}
       {selectedMeal && (
         <div className='fixed inset-0 bg-opacity-30 backdrop-blur-xs flex justify-center items-center z-50'>
           <div className='bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl relative'>
