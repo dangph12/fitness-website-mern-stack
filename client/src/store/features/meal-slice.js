@@ -117,16 +117,16 @@ export const mealSlice = createSlice({
           meal => meal._id === action.payload._id
         );
         if (index !== -1) {
-          state.meals[index] = action.payload; // Update the meal in the list
+          state.meals[index] = action.payload;
         }
         if (state.currentMeal?._id === action.payload._id) {
-          state.currentMeal = action.payload; // Update current meal if it matches
+          state.currentMeal = action.payload;
         }
       })
 
       // Delete meal
       .addCase(deleteMeal.fulfilled, (state, action) => {
-        state.meals = state.meals.filter(meal => meal._id !== action.payload); // Remove the meal from the list
+        state.meals = state.meals.filter(meal => meal._id !== action.payload);
       });
   }
 });
