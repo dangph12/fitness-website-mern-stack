@@ -1,8 +1,6 @@
 import createHttpError from 'http-errors';
 import { Types } from 'mongoose';
 
-import { uploadImage } from '~/utils/cloudinary';
-
 import BodyClassificationModel from './body-classification-model';
 import { IBodyClassification } from './body-classification-type';
 
