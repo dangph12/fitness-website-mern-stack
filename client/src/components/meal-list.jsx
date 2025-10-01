@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router'; // Import useNavigate
 
 import { fetchMeals } from '~/store/features/meal-slice';
 
@@ -10,6 +11,7 @@ const MealsList = () => {
   const { meals, loading, error } = useSelector(state => state.meals);
 
   const [selectedMeal, setSelectedMeal] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchMeals({ page: 1, limit: 10 }));
@@ -17,6 +19,10 @@ const MealsList = () => {
 
   const handleSelectMeal = meal => {
     setSelectedMeal(meal);
+  };
+
+  const handleSelectFood = foodId => {
+    navigate(`/nutrition/food/${foodId}`);
   };
 
   const handleCloseDetails = () => {
@@ -79,35 +85,34 @@ const MealsList = () => {
 
             <UserCard user={selectedMeal.userId} />
 
-            <div className='mt-10'>
-              <h3 className='text-xl font-semibold mb-2'>Foods in this Meal</h3>
-              <ul className='space-y-4'>
-                {selectedMeal.foods.map(food => (
-                  <li
-                    key={food._id}
-                    className='flex items-center space-x-4 border border-gray-300 p-4 rounded-lg hover:shadow-lg transition-all'
-                  >
-                    <img
-                      src={food.foodId.image}
-                      alt={food.foodId.title}
-                      className='w-16 h-16 object-cover rounded-full'
-                    />
-                    <div className='flex-1'>
-                      <p className='font-medium'>{food.foodId.title}</p>
-                      <p className='text-sm text-gray-600'>
-                        Quantity: {food.quantity} units
-                      </p>
-                      <p className='text-sm text-gray-500'>
-                        Calories: {food.foodId.calories} kcal
-                      </p>
-                      <p className='text-sm text-gray-500'>
-                        Fat: {food.foodId.fats} g
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <h3 className='text-xl font-semibold mb-2'>Foods in this Meal</h3>
+            <ul className='space-y-4'>
+              {selectedMeal.foods.map(food => (
+                <li
+                  key={food._id}
+                  className='flex items-center space-x-4 border border-gray-300 p-4 rounded-lg hover:shadow-lg transition-all cursor-pointer'
+                  onClick={() => handleSelectFood(food.foodId._id)} // Navigate to food details
+                >
+                  <img
+                    src={food.foodId.image}
+                    alt={food.foodId.title}
+                    className='w-16 h-16 object-cover rounded-full'
+                  />
+                  <div className='flex-1'>
+                    <p className='font-medium'>{food.foodId.title}</p>
+                    <p className='text-sm text-gray-600'>
+                      Quantity: {food.quantity} units
+                    </p>
+                    <p className='text-sm text-gray-500'>
+                      Calories: {food.foodId.calories} kcal
+                    </p>
+                    <p className='text-sm text-gray-500'>
+                      Fat: {food.foodId.fats} g
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
