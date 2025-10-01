@@ -23,6 +23,8 @@ const MuscleService = {
     if (!muscle) {
       throw createHttpError(404, 'Muscle not found');
     }
+
+    return muscle;
   },
 
   create: async (muscleData: IMuscle, file?: Express.Multer.File) => {
@@ -37,23 +39,20 @@ const MuscleService = {
       throw createHttpError(409, 'Muscle with this title already exists');
     }
 
-    let imageUrl: string | undefined;
-    if (file) {
-      const uploadResult = await uploadImage(file.buffer);
+    const uploadResult = await uploadImage(file.buffer);
 
-      if (!uploadResult.success || !uploadResult.data) {
-        throw createHttpError(
-          500,
-          uploadResult.error || 'Failed to upload image'
-        );
-      }
-
-      imageUrl = uploadResult.data.secure_url;
+    if (!uploadResult.success || !uploadResult.data) {
+      throw createHttpError(
+        500,
+        uploadResult.error || 'Failed to upload image'
+      );
     }
+
+    const imageUrl = uploadResult.data.secure_url;
 
     const newMuscleData = { ...muscleData, image: imageUrl };
 
-    const newMuscle = MuscleModel.create(newMuscleData);
+    const newMuscle = await MuscleModel.create(newMuscleData);
     if (!newMuscle) {
       throw createHttpError(500, 'Failed to create muscle');
     }
