@@ -2,12 +2,21 @@ import { z } from 'zod';
 
 const FoodValidation = {
   title: z.string(),
-  image: z.string(),
-  unit: z.number(),
-  calories: z.number(),
-  proteins: z.number(),
-  carbs: z.number(),
-  fats: z.number(),
+  unit: z.preprocess(val => {
+    if (typeof val === 'string') return parseInt(val, 10);
+  }, z.number()),
+  protein: z.preprocess(val => {
+    if (typeof val === 'string') return parseInt(val, 10);
+  }, z.number()),
+  fat: z.preprocess(val => {
+    if (typeof val === 'string') return parseInt(val, 10);
+  }, z.number()),
+  carbonhydrate: z.preprocess(val => {
+    if (typeof val === 'string') return parseInt(val, 10);
+  }, z.number()),
+  calories: z.preprocess(val => {
+    if (typeof val === 'string') return parseInt(val, 10);
+  }, z.number()),
   category: z.enum(['Meat', 'Egg', 'Fruits & Vegetables'])
 };
 
