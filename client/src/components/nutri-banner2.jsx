@@ -35,7 +35,6 @@ const NutriBanner2 = () => {
           </p>
         </div>
 
-        {/* Tool 3 */}
         <div className='flex flex-col items-center bg-gray-100 p-6 rounded-lg shadow-lg'>
           <FaRunning size={50} className='text-blue-500 mb-4' />
           <h3 className='text-xl font-semibold mb-2'>Stay motivated.</h3>
