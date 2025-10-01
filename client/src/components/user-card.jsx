@@ -8,7 +8,7 @@ const UserCard = ({ user }) => {
           <img src={user.avatar} className='w-16 h-16 rounded-full border-2' />
         </div>
         <div>
-          <p className='text-sm text-gray-700'>Người tạo bữa ăn:</p>
+          <p className='text-md text-gray-700'>Người tạo bữa ăn:</p>
           <p className='font-semibold text-pink-600'>{user.name}</p>
           <p className='text-sm text-gray-500'>{user.email}</p>
         </div>
