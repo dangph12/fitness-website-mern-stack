@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaClipboardList, FaHamburger, FaPhotoVideo } from 'react-icons/fa';
 import { MdFileUpload } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 
 import { createMeal } from '~/store/features/meal-slice';
 
@@ -9,6 +10,7 @@ import FoodList from './food-list';
 
 const CreateMeal = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userId = useSelector(state => state.auth.user.id);
   const { foods } = useSelector(state => state.foods.foods);
 
@@ -42,6 +44,8 @@ const CreateMeal = () => {
     try {
       await dispatch(createMeal(formData));
       alert('Meal created successfully!');
+
+      navigate('/nutrition');
 
       setTitle('');
       setMealType('Breakfast');
