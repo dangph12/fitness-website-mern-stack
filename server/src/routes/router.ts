@@ -2,9 +2,10 @@ import { Router } from 'express';
 
 import authorize from '~/middleware/authorize';
 import AuthRoutes from '~/modules/auth/auth-route';
+import BodyClassificationRouter from '~/modules/body-classification/body-classification-route';
 import FoodRoute from '~/modules/foods/food-route';
-import UserRoute from '~/modules/users/user-route';
 import MuscleRouter from '~/modules/muscles/muscle-route';
+import UserRoute from '~/modules/users/user-route';
 
 const router = Router();
 // Non-auth routes
@@ -18,5 +19,8 @@ router.use('/foods', FoodRoute);
 
 // Muscle routes
 router.use('/muscles', MuscleRouter);
+
+// Body classification routes
+router.use('/body-classifications', BodyClassificationRouter);
 
 export default router;
