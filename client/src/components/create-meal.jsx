@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { FaClipboardList, FaHamburger, FaPhotoVideo } from 'react-icons/fa'; // Import icons
+import { MdFileUpload } from 'react-icons/md'; // Import file upload icon
 import { useDispatch, useSelector } from 'react-redux';
 
 import { createMeal } from '~/store/features/meal-slice';
@@ -58,34 +60,38 @@ const CreateMeal = () => {
   };
 
   return (
-    <div className='max-w-4xl mx-auto p-6'>
-      <h1 className='text-3xl font-semibold mb-6 text-center'>Create Meal</h1>
+    <div className='max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-lg'>
+      <h1 className='text-4xl font-semibold text-center text-gray-800 mb-8'>
+        Create Meal
+      </h1>
 
-      {error && <div className='text-red-500 text-center mb-4'>{error}</div>}
+      {error && (
+        <div className='text-red-500 text-center mb-6 text-lg'>{error}</div>
+      )}
 
-      <form className='space-y-4'>
+      <form className='space-y-6'>
         <div>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
-            Meal Title
+          <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
+            <FaClipboardList className='mr-2 text-blue-600' /> Meal Title
           </label>
           <input
             type='text'
             value={title}
             onChange={e => setTitle(e.target.value)}
             required
-            className='w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+            className='w-full p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg'
           />
         </div>
 
         <div>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
-            Meal Type
+          <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
+            <FaHamburger className='mr-2 text-yellow-500' /> Meal Type
           </label>
           <select
             value={mealType}
             onChange={e => setMealType(e.target.value)}
             required
-            className='w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+            className='w-full p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg'
           >
             <option value='Breakfast'>Breakfast</option>
             <option value='Lunch'>Lunch</option>
@@ -103,38 +109,44 @@ const CreateMeal = () => {
         />
 
         <div>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
-            Meal Image
+          <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
+            <MdFileUpload className='mr-2 text-green-500' /> Meal Image
           </label>
           <input
             type='file'
             onChange={handleImageChange}
             required
-            className='w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+            className='w-full p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
           />
         </div>
 
         {image && (
-          <div className='mt-4'>
-            <h3 className='text-sm font-medium text-gray-700 mb-2'>
+          <div className='mt-6'>
+            <h3 className='text-lg font-medium text-gray-700 mb-2'>
               Preview Image
             </h3>
             <img
               src={URL.createObjectURL(image)}
               alt='Meal preview'
-              className='w-full h-auto rounded-lg'
+              className='w-full h-auto rounded-lg shadow-lg'
             />
           </div>
         )}
 
-        <button
-          type='button'
-          onClick={handleCreateMeal}
-          className={`w-full p-3 text-white rounded-lg ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
-          disabled={loading}
-        >
-          {loading ? 'Creating...' : 'Create Meal'}
-        </button>
+        <div className='mt-6'>
+          <button
+            type='button'
+            onClick={handleCreateMeal}
+            className={`w-full p-4 text-white rounded-lg ${
+              loading
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
+            } transition duration-300 ease-in-out`}
+            disabled={loading}
+          >
+            {loading ? 'Creating Meal...' : 'Create Meal'}
+          </button>
+        </div>
       </form>
     </div>
   );
