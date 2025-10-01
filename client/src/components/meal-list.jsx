@@ -82,7 +82,10 @@ const MealsList = () => {
             <h3 className='text-xl font-semibold mb-2'>Foods in this Meal</h3>
             <ul className='space-y-4'>
               {selectedMeal.foods.map(food => (
-                <li key={food._id} className='flex items-center space-x-4'>
+                <li
+                  key={food._id}
+                  className='flex items-center space-x-4 border border-gray-300 p-4 rounded-lg hover:shadow-lg transition-all'
+                >
                   <img
                     src={food.foodId.image}
                     alt={food.foodId.title}
