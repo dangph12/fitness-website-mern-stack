@@ -21,7 +21,7 @@ router.post(
 );
 
 router.put(
-  '/',
+  '/:id',
   uploadSingle('image'),
   validate(MuscleValidationSchema.shape),
   asyncHandler(MuscleController.update)
