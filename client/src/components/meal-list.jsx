@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchMeals } from '~/store/features/meal-slice';
 
+import UserCard from './user-card';
+
 const MealsList = () => {
   const dispatch = useDispatch();
   const { meals, loading, error } = useSelector(state => state.meals);
@@ -75,21 +77,7 @@ const MealsList = () => {
               {selectedMeal.mealType}
             </p>
 
-            <div className='flex items-center justify-center mb-6'>
-              <div className='flex items-center space-x-4'>
-                <div className='flex flex-col items-center'>
-                  <p className='font-medium'>Created By</p>
-                  <img
-                    src={selectedMeal.userId.avatar}
-                    alt={selectedMeal.userId.name}
-                    className='w-16 h-16 rounded-full border-2 border-gray-300'
-                  />
-                  <p className='mt-2 text-sm text-gray-600'>
-                    {selectedMeal.userId.name}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <UserCard user={selectedMeal.userId} />
 
             <h3 className='text-xl font-semibold mb-2'>Foods in this Meal</h3>
             <ul className='space-y-4'>
