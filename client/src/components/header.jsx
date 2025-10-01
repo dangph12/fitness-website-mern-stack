@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaBars, FaTimes, FaUser } from 'react-icons/fa';
 import { Link } from 'react-router';
 
@@ -36,6 +36,16 @@ const MenuItem = ({ label, links, isDropdown }) => (
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('accessToken');
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -100,21 +110,31 @@ function Header() {
       </motion.nav>
 
       <div className='flex space-x-5'>
-        <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-          <Button className='bg-yellow-400 text-black px-5 py-2 rounded-full font-medium hover:bg-yellow-500 transition'>
-            <Link to='/auth/login'>Login</Link>
-          </Button>
-        </motion.div>
+        {!isLoggedIn ? (
+          <>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button className='bg-yellow-400 text-black px-5 py-2 rounded-full font-medium hover:bg-yellow-500 transition'>
+                <Link to='/auth/login'>Login</Link>
+              </Button>
+            </motion.div>
 
-        <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-          <Button className='bg-[#3067B6] text-[#F5F2EC] px-5 py-2 rounded-full font-medium transition'>
-            <Link to='/auth/sign-up'>Sign Up</Link>
-          </Button>
-        </motion.div>
-
-        <Link to='/profile' className='text-[#3067B6] hover:text-gray-500'>
-          <FaUser size={30} />
-        </Link>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button className='bg-[#3067B6] text-[#F5F2EC] px-5 py-2 rounded-full font-medium transition'>
+                <Link to='/auth/sign-up'>Sign Up</Link>
+              </Button>
+            </motion.div>
+          </>
+        ) : (
+          <Link to='/profile' className='text-[#3067B6] hover:text-gray-500'>
+            <FaUser size={30} />
+          </Link>
+        )}
       </div>
     </header>
   );
