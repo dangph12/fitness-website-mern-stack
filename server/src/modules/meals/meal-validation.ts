@@ -10,10 +10,6 @@ const MealValidationSchema = z.object({
     'Brunch',
     'Dessert'
   ]),
-  quantity: z.preprocess(val => {
-    if (typeof val === 'string') return parseInt(val, 10);
-    return val;
-  }, z.number()),
   userId: z.string(),
   foods: z.preprocess(
     val => {
@@ -21,7 +17,7 @@ const MealValidationSchema = z.object({
         return val.map(food => {
           return {
             foodId: z.string().parse(food.foodId),
-            quantity: z.number().parse(food.quantity)
+            quantity: z.number().parse(parseInt(food.quantity, 10))
           };
         });
       }

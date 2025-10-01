@@ -8,7 +8,9 @@ import { IMeal } from './meal-type';
 
 const MealService = {
   findAll: async () => {
-    const meals = await MealModel.find();
+    const meals = await MealModel.find()
+      .populate('userId')
+      .populate('foods.foodId');
 
     return meals;
   },
@@ -18,7 +20,9 @@ const MealService = {
       throw createHttpError(400, 'Invalid ObjectId');
     }
 
-    const meal = await MealModel.findById(mealId);
+    const meal = await MealModel.findById(mealId)
+      .populate('userId')
+      .populate('foods.foodId');
 
     if (!meal) {
       throw createHttpError(404, 'Meal not found');
@@ -32,12 +36,7 @@ const MealService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    if (
-      mealData.foods &&
-      !mealData.foods.every(foodId => Types.ObjectId.isValid(foodId))
-    ) {
-      throw createHttpError(400, 'One or more food IDs are invalid');
-    }
+    // Pls check valid foodId and exist food in this code
 
     const existingMeal = await MealModel.findOne({
       title: mealData.title
@@ -83,12 +82,7 @@ const MealService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    if (
-      updateData.foods &&
-      !updateData.foods.every(foodId => Types.ObjectId.isValid(foodId))
-    ) {
-      throw createHttpError(400, 'One or more food IDs are invalid');
-    }
+    // Pls check valid foodId and exist food in this code
 
     const existingMeal = await MealModel.findById(mealId);
     if (!existingMeal) {
