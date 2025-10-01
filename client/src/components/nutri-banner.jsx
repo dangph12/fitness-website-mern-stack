@@ -16,7 +16,7 @@ const NutriBanner = () => {
             more about your habits, and achieve your goals with MyFitnessPal.
           </p>
           <Link
-            to={`/nutrition/start`}
+            to={`/nutrition/create-meal`}
             className='inline-block bg-blue-500 text-white py-3 px-6 rounded-lg text-lg hover:bg-blue-600 transition'
           >
             + Bắt đầu tạo bữa ăn
