@@ -7,33 +7,28 @@ import { fetchMealById, updateMeal } from '~/store/features/meal-slice';
 import FoodList from './food-list';
 
 const EditMeal = () => {
-  const { id } = useParams(); // Get meal ID from URL
+  const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Get the current meal data from the Redux store
   const { currentMeal, loading, error } = useSelector(state => state.meals);
 
-  // Get the authenticated user's id from the auth slice
   const userId = useSelector(state => state.auth.user.id);
 
   const [title, setTitle] = useState('');
   const [mealType, setMealType] = useState('Breakfast');
   const [image, setImage] = useState(null);
-  const [selectedFoods, setSelectedFoods] = useState([]); // State for selected foods
+  const [selectedFoods, setSelectedFoods] = useState([]);
 
-  // Fetch meal data when the component mounts
   useEffect(() => {
-    dispatch(fetchMealById(id)); // Fetch the meal by its ID
+    dispatch(fetchMealById(id));
   }, [dispatch, id]);
 
-  // Set initial values in the form when meal data is fetched
   useEffect(() => {
     if (currentMeal) {
       setTitle(currentMeal.title || '');
       setMealType(currentMeal.mealType || 'Breakfast');
       setImage(currentMeal.image || null);
-      // Pre-populate selected foods from currentMeal's foods
       setSelectedFoods(
         currentMeal.foods.map(food => ({
           foodId: food.foodId._id,
@@ -44,7 +39,6 @@ const EditMeal = () => {
     }
   }, [currentMeal]);
 
-  // Handle update meal
   const handleUpdateMeal = async () => {
     const updatedMeal = {
       title,
@@ -57,7 +51,8 @@ const EditMeal = () => {
     try {
       await dispatch(updateMeal({ id, updateData: updatedMeal }));
       alert('Meal updated successfully!');
-      navigate('/nutrition'); // Navigate back to the meals list page after update
+
+      navigate('/nutrition');
     } catch (err) {
       console.error('Error updating meal:', err);
     }
@@ -73,7 +68,6 @@ const EditMeal = () => {
         Edit Meal
       </h1>
 
-      {/* Form removed, handle update directly via button */}
       <div className='space-y-6'>
         <div>
           <label className='block text-lg font-medium text-gray-700 mb-3'>
@@ -107,13 +101,11 @@ const EditMeal = () => {
           </select>
         </div>
 
-        {/* Food List for selected foods */}
         <FoodList
           selectedFoods={selectedFoods}
           setSelectedFoods={setSelectedFoods}
         />
 
-        {/* Display current image or image preview */}
         {image && (
           <div className='mb-4'>
             <label className='block text-lg font-medium text-gray-700 mb-2'>
@@ -138,10 +130,9 @@ const EditMeal = () => {
           />
         </div>
 
-        {/* Update Meal Button */}
         <div className='mt-6'>
           <button
-            type='button' // Ensure it's not type='submit'
+            type='button'
             onClick={handleUpdateMeal}
             className={`w-full p-4 text-white rounded-lg ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
             disabled={loading}
