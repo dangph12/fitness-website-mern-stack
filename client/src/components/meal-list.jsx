@@ -128,7 +128,7 @@ const MealsList = () => {
             </div>
 
             {selectedMeal.foods && (
-              <div className='text-center mb-6 mt-10'>
+              <div className='text-center mb-6 mt-3'>
                 <div className='flex justify-center space-x-8 bg-gradient-to-r from-blue-400 to-blue-300 p-4 rounded-lg shadow-lg'>
                   <div className='text-white font-medium'>
                     <p className='text-xl'>Total Calories</p>
