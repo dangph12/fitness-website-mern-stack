@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FaBars, FaTimes, FaUser } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 
 import logo from '../assets/logo.png';
@@ -36,16 +38,9 @@ const MenuItem = ({ label, links, isDropdown }) => (
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const token = sessionStorage.getItem('accessToken');
-    if (token) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, []);
+  const { user } = useSelector(state => state.auth);
+  const { url: avatarUrl } = useSelector(state => state.avatar);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -110,7 +105,7 @@ function Header() {
       </motion.nav>
 
       <div className='flex space-x-5'>
-        {!isLoggedIn ? (
+        {!user ? (
           <>
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -131,8 +126,21 @@ function Header() {
             </motion.div>
           </>
         ) : (
-          <Link to='/profile' className='text-[#3067B6] hover:text-gray-500'>
-            <FaUser size={30} />
+          <Link to='/profile' className='flex items-center space-x-2'>
+            {avatarUrl ? (
+              <Avatar className='w-15 h-15'>
+                <AvatarImage
+                  src={avatarUrl}
+                  alt='User Avatar'
+                  className='rounded-full border-2 border-[#3067B6]'
+                />
+                <AvatarFallback className='text-[#3067B6]'>
+                  {user.name ? user.name[0] : 'U'}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <FaUser size={30} />
+            )}
           </Link>
         )}
       </div>
