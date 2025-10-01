@@ -9,7 +9,7 @@ export const fetchMeals = createAsyncThunk(
     const response = await axiosInstance.get('/api/meals', {
       params: { page, limit, sortBy, sortOrder, ...filterParams }
     });
-    return response.data.data; // Assuming response.data.data contains the list of meals
+    return response.data.data;
   }
 );
 
@@ -26,8 +26,16 @@ export const fetchMealById = createAsyncThunk(
 export const createMeal = createAsyncThunk(
   'meals/createMeal',
   async mealData => {
-    const response = await axiosInstance.post('/api/meals', mealData);
-    return response.data.data;
+    try {
+      const response = await axiosInstance.post('/api/meals', mealData, {});
+      return response.data.data;
+    } catch (error) {
+      console.error(
+        'Error creating meal:',
+        error.response ? error.response.data : error.message
+      );
+      throw error;
+    }
   }
 );
 
@@ -35,7 +43,11 @@ export const createMeal = createAsyncThunk(
 export const updateMeal = createAsyncThunk(
   'meals/updateMeal',
   async ({ id, updateData }) => {
-    const response = await axiosInstance.put(`/api/meals/${id}`, updateData);
+    const response = await axiosInstance.put(`/api/meals/${id}`, updateData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return response.data.data;
   }
 );
@@ -43,7 +55,7 @@ export const updateMeal = createAsyncThunk(
 // Delete meal
 export const deleteMeal = createAsyncThunk('meals/deleteMeal', async id => {
   await axiosInstance.delete(`/api/meals/${id}`);
-  return id; // Return the ID of the meal to delete it from the store
+  return id;
 });
 
 // Meal slice
@@ -73,16 +85,16 @@ export const mealSlice = createSlice({
       })
       .addCase(fetchMeals.fulfilled, (state, action) => {
         state.loading = false;
-        state.meals = action.payload; // Update meals with fetched data
+        state.meals = action.payload;
       })
       .addCase(fetchMeals.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to fetch meals'; // Error handling
+        state.error = action.payload || 'Failed to fetch meals';
       })
 
       // Fetch meal by ID
       .addCase(fetchMealById.fulfilled, (state, action) => {
-        state.currentMeal = action.payload; // Set current meal based on ID
+        state.currentMeal = action.payload;
       })
 
       // Create meal
@@ -92,11 +104,11 @@ export const mealSlice = createSlice({
       })
       .addCase(createMeal.fulfilled, (state, action) => {
         state.loading = false;
-        state.meals.unshift(action.payload); // Add the newly created meal to the start of the list
+        state.meals.unshift(action.payload);
       })
       .addCase(createMeal.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to create meal'; // Error handling
+        state.error = action.payload || 'Failed to create meal';
       })
 
       // Update meal
