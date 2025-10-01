@@ -25,7 +25,7 @@ const EquipmentController = {
 
   create: async (req: Request, res: Response) => {
     const equipmentData = req.body;
-    const newEquipment = await EquipmentService.create(equipmentData);
+    const newEquipment = await EquipmentService.create(equipmentData, req.file);
     return res
       .status(201)
       .json(
@@ -38,7 +38,8 @@ const EquipmentController = {
     const updateData = req.body;
     const updatedEquipment = await EquipmentService.update(
       equipmentId,
-      updateData
+      updateData,
+      req.file
     );
     return res
       .status(200)
@@ -51,8 +52,8 @@ const EquipmentController = {
     const equipmentId = req.params.id;
     await EquipmentService.remove(equipmentId);
     return res
-      .status(204)
-      .json(ApiResponse.success('Equipment deleted successfully', null));
+      .status(200)
+      .json(ApiResponse.success('Equipment deleted successfully'));
   }
 };
 
