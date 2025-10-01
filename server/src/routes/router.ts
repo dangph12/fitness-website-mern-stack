@@ -29,6 +29,6 @@ router.use('/muscles', MuscleRouter);
 router.use('/body-classifications', BodyClassificationRouter);
 
 // Meal routes
-router.use('/meals', BodyClassificationRouter);
+router.use('/meals', MealRoute);
 
 export default router;
