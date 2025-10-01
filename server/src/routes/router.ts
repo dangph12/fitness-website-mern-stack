@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import authorize from '~/middleware/authorize';
 import AuthRoutes from '~/modules/auth/auth-route';
+import BodyClassificationRouter from '~/modules/body-classification/body-classification-route';
 import EquipmentRoute from '~/modules/equipments/equipment-route';
 import FoodRoute from '~/modules/foods/food-route';
 import MuscleRouter from '~/modules/muscles/muscle-route';
@@ -22,5 +23,8 @@ router.use('/equipments', EquipmentRoute);
 
 // Muscle routes
 router.use('/muscles', MuscleRouter);
+
+// Body classification routes
+router.use('/body-classifications', BodyClassificationRouter);
 
 export default router;
