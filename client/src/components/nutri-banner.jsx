@@ -19,7 +19,7 @@ const NutriBanner = () => {
             to={`/nutrition/create-meal`}
             className='inline-block bg-blue-500 text-white py-3 px-6 rounded-lg text-lg hover:bg-blue-600 transition'
           >
-            + Bắt đầu tạo bữa ăn
+            Bắt đầu tạo bữa ăn
           </Link>
         </div>
 
