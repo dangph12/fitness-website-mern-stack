@@ -36,7 +36,7 @@ const FoodController = {
 
   create: async (req: Request, res: Response) => {
     const foodData = req.body;
-    const newFood = await FoodService.create(foodData);
+    const newFood = await FoodService.create(foodData, req.file);
     return res
       .status(201)
       .json(ApiResponse.success('Food created successfully', newFood));
@@ -45,7 +45,7 @@ const FoodController = {
   update: async (req: Request, res: Response) => {
     const foodId = req.params.id;
     const updateData = req.body;
-    const updatedFood = await FoodService.update(foodId, updateData);
+    const updatedFood = await FoodService.update(foodId, updateData, req.file);
     return res
       .status(200)
       .json(ApiResponse.success('Food updated successfully', updatedFood));
@@ -55,8 +55,8 @@ const FoodController = {
     const foodId = req.params.id;
     await FoodService.remove(foodId);
     return res
-      .status(204)
-      .json(ApiResponse.success('Food deleted successfully', null));
+      .status(200)
+      .json(ApiResponse.success('Food deleted successfully'));
   }
 };
 
