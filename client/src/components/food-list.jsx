@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FaPlus } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchFoods } from '~/store/features/food-slice';
@@ -55,14 +56,17 @@ const FoodList = ({ selectedFoods, setSelectedFoods }) => {
   }
 
   return (
-    <div>
-      <h3 className='text-2xl font-semibold mb-6 text-center'>Select Foods</h3>
+    <div className='border-1 border-gray-200 rounded-2xl'>
+      <h3 className='text-2xl font-semibold mb-6 text-center mt-4'>
+        Select Foods
+      </h3>
 
       <button
         onClick={() => setIsModalOpen(true)}
-        className='bg-green-500 text-white px-6 py-3 rounded-md mb-6'
+        className='bg-green-500 text-white px-6 py-3 rounded-md mb-6 flex items-center ml-5'
       >
-        + Add Food
+        <FaPlus className='w-5 h-5 mr-2' />
+        Add Food
       </button>
 
       {selectedFoods.length > 0 ? (
@@ -91,7 +95,7 @@ const FoodList = ({ selectedFoods, setSelectedFoods }) => {
           </div>
         </div>
       ) : (
-        <div className='text-center text-gray-500'>No foods selected</div>
+        <div className='text-center text-gray-500 mb-5'>No foods selected</div>
       )}
 
       {isModalOpen && (
