@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchFoods } from '~/store/features/food-slice';
@@ -71,7 +71,7 @@ const FoodList = ({ selectedFoods, setSelectedFoods }) => {
 
       {selectedFoods.length > 0 ? (
         <div>
-          <h4 className='font-medium text-lg mb-4'>Selected Foods:</h4>
+          <h4 className='font-medium text-lg mb-4 ml-4'>Selected Foods:</h4>
           <div className='space-y-4'>
             {selectedFoods.map(food => (
               <div
@@ -84,11 +84,13 @@ const FoodList = ({ selectedFoods, setSelectedFoods }) => {
                     Quantity: {food.quantity}
                   </div>
                 </div>
+
                 <button
                   onClick={() => handleRemoveFood(food.foodId)}
-                  className='bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600'
+                  className='bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 flex items-center space-x-2'
                 >
-                  Remove
+                  <FaTrash />
+                  <span>Remove</span>
                 </button>
               </div>
             ))}
