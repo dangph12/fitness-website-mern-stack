@@ -79,33 +79,35 @@ const MealsList = () => {
 
             <UserCard user={selectedMeal.userId} />
 
-            <h3 className='text-xl font-semibold mb-2'>Foods in this Meal</h3>
-            <ul className='space-y-4'>
-              {selectedMeal.foods.map(food => (
-                <li
-                  key={food._id}
-                  className='flex items-center space-x-4 border border-gray-300 p-4 rounded-lg hover:shadow-lg transition-all'
-                >
-                  <img
-                    src={food.foodId.image}
-                    alt={food.foodId.title}
-                    className='w-16 h-16 object-cover rounded-full'
-                  />
-                  <div className='flex-1'>
-                    <p className='font-medium'>{food.foodId.title}</p>
-                    <p className='text-sm text-gray-600'>
-                      Quantity: {food.quantity} units
-                    </p>
-                    <p className='text-sm text-gray-500'>
-                      Calories: {food.foodId.calories} kcal
-                    </p>
-                    <p className='text-sm text-gray-500'>
-                      Fat: {food.foodId.fats} g
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className='mt-10'>
+              <h3 className='text-xl font-semibold mb-2'>Foods in this Meal</h3>
+              <ul className='space-y-4'>
+                {selectedMeal.foods.map(food => (
+                  <li
+                    key={food._id}
+                    className='flex items-center space-x-4 border border-gray-300 p-4 rounded-lg hover:shadow-lg transition-all'
+                  >
+                    <img
+                      src={food.foodId.image}
+                      alt={food.foodId.title}
+                      className='w-16 h-16 object-cover rounded-full'
+                    />
+                    <div className='flex-1'>
+                      <p className='font-medium'>{food.foodId.title}</p>
+                      <p className='text-sm text-gray-600'>
+                        Quantity: {food.quantity} units
+                      </p>
+                      <p className='text-sm text-gray-500'>
+                        Calories: {food.foodId.calories} kcal
+                      </p>
+                      <p className='text-sm text-gray-500'>
+                        Fat: {food.foodId.fats} g
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       )}
