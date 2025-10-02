@@ -13,13 +13,18 @@ const EditMeal = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { currentMeal, loading, error } = useSelector(state => state.meals);
+  const {
+    currentMeal,
+    loading: mealLoading,
+    error
+  } = useSelector(state => state.meals);
   const userId = useSelector(state => state.auth.user.id);
 
   const [title, setTitle] = useState('');
   const [mealType, setMealType] = useState('Breakfast');
   const [image, setImage] = useState(null);
   const [selectedFoods, setSelectedFoods] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     dispatch(fetchMealById(id));
@@ -52,6 +57,7 @@ const EditMeal = () => {
   };
 
   const handleUpdateMeal = async () => {
+    setLoading(true);
     const formData = new FormData();
     formData.append('title', title);
     formData.append('mealType', mealType);
@@ -69,10 +75,13 @@ const EditMeal = () => {
       navigate('/nutrition');
     } catch (err) {
       console.error('Error updating meal:', err);
+      alert('Failed to update meal!');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (mealLoading) return <div>Loading meal data...</div>;
 
   if (error) return <div className='text-red-500'>{error}</div>;
 
@@ -120,17 +129,30 @@ const EditMeal = () => {
           setSelectedFoods={setSelectedFoods}
         />
 
-        {image && (
+        {image ? (
           <div className='mb-4'>
             <label className='block text-lg font-medium text-gray-700 mb-2'>
               Current Image
             </label>
             <img
-              src={image}
+              src={image instanceof File ? URL.createObjectURL(image) : image}
               alt='Current Meal'
               className='w-32 h-32 object-cover rounded-lg mb-4'
             />
           </div>
+        ) : (
+          currentMeal?.image && (
+            <div className='mb-4'>
+              <label className='block text-lg font-medium text-gray-700 mb-2'>
+                Current Image
+              </label>
+              <img
+                src={currentMeal.image}
+                alt='Current Meal'
+                className='w-32 h-32 object-cover rounded-lg mb-4'
+              />
+            </div>
+          )
         )}
 
         <div>
