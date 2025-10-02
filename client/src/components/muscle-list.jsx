@@ -8,7 +8,7 @@ function MuscleList() {
   const { muscles, loading, error } = useSelector(state => state.muscles);
 
   useEffect(() => {
-    dispatch(fetchMuscles()); // Fetch muscles on component mount
+    dispatch(fetchMuscles());
   }, [dispatch]);
 
   return (
@@ -30,11 +30,14 @@ function MuscleList() {
 
       <div className='flex justify-center space-x-4 overflow-x-auto'>
         {muscles.map(muscle => (
-          <div key={muscle._id} className='p-4 text-center transition-all'>
+          <div
+            key={muscle._id}
+            className='bg-white rounded-lg p-4 text-center hover:bg-gray-100 transition-all'
+          >
             <img
               src={muscle.image}
               alt={muscle.title}
-              className='w-24 h-24 object-cover rounded-lg mb-4'
+              className='w-24 h-24 object-cover rounded-lg mb-4 transition-transform duration-300 ease-in-out transform hover:scale-125'
             />
             <h3 className='text-lg font-medium text-blue-600'>
               {muscle.title}
