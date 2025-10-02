@@ -69,11 +69,11 @@ const router = createBrowserRouter([
       },
       {
         path: '',
-        Component: () => (
-          <PrivateRoute allowedRoles={['admin']}>
-            <AdminLayout />
-          </PrivateRoute>
-        ),
+        // Component: () => (
+        //   <PrivateRoute allowedRoles={['admin']}>
+        //     <AdminLayout />
+        //   </PrivateRoute>
+        // ),
         children: [
           {
             index: true,
