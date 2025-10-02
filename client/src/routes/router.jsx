@@ -36,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: 'nutrition/food/:foodId',
         Component: lazy(() => import('~/app/nutrition/food/page'))
+      },
+      {
+        path: 'nutrition/edit-meal/:id',
+        Component: lazy(() => import('~/app/nutrition/edit-meal/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
