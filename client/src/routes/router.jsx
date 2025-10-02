@@ -40,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: 'nutrition/edit-meal/:id',
         Component: lazy(() => import('~/app/nutrition/edit-meal/page'))
+      },
+      {
+        path: 'exercise',
+        Component: lazy(() => import('~/app/exercises/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
