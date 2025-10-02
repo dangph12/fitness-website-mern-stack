@@ -96,8 +96,8 @@ function Header() {
         <Link to='/community' className='hover:text-gray-300 text-lg'>
           Community
         </Link>
-        <Link to='/challenging' className='hover:text-gray-300 text-lg'>
-          Challenging
+        <Link to='/exercise' className='hover:text-gray-300 text-lg'>
+          Exercise
         </Link>
         <Link to='/about' className='hover:text-gray-300 text-lg'>
           About
