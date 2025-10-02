@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { FaClipboardList, FaHamburger } from 'react-icons/fa';
+import { MdFileUpload } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
@@ -12,7 +14,6 @@ const EditMeal = () => {
   const navigate = useNavigate();
 
   const { currentMeal, loading, error } = useSelector(state => state.meals);
-
   const userId = useSelector(state => state.auth.user.id);
 
   const [title, setTitle] = useState('');
@@ -39,19 +40,32 @@ const EditMeal = () => {
     }
   }, [currentMeal]);
 
+  const handleImageChange = e => {
+    const file = e.target.files[0];
+
+    if (file && file.type.startsWith('image/')) {
+      setImage(file);
+    } else {
+      alert('Please select a valid image file.');
+      setImage(null);
+    }
+  };
+
   const handleUpdateMeal = async () => {
-    const updatedMeal = {
-      title,
-      mealType,
-      image,
-      foods: selectedFoods,
-      userId
-    };
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('mealType', mealType);
+    formData.append('userId', userId);
+    formData.append('image', image);
+
+    selectedFoods.forEach((food, index) => {
+      formData.append(`foods[${index}][foodId]`, food.foodId);
+      formData.append(`foods[${index}][quantity]`, food.quantity);
+    });
 
     try {
-      await dispatch(updateMeal({ id, updateData: updatedMeal }));
+      await dispatch(updateMeal({ id, updateData: formData }));
       alert('Meal updated successfully!');
-
       navigate('/nutrition');
     } catch (err) {
       console.error('Error updating meal:', err);
@@ -70,8 +84,8 @@ const EditMeal = () => {
 
       <div className='space-y-6'>
         <div>
-          <label className='block text-lg font-medium text-gray-700 mb-3'>
-            Meal Title
+          <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
+            <FaClipboardList className='mr-2 text-blue-600' /> Meal Title
           </label>
           <input
             type='text'
@@ -83,8 +97,8 @@ const EditMeal = () => {
         </div>
 
         <div>
-          <label className='block text-lg font-medium text-gray-700 mb-3'>
-            Meal Type
+          <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
+            <FaHamburger className='mr-2 text-yellow-500' /> Meal Type
           </label>
           <select
             value={mealType}
@@ -120,12 +134,12 @@ const EditMeal = () => {
         )}
 
         <div>
-          <label className='block text-lg font-medium text-gray-700 mb-3'>
-            Meal Image
+          <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
+            <MdFileUpload className='mr-2 text-green-500' /> Meal Image
           </label>
           <input
             type='file'
-            onChange={e => setImage(URL.createObjectURL(e.target.files[0]))}
+            onChange={handleImageChange}
             className='w-full p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
           />
         </div>
