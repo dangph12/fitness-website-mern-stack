@@ -9,7 +9,7 @@ const FoodSchema = new Schema<IFood>(
     unit: { type: Number, required: true },
     protein: { type: Number, required: true },
     fat: { type: Number, required: true },
-    carbonhydrate: { type: Number, required: true },
+    carbohydrate: { type: Number, required: true },
     calories: { type: Number, required: true },
     category: {
       type: String,

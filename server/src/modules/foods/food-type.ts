@@ -4,7 +4,7 @@ export interface IFood {
   unit: number;
   protein: number;
   fat: number;
-  carbonhydrate: number;
+  carbohydrate: number;
   calories: number;
   category: 'Meat' | 'Egg' | 'Fruits & Vegetables';
 }

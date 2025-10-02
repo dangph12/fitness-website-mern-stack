@@ -11,7 +11,7 @@ const FoodValidation = {
   fat: z.preprocess(val => {
     if (typeof val === 'string') return parseInt(val, 10);
   }, z.number()),
-  carbonhydrate: z.preprocess(val => {
+  carbohydrate: z.preprocess(val => {
     if (typeof val === 'string') return parseInt(val, 10);
   }, z.number()),
   calories: z.preprocess(val => {
