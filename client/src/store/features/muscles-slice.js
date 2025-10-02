@@ -6,15 +6,14 @@ import axiosInstance from '~/lib/axios-instance';
 export const fetchMuscles = createAsyncThunk(
   'muscles/fetchMuscles',
   async (_, { rejectWithValue }) => {
-    // No parameters needed here
     try {
-      const response = await axiosInstance.get('/api/muscles'); // Make a simple GET request without params
-      return response.data.data; // Return muscles data
+      const response = await axiosInstance.get('/api/muscles');
+      return response.data.data;
     } catch (error) {
-      console.error('Error fetching muscles:', error); // Log the error
+      console.error('Error fetching muscles:', error);
       return rejectWithValue(
         error.response ? error.response.data : 'Error fetching muscles'
-      ); // Return error if failed
+      );
     }
   }
 );
@@ -25,14 +24,14 @@ export const fetchMuscleById = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/api/muscles/${id}`);
-      return response.data.data; // Return the muscle data
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching muscle by ID:', error);
       return rejectWithValue(
         error.response
           ? error.response.data
           : 'An unknown error occurred while fetching muscle'
-      ); // Provide detailed error message
+      );
     }
   }
 );
@@ -43,12 +42,12 @@ export const createMuscle = createAsyncThunk(
   async (muscleData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post('/api/muscles', muscleData);
-      return response.data.data; // Return the created muscle data
+      return response.data.data;
     } catch (error) {
       console.error('Error creating muscle:', error);
       return rejectWithValue(
         error.response ? error.response.data : 'Failed to create muscle'
-      ); // Provide error message
+      );
     }
   }
 );
@@ -67,12 +66,12 @@ export const updateMuscle = createAsyncThunk(
           }
         }
       );
-      return response.data.data; // Return the updated muscle data
+      return response.data.data;
     } catch (error) {
       console.error('Error updating muscle:', error);
       return rejectWithValue(
         error.response ? error.response.data : 'Failed to update muscle'
-      ); // Provide error message
+      );
     }
   }
 );
@@ -83,12 +82,12 @@ export const deleteMuscle = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       await axiosInstance.delete(`/api/muscles/${id}`);
-      return id; // Return the ID of the deleted muscle
+      return id;
     } catch (error) {
       console.error('Error deleting muscle:', error);
       return rejectWithValue(
         error.response ? error.response.data : 'Failed to delete muscle'
-      ); // Provide error message
+      );
     }
   }
 );
@@ -120,16 +119,16 @@ const muscleSlice = createSlice({
       })
       .addCase(fetchMuscles.fulfilled, (state, action) => {
         state.loading = false;
-        state.muscles = action.payload; // Store muscles data in state
+        state.muscles = action.payload;
       })
       .addCase(fetchMuscles.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to fetch muscles'; // Error handling
-        console.error('Error fetching muscles:', action.payload); // Log the error to the console
+        state.error = action.payload || 'Failed to fetch muscles';
+        console.error('Error fetching muscles:', action.payload);
       })
       // Fetch muscle by ID
       .addCase(fetchMuscleById.fulfilled, (state, action) => {
-        state.currentMuscle = action.payload; // Update the current muscle
+        state.currentMuscle = action.payload;
       })
       // Create muscle
       .addCase(createMuscle.pending, state => {
@@ -138,11 +137,11 @@ const muscleSlice = createSlice({
       })
       .addCase(createMuscle.fulfilled, (state, action) => {
         state.loading = false;
-        state.muscles.unshift(action.payload); // Add newly created muscle to the list
+        state.muscles.unshift(action.payload);
       })
       .addCase(createMuscle.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to create muscle'; // Error handling
+        state.error = action.payload || 'Failed to create muscle';
       })
       // Update muscle
       .addCase(updateMuscle.fulfilled, (state, action) => {
@@ -150,16 +149,16 @@ const muscleSlice = createSlice({
           muscle => muscle._id === action.payload._id
         );
         if (index !== -1) {
-          state.muscles[index] = action.payload; // Update the muscle in the list
+          state.muscles[index] = action.payload;
         }
         if (state.currentMuscle?._id === action.payload._id) {
-          state.currentMuscle = action.payload; // Update the current muscle if it's being edited
+          state.currentMuscle = action.payload;
         }
       })
       // Delete muscle
       .addCase(deleteMuscle.fulfilled, (state, action) => {
         state.muscles = state.muscles.filter(
-          muscle => muscle._id !== action.payload // Remove the deleted muscle
+          muscle => muscle._id !== action.payload
         );
       });
   }
