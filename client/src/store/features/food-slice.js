@@ -2,14 +2,18 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import axiosInstance from '~/lib/axios-instance';
 
-// Fetch all foods
 export const fetchFoods = createAsyncThunk(
   'foods/fetchFoods',
   async ({ page, limit, sortBy, sortOrder, filterParams }) => {
-    const response = await axiosInstance.get('/api/foods', {
-      params: { page, limit, sortBy, sortOrder, ...filterParams }
-    });
-    return response.data.data;
+    try {
+      const response = await axiosInstance.get('/api/foods', {
+        params: { page, limit, sortBy, sortOrder, ...filterParams }
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching foods:', error);
+      throw error;
+    }
   }
 );
 

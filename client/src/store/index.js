@@ -3,6 +3,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '~/store/features/auth-slice';
 import avatarReducer from '~/store/features/avatar-slice';
 import foodReducer from '~/store/features/food-slice';
+import mealsReducer from '~/store/features/meal-slice';
+import musclesReducer from '~/store/features/muscles-slice';
 import usersReducer from '~/store/features/users-slice';
 
 export default configureStore({
@@ -10,6 +12,8 @@ export default configureStore({
     auth: authReducer,
     avatar: avatarReducer,
     users: usersReducer,
-    foods: foodReducer
+    foods: foodReducer,
+    meals: mealsReducer,
+    muscles: musclesReducer
   }
 });
