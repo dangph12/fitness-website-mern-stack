@@ -133,7 +133,7 @@ const UserService = {
 
     const updateUserData = {
       ...updateData,
-      image: imageUrl || existingUser.avatar
+      avatar: imageUrl || existingUser.avatar
     };
 
     const updatedUser = await UserModel.findByIdAndUpdate(
