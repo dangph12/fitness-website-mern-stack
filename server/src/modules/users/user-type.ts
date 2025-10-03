@@ -4,7 +4,6 @@ export interface IUser {
   avatar?: string;
   role: 'user' | 'admin';
   dob?: Date;
-  height?: number;
   gender?: string;
   isActive?: boolean;
 }

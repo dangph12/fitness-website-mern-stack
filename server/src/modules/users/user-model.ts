@@ -15,7 +15,6 @@ const UserSchema = new Schema<IUser>(
       default: 'user'
     },
     dob: { type: Date },
-    height: { type: Number },
     isActive: { type: Boolean, default: true }
   },
   { timestamps: true }
