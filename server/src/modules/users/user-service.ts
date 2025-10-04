@@ -85,21 +85,16 @@ const UserService = {
         newUser._id.toString()
       );
       if (uploadResult.success && uploadResult.data) {
-        await UserModel.findByIdAndUpdate(
-          newUser._id,
-          { avatar: uploadResult.data.secure_url },
-          { new: true }
-        );
+        newUser.avatar = uploadResult.data.secure_url;
+        await newUser.save();
       }
     }
 
-    const createdUser = await UserModel.findById(newUser._id);
-
-    if (!createdUser) {
+    if (!newUser) {
       throw createHttpError(500, 'Failed to create user');
     }
 
-    return createdUser;
+    return newUser;
   },
 
   update: async (
