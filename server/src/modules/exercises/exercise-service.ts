@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors';
 import { Types } from 'mongoose';
 
-import { uploadImage } from '~/utils/cloudinary';
+import { uploadExerciseImage, uploadImage } from '~/utils/cloudinary';
 
 import ExerciseModel from './exercise-model';
 import { IExercise } from './exercise-type';
@@ -39,9 +39,21 @@ const ExerciseService = {
       throw createHttpError(409, 'Exercise with this title already exists');
     }
 
-    const uploadResult = await uploadImage(file.buffer);
+    const newExercise = await ExerciseModel.create({
+      exerciseData
+    });
+
+    if (!newExercise) {
+      throw createHttpError(500, 'Failed to create exercise');
+    }
+
+    const uploadResult = await uploadExerciseImage(
+      file.buffer,
+      newExercise._id.toString()
+    );
 
     if (!uploadResult.success || !uploadResult.data) {
+      await ExerciseModel.findByIdAndDelete(newExercise._id);
       throw createHttpError(
         500,
         uploadResult.error || 'Failed to upload image'
@@ -50,12 +62,8 @@ const ExerciseService = {
 
     const imageUrl = uploadResult.data.secure_url;
 
-    const newExerciseData = { ...exerciseData, image: imageUrl };
-
-    const newExercise = await ExerciseModel.create(newExerciseData);
-    if (!newExercise) {
-      throw createHttpError(500, 'Failed to create exercise');
-    }
+    newExercise.tutorial = imageUrl;
+    await newExercise.save();
 
     return newExercise;
   },
@@ -90,7 +98,7 @@ const ExerciseService = {
 
     const updatedExerciseData = {
       ...updateData,
-      tutorialVideo: imageUrl || existingExercise.tutorialVideo
+      tutorial: imageUrl || existingExercise.tutorial
     };
 
     const updatedExercise = await ExerciseModel.findByIdAndUpdate(
