@@ -15,14 +15,14 @@ router.get('/:id', asyncHandler(ExerciseController.findById));
 
 router.post(
   '/',
-  uploadSingle('image'),
+  uploadSingle('tutorial'),
   validate(ExerciseValidationSchema.shape),
   asyncHandler(ExerciseController.create)
 );
 
 router.put(
   '/:id',
-  uploadSingle('image'),
+  uploadSingle('tutorial'),
   validate(ExerciseValidationSchema.shape),
   asyncHandler(ExerciseController.update)
 );

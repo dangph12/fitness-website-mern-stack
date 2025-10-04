@@ -86,9 +86,7 @@ const ExerciseService = {
       throw createHttpError(409, 'Exercise with this title already exists');
     }
 
-    const newExercise = await ExerciseModel.create({
-      exerciseData
-    });
+    const newExercise = await ExerciseModel.create(exerciseData);
 
     if (!newExercise) {
       throw createHttpError(500, 'Failed to create exercise');
