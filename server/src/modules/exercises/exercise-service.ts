@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors';
 import { Types } from 'mongoose';
 
-import { uploadExerciseImage, uploadImage } from '~/utils/cloudinary';
+import { deleteExerciseImage, uploadExerciseImage } from '~/utils/cloudinary';
 
 import ExerciseModel from './exercise-model';
 import { IExercise } from './exercise-type';
@@ -82,9 +82,10 @@ const ExerciseService = {
       throw createHttpError(404, 'Exercise not found');
     }
 
-    let imageUrl: string | undefined;
+    let imageUrl = existingExercise.tutorial;
+
     if (file) {
-      const uploadResult = await uploadImage(file.buffer);
+      const uploadResult = await uploadExerciseImage(file.buffer, exerciseId);
 
       if (!uploadResult.success || !uploadResult.data) {
         throw createHttpError(
@@ -98,16 +99,13 @@ const ExerciseService = {
 
     const updatedExerciseData = {
       ...updateData,
-      tutorial: imageUrl || existingExercise.tutorial
+      tutorial: imageUrl
     };
 
     const updatedExercise = await ExerciseModel.findByIdAndUpdate(
       exerciseId,
       updatedExerciseData,
-      {
-        new: true,
-        runValidators: true
-      }
+      { new: true, runValidators: true }
     );
 
     if (!updatedExercise) {
@@ -126,6 +124,15 @@ const ExerciseService = {
 
     if (!exercise) {
       throw createHttpError(404, 'Exercise not found');
+    }
+
+    if (exercise.tutorial) {
+      const deleteResult = await deleteExerciseImage(exerciseId);
+      if (!deleteResult.success) {
+        console.warn(
+          `Failed to delete exercise image for ${exerciseId}: ${deleteResult.error}`
+        );
+      }
     }
   }
 };
