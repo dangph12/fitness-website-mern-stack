@@ -32,7 +32,7 @@ router.use('/body-classifications', BodyClassificationRouter);
 // Meal routes
 router.use('/meals', MealRoute);
 
-// Meal routes
+// Exercise routes
 router.use('/exercises', ExerciseRoute);
 
 export default router;
