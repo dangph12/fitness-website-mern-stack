@@ -67,7 +67,7 @@ function Header() {
       </div>
 
       <motion.nav
-        className={`lg:flex space-x-10 font-bold relative ${menuOpen ? 'block' : 'hidden'} lg:block`}
+        className={`lg:flex space-x-15 font-bold relative ${menuOpen ? 'block' : 'hidden'} lg:block`}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1 }}
