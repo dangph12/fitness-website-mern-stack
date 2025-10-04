@@ -2,48 +2,58 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import { FaBarcode, FaBook, FaRunning } from 'react-icons/fa';
 
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.2 // hiệu ứng lần lượt
+    }
+  }
+};
+
 const cardVariants = {
   hidden: { opacity: 0, y: 50 },
-  visible: i => ({
+  visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      delay: i * 0.2,
-      duration: 0.6,
-      ease: 'easeOut'
-    }
-  })
+    transition: { duration: 0.6, ease: 'easeOut' }
+  }
 };
 
 const NutriBanner2 = () => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 100 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
-      viewport={{ once: true, amount: 0.2 }}
+      initial='hidden'
+      whileInView='visible'
+      viewport={{ once: true, amount: 0 }} // chạy chắc chắn khi xuất hiện
+      variants={containerVariants}
       className='bg-white py-16 px-6 flex flex-col items-center justify-center text-center'
     >
       <motion.h2
-        initial={{ opacity: 0, y: -30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
+        variants={{
+          hidden: { opacity: 0, y: -30 },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.7 } }
+        }}
         className='text-6xl font-bold mb-4 text-gray-900'
       >
         The tools for your goals
       </motion.h2>
 
       <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.7 }}
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { delay: 0.2, duration: 0.7 } }
+        }}
         className='text-lg text-gray-600 mb-12'
       >
         Are you trying to lose weight, tone up, lower your BMI, or improve your
         overall health? We give you the right features to make it happen.
       </motion.p>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto'>
+      <motion.div
+        variants={containerVariants}
+        className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto'
+      >
         {[
           {
             icon: <FaBook size={50} className='text-blue-500 mb-4' />,
@@ -63,11 +73,7 @@ const NutriBanner2 = () => {
         ].map((card, i) => (
           <motion.div
             key={i}
-            custom={i}
             variants={cardVariants}
-            initial='hidden'
-            whileInView='visible'
-            viewport={{ once: true }}
             whileHover={{
               scale: 1.05,
               boxShadow: '0px 8px 20px rgba(0,0,0,0.15)'
@@ -79,7 +85,7 @@ const NutriBanner2 = () => {
             <p className='text-center text-gray-600'>{card.text}</p>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
