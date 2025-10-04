@@ -68,39 +68,38 @@ const UserService = {
     return user;
   },
 
-  create: async (userData: IUser, file?: Express.Multer.File) => {
-    if (!file) {
-      throw createHttpError(400, 'No file provided');
-    }
-
-    const uploadResult = await uploadImage(file.buffer);
-
-    if (!uploadResult.success || !uploadResult.data) {
-      throw createHttpError(
-        500,
-        uploadResult.error || 'Failed to upload image'
-      );
-    }
-
-    const imageUrl = uploadResult.data.secure_url;
-
-    const newUserData = { ...userData, avatar: imageUrl };
-
+  create: async (userData: IUser, avatar?: Express.Multer.File) => {
     const existingUser = await UserModel.findOne({ email: userData.email });
     if (existingUser) {
       throw createHttpError(400, 'User with this email already exists');
     }
 
-    const newUser = UserModel.create({
-      ...newUserData,
+    const newUser = await UserModel.create({
+      ...userData,
       isActive: true
     });
 
-    if (!newUser) {
+    if (avatar) {
+      const uploadResult = await uploadAvatar(
+        avatar.buffer,
+        newUser._id.toString()
+      );
+      if (uploadResult.success && uploadResult.data) {
+        await UserModel.findByIdAndUpdate(
+          newUser._id,
+          { avatar: uploadResult.data.secure_url },
+          { new: true }
+        );
+      }
+    }
+
+    const createdUser = await UserModel.findById(newUser._id);
+
+    if (!createdUser) {
       throw createHttpError(500, 'Failed to create user');
     }
 
-    return newUser;
+    return createdUser;
   },
 
   update: async (
