@@ -1,9 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 
 import { Button } from '~/components/ui/button';
@@ -30,6 +30,8 @@ import { loginSchema } from '~/lib/validations/auth';
 import { loadUser } from '~/store/features/auth-slice';
 
 const Login = () => {
+  const [searchParams] = useSearchParams();
+  const error = searchParams.get('error');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -41,6 +43,20 @@ const Login = () => {
       isRemember: false
     }
   });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (error) {
+        toast.error(
+          error === 'user_inactive'
+            ? 'User account is deactivated'
+            : 'Login failed.'
+        );
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [error]);
 
   const onSubmit = async data => {
     try {
