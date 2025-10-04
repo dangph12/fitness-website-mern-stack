@@ -1,8 +1,8 @@
 import createHttpError from 'http-errors';
 import { Types } from 'mongoose';
 
-import { uploadImage } from '~/utils/cloudinary';
-
+import BodyClassificationModel from '../body-classification/body-classification-model';
+import UserModel from '../users/user-model';
 import BodyRecordModel from './body-record-model';
 import { IBodyRecord } from './body-record-type';
 
@@ -34,9 +34,7 @@ const BodyRecordService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const bodyRecord = await BodyRecordModel.find({ userId })
-      .populate('userId')
-      .populate('bodyClassification');
+    const bodyRecord = await BodyRecordModel.find({ userId: userId });
 
     if (!bodyRecord) {
       throw createHttpError(404, 'Records not found');
@@ -50,8 +48,20 @@ const BodyRecordService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
+    const user = await UserModel.findById(bodyRecordData.userId);
+    if (!user) {
+      throw createHttpError(404, 'User not found');
+    }
+
     if (!Types.ObjectId.isValid(bodyRecordData.bodyClassificationId)) {
       throw createHttpError(400, 'Invalid bodyClassificationId');
+    }
+
+    const bodyClassification = await BodyClassificationModel.findById(
+      bodyRecordData.bodyClassificationId
+    );
+    if (!bodyClassification) {
+      throw createHttpError(404, 'Body Classification not found');
     }
 
     const bodyRecord = await BodyRecordModel.create(bodyRecordData);
@@ -78,11 +88,23 @@ const BodyRecordService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
+    const user = await UserModel.findById(bodyRecordData.userId);
+    if (!user) {
+      throw createHttpError(404, 'User not found');
+    }
+
     if (
       bodyRecordData.bodyClassificationId &&
       !Types.ObjectId.isValid(bodyRecordData.bodyClassificationId)
     ) {
       throw createHttpError(400, 'Invalid bodyClassificationId');
+    }
+
+    const bodyClassification = await BodyClassificationModel.findById(
+      bodyRecordData.bodyClassificationId
+    );
+    if (!bodyClassification) {
+      throw createHttpError(404, 'Body Classification not found');
     }
 
     const bodyRecord = await BodyRecordModel.findByIdAndUpdate(
