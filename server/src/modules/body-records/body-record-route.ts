@@ -16,9 +16,9 @@ router.post(
   asyncHandler(BodyRecordController.create)
 );
 
-router.get('/user/:userId', asyncHandler(BodyRecordController.findByUser));
-
 router.get('/:id', asyncHandler(BodyRecordController.findById));
+
+router.get('/user/:userId', asyncHandler(BodyRecordController.findByUser));
 
 router.put(
   '/:id',
