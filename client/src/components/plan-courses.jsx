@@ -85,9 +85,8 @@ const PlanCourses = () => {
               {plan.title}
             </h2>
             <p
-              className='text-2xl font-bold'
+              className='text-2xl font-bold mb-6'
               style={{ color: plan.color }}
-              mb-6
             >
               {plan.price}
             </p>
