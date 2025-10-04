@@ -8,9 +8,9 @@ import AuthController from '~/modules/auth/auth-controller';
  * @param provider - The OAuth provider name (e.g., 'google', 'facebook')
  * @returns Express middleware function
  */
-const createOAuthCallback = (provider: string) => {
+const createOAuthCallback = (provider: 'google' | 'facebook') => {
   return (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate(provider, function (err: any, user: any, info: any) {
+    passport.authenticate(provider, { session: false }, function (err: any, user: any, info: any) {
       if (err) {
         console.error(`${provider} OAuth error:`, err);
         return res.redirect(
@@ -28,7 +28,8 @@ const createOAuthCallback = (provider: string) => {
 
       req.user = user;
 
-      return AuthController.loginWithProvider(req, res);
+      // Ensure errors are passed to Express error middleware
+      Promise.resolve(AuthController.loginWithProvider(req, res)).catch(next);
     })(req, res, next);
   };
 };
