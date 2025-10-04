@@ -7,6 +7,53 @@ import ExerciseModel from './exercise-model';
 import { IExercise } from './exercise-type';
 
 const ExerciseService = {
+  find: async ({
+    page = 1,
+    limit = 10,
+    filterParams = {},
+    sortBy = 'createdAt',
+    sortOrder = 'desc'
+  }: {
+    page?: number;
+    limit?: number;
+    filterParams?: Record<string, any>;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) => {
+    const filterRecord: Record<string, any> = {};
+
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (!value || value === '') continue;
+
+      if (['muscles', 'equipments'].includes(key)) {
+        filterRecord[key] = {
+          $in: (value as string[]).map((id: string) => new Types.ObjectId(id))
+        };
+      } else {
+        filterRecord[key] = { $regex: value, $options: 'i' };
+      }
+    }
+
+    const skip = (page - 1) * limit;
+    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as any;
+
+    const totalExercises = await ExerciseModel.countDocuments(filterRecord);
+    const totalPages = Math.ceil(totalExercises / limit);
+
+    const exercises = await ExerciseModel.find(filterRecord)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate('muscles')
+      .populate('equipments');
+
+    return {
+      exercises,
+      totalExercises,
+      totalPages
+    };
+  },
+
   findAll: async () => {
     const exercises = await ExerciseModel.find();
 
