@@ -9,7 +9,7 @@ import ExerciseValidationSchema from './exercise-validation';
 
 const router: Router = express.Router();
 
-router.get('/', asyncHandler(ExerciseController.findAll));
+router.get('/', asyncHandler(ExerciseController.find));
 
 router.get('/:id', asyncHandler(ExerciseController.findById));
 

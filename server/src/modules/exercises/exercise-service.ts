@@ -13,22 +13,23 @@ const ExerciseService = {
     filterParams = {},
     sortBy = 'createdAt',
     sortOrder = 'desc'
-  }: {
-    page?: number;
-    limit?: number;
-    filterParams?: Record<string, any>;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
   }) => {
     const filterRecord: Record<string, any> = {};
 
     for (const [key, value] of Object.entries(filterParams)) {
       if (!value || value === '') continue;
 
+      const values = Array.isArray(value) ? value : [value];
+
       if (['muscles', 'equipments'].includes(key)) {
-        filterRecord[key] = {
-          $in: (value as string[]).map((id: string) => new Types.ObjectId(id))
-        };
+        const objectIds = values
+          .map(v => String(v).trim())
+          .filter(v => Types.ObjectId.isValid(v))
+          .map(v => new Types.ObjectId(v));
+
+        if (objectIds.length > 0) {
+          filterRecord[key] = { $in: objectIds };
+        }
       } else {
         filterRecord[key] = { $regex: value, $options: 'i' };
       }
@@ -55,7 +56,9 @@ const ExerciseService = {
   },
 
   findAll: async () => {
-    const exercises = await ExerciseModel.find();
+    const exercises = await ExerciseModel.find()
+      .populate('muscles')
+      .populate('equipments');
 
     return exercises;
   },
@@ -65,7 +68,9 @@ const ExerciseService = {
       throw createHttpError(400, 'Invalid ObjectId');
     }
 
-    const exercise = await ExerciseModel.findById(exerciseId);
+    const exercise = await ExerciseModel.findById(exerciseId)
+      .populate('muscles')
+      .populate('equipments');
 
     if (!exercise) {
       throw createHttpError(404, 'Exercise not found');
