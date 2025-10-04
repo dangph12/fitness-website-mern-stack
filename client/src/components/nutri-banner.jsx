@@ -1,11 +1,26 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 import nutri from '../assets/nutri.webp';
 
 const NutriBanner = () => {
+  const userId = useSelector(state => state.auth.user?.id);
+  const navigate = useNavigate();
+
+  const handleClick = e => {
+    if (!userId) {
+      e.preventDefault();
+      toast.error('Bạn chưa đăng nhập, vui lòng đăng nhập để tiếp tục!');
+      setTimeout(() => {
+        navigate('/auth/login');
+      }, 3000);
+    }
+  };
+
   return (
-    <div className='bg-white text-black flex justify-center items-center min-h-max: p-20'>
+    <div className='bg-white text-black flex justify-center items-center min-h-max p-20'>
       <div className='flex flex-col lg:flex-row items-center space-x-10 max-w-6xl'>
         <div className='text-center lg:text-left space-y-6'>
           <h1 className='text-7xl font-bold leading-tight'>
@@ -15,8 +30,10 @@ const NutriBanner = () => {
             Want to be more mindful of what you eat? Track your meals, learn
             more about your habits, and achieve your goals with MyFitnessPal.
           </p>
+
           <Link
-            to={`/nutrition/create-meal`}
+            to='/nutrition/create-meal'
+            onClick={handleClick}
             className='inline-block bg-blue-500 text-white py-3 px-6 rounded-lg text-lg hover:bg-blue-600 transition'
           >
             Bắt đầu tạo bữa ăn
