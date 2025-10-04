@@ -3,7 +3,7 @@ import { z } from 'zod';
 const ExerciseValidation = {
   title: z.string(),
   difficulty: z.enum(['Beginner', 'Intermediate', 'Advanced']),
-  exerciseType: z.enum([
+  type: z.enum([
     'Strength',
     'Stretching',
     'Power',

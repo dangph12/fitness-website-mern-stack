@@ -10,7 +10,7 @@ const ExerciseSchema = new Schema<IExercise>(
       enum: ['Beginner', 'Intermediate', 'Advanced'],
       required: true
     },
-    exerciseType: {
+    type: {
       type: String,
       enum: [
         'Strength',
@@ -24,7 +24,7 @@ const ExerciseSchema = new Schema<IExercise>(
       ],
       required: true
     },
-    tutorialVideo: { type: String, default: '' },
+    tutorial: { type: String, default: '' },
     instructions: { type: String, required: true },
     muscles: [
       {
