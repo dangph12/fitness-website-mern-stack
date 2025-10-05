@@ -220,8 +220,407 @@
 			]
 		},
 		{
+			"name": "Exercise",
+			"item": [
+				{
+					"name": "Filter Exercise",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises?page=1&limit=10&sortBy=createdAt&sortOrder=desc&title=Plank&type=Strength&difficulty=Beginner&muscles=68dbfb24b959a26b9a83fad4&muscles=68dc003196c0756913d0a587&equipments=68e16c81f5caf5d27d7763c8",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								},
+								{
+									"key": "title",
+									"value": "Plank"
+								},
+								{
+									"key": "type",
+									"value": "Strength",
+									"description": "'Strength', 'Stretching', 'Power', 'Olympic', 'Explosive', 'Mobility', 'Dynamic', 'Yoga'"
+								},
+								{
+									"key": "difficulty",
+									"value": "Beginner",
+									"description": "'Beginner', 'Intermediate', 'Advanced'"
+								},
+								{
+									"key": "muscles",
+									"value": "68dbfb24b959a26b9a83fad4"
+								},
+								{
+									"key": "muscles",
+									"value": "68dc003196c0756913d0a587"
+								},
+								{
+									"key": "equipments",
+									"value": "68e16c81f5caf5d27d7763c8"
+								},
+								{
+									"key": "equipments",
+									"value": "68e16d38f5caf5d27d7763ce",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Exercise",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Exercise By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Chicken Breast\",\r\n    \"image\": \"https://picsum.photos/seed/chicken/400/300\",\r\n    \"calories\": 135,\r\n    \"proteins\": 27,\r\n    \"carbs\": 0,\r\n    \"fats\": 3\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises/{{exerciseId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises",
+								"{{exerciseId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Exercise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"if (jsonData.data && jsonData.data._id) {",
+									"    pm.collectionVariables.set(\"exerciseId\", jsonData.data._id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tutorial",
+									"type": "file",
+									"src": "postman-cloud:///1f0a1518-b881-46a0-ab3c-46c77502c414"
+								},
+								{
+									"key": "title",
+									"value": "Plank",
+									"type": "text"
+								},
+								{
+									"key": "difficulty",
+									"value": "Beginner",
+									"description": "'Beginner', 'Intermediate', 'Advanced'",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "Strength",
+									"description": "'Strength', 'Stretching', 'Power', 'Olympic', 'Explosive', 'Mobility', 'Dynamic', 'Yoga'",
+									"type": "text"
+								},
+								{
+									"key": "instructions",
+									"value": "Steps : \n1.) Start by kneeling on all fours and aligning both hands right below your shoulders keep your knees beneath your hips.\n\n2.) Extend both of your feet out behind you and squeeze on your core muscles, making sure that your body is aligned straight \n\n3.) Hold this position for about 30 seconds to a minute.\n\n4.) Release, return back to the starting position and repeat for as many times as you would like to perform this exercise.",
+									"type": "text"
+								},
+								{
+									"key": "muscles[0]",
+									"value": "68dbfb24b959a26b9a83fad4",
+									"type": "text"
+								},
+								{
+									"key": "muscles[1]",
+									"value": "68dc003196c0756913d0a587",
+									"type": "text"
+								},
+								{
+									"key": "equipments[0]",
+									"value": "68e16c81f5caf5d27d7763c8",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Exercise By Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tutorial",
+									"type": "file",
+									"src": "postman-cloud:///1f0a1518-b881-46a0-ab3c-46c77502c414"
+								},
+								{
+									"key": "title",
+									"value": "Plank",
+									"type": "text"
+								},
+								{
+									"key": "difficulty",
+									"value": "Beginner",
+									"description": "'Beginner', 'Intermediate', 'Advanced'",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "Strength",
+									"description": "'Strength', 'Stretching', 'Power', 'Olympic', 'Explosive', 'Mobility', 'Dynamic', 'Yoga'",
+									"type": "text"
+								},
+								{
+									"key": "instructions",
+									"value": "Steps : \n1.) Start by kneeling on all fours and aligning both hands right below your shoulders keep your knees beneath your hips.\n\n2.) Extend both of your feet out behind you and squeeze on your core muscles, making sure that your body is aligned straight \n\n3.) Hold this position for about 30 seconds to a minute.\n\n4.) Release, return back to the starting position and repeat for as many times as you would like to perform this exercise.",
+									"type": "text"
+								},
+								{
+									"key": "muscles[0]",
+									"value": "68dbfb24b959a26b9a83fad4",
+									"type": "text"
+								},
+								{
+									"key": "muscles[1]",
+									"value": "68dc003196c0756913d0a587",
+									"type": "text"
+								},
+								{
+									"key": "equipments[0]",
+									"value": "68e16c81f5caf5d27d7763c8",
+									"type": "text"
+								},
+								{
+									"key": "equipments[1]",
+									"value": "68e16cbef5caf5d27d7763cb",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises/{{exerciseId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises",
+								"{{exerciseId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Exercise By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Chicken Breast\",\r\n    \"image\": \"https://picsum.photos/seed/chicken/400/300\",\r\n    \"calories\": 135,\r\n    \"proteins\": 27,\r\n    \"carbs\": 0,\r\n    \"fats\": 3\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises/{{exerciseId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises",
+								"{{exerciseId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "User",
 			"item": [
+				{
+					"name": "Filter User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users?page=1&limit=10&name=&email=&gender&role=user&sortBy=createdAt&sortOrder=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "name",
+									"value": ""
+								},
+								{
+									"key": "email",
+									"value": ""
+								},
+								{
+									"key": "gender",
+									"value": null
+								},
+								{
+									"key": "role",
+									"value": "user"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "Get All Users",
 					"request": {
@@ -255,13 +654,13 @@
 								},
 								{
 									"key": "email",
-									"value": "anhduck1202@gmail.com",
+									"value": "anhduck120212121212@gmail.com",
 									"type": "text"
 								},
 								{
 									"key": "avatar",
 									"type": "file",
-									"src": "/C:/Users/os/Downloads/anh_duc.jpg"
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
 								},
 								{
 									"key": "role",
@@ -456,14 +855,14 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{base_url}}/api/users/68de8123adcebd592c06ec43",
+							"raw": "{{base_url}}/api/users/68e0fea721f293698bb244c1",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"68de8123adcebd592c06ec43"
+								"68e0fea721f293698bb244c1"
 							]
 						}
 					},
@@ -587,13 +986,13 @@
 							"formdata": [
 								{
 									"key": "title",
-									"value": "Weight Plates",
+									"value": "Weight Plate",
 									"type": "text"
 								},
 								{
 									"key": "image",
 									"type": "file",
-									"src": "/C:/Users/os/Downloads/images (1).jpg"
+									"src": "/C:/Users/os/Downloads/download (6).jpg"
 								}
 							]
 						},
@@ -880,7 +1279,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"Body Classification Test\",\r\n    \"weightFactor\": 123,\r\n    \"description\": \"Body Classification Description Test\"\r\n}",
+							"raw": "{\r\n    \"title\": \"Béo phì độ III\",\r\n    \"weightFactor\": {\r\n        \"min\": 40,\r\n        \"max\": 56\r\n    },\r\n    \"description\": \"Béo phì rất nặng, nguy cơ cao biến chứng tim mạch, tiểu đường, đột quỵ.\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -906,14 +1305,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/body-classifications/68de3711d3574ce5f2e685c8",
+							"raw": "{{base_url}}/api/body-classifications/68e219d7a3786ffc3608907d",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"body-classifications",
-								"68de3711d3574ce5f2e685c8"
+								"68e219d7a3786ffc3608907d"
 							]
 						}
 					},
@@ -957,14 +1356,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{base_url}}/api/body-classifications/68de3711d3574ce5f2e685c8",
+							"raw": "{{base_url}}/api/body-classifications/68e1640898bdfbd4afdf2d7c",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"body-classifications",
-								"68de3711d3574ce5f2e685c8"
+								"68e1640898bdfbd4afdf2d7c"
 							]
 						}
 					},
@@ -1284,6 +1683,203 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Body Record",
+			"item": [
+				{
+					"name": "Get All Body Records",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Anh Duc",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "anhduck120212121212@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								},
+								{
+									"key": "role",
+									"value": "user",
+									"type": "text"
+								},
+								{
+									"key": "dob",
+									"value": "02/12/2004",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text"
+								},
+								{
+									"key": "isActive",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Body Record",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"height\": 168,\r\n    \"weight\": 65,\r\n    \"user\": \"68e15d4db4068819de9bced5\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Body Record By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"height\": ,\r\n    \"weight\": ,\r\n    \"userId\": \"\",\r\n    \"bodyClassificationId\": \"68e1640898bdfbd4afdf2d7c\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records/68e1669cb0df842f4ecc9347",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records",
+								"68e1669cb0df842f4ecc9347"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Body Record By User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"height\": ,\r\n    \"weight\": ,\r\n    \"userId\": \"\",\r\n    \"bodyClassificationId\": \"68e1640898bdfbd4afdf2d7c\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records/user/68e15d4db4068819de9bced5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records",
+								"user",
+								"68e15d4db4068819de9bced5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Body Record By Id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"height\": 168,\r\n    \"weight\": 65,\r\n    \"user\": \"68e15d4db4068819de9bced5\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records/68e228ea8be9cb666b085dd1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records",
+								"68e228ea8be9cb666b085dd1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Body Record By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"height\": 169,\r\n    \"weight\": 69,\r\n    \"userId\": \"68e15d4db4068819de9bced5\",\r\n    \"bodyClassificationId\": \"68e1640898bdfbd4afdf2d7c\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records/68e1669cb0df842f4ecc9347",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records",
+								"68e1669cb0df842f4ecc9347"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -1318,6 +1914,11 @@
 		{
 			"key": "accessToken",
 			"value": ""
+		},
+		{
+			"key": "exerciseId",
+			"value": "",
+			"type": "default"
 		}
 	]
 }
