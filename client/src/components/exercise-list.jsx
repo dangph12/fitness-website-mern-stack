@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router';
 
 import { Input } from '~/components/ui/input';
 import {
@@ -117,25 +118,27 @@ const ExerciseList = () => {
               key={exercise._id}
               className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all cursor-pointer border border-gray-200'
             >
-              <img
-                src={
-                  exercise.tutorial.endsWith('.gif')
-                    ? exercise.tutorial.replace(
-                        '/upload/',
-                        '/upload/f_jpg/so_0/'
-                      )
-                    : exercise.tutorial
-                }
-                onMouseEnter={e => (e.currentTarget.src = exercise.tutorial)}
-                onMouseLeave={e =>
-                  (e.currentTarget.src = exercise.tutorial.replace(
-                    '/upload/',
-                    '/upload/f_jpg/so_0/'
-                  ))
-                }
-                alt={exercise.title}
-                className='w-full h-48 object-cover rounded-md transition-all duration-200'
-              />
+              <Link to={`/exercise/${exercise._id}`}>
+                <img
+                  src={
+                    exercise.tutorial.endsWith('.gif')
+                      ? exercise.tutorial.replace(
+                          '/upload/',
+                          '/upload/f_jpg/so_0/'
+                        )
+                      : exercise.tutorial
+                  }
+                  onMouseEnter={e => (e.currentTarget.src = exercise.tutorial)}
+                  onMouseLeave={e =>
+                    (e.currentTarget.src = exercise.tutorial.replace(
+                      '/upload/',
+                      '/upload/f_jpg/so_0/'
+                    ))
+                  }
+                  alt={exercise.title}
+                  className='w-full h-48 object-cover rounded-md transition-all duration-200'
+                />
+              </Link>
               <div className='p-4'>
                 <h3 className='text-lg font-semibold mb-1'>{exercise.title}</h3>
                 <p className='text-blue-600 text-sm mb-1'>
