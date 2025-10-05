@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 import { deleteMeal, fetchMeals } from '~/store/features/meal-slice';
 
@@ -46,12 +47,12 @@ const MealsList = () => {
 
   const handleDeleteMeal = mealId => {
     if (!userId) {
-      alert('Bạn chưa đăng nhập, không thể xóa meal!');
+      toast.error('Bạn chưa đăng nhập, không thể xóa meal!');
       navigate('/auth/login');
       return;
     }
 
-    if (window.confirm('Are you sure you want to delete this meal?')) {
+    if (toast.warning('Are you sure you want to delete this meal?')) {
       dispatch(deleteMeal(mealId));
     }
   };
