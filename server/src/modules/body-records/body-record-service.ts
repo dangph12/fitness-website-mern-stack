@@ -6,10 +6,18 @@ import UserModel from '../users/user-model';
 import BodyRecordModel from './body-record-model';
 import { IBodyRecord } from './body-record-type';
 
+const calculateBMI = (height: number, weight: number): number => {
+  if (height <= 0 || weight <= 0) {
+    throw createHttpError(400, 'Height and weight must be positive numbers');
+  }
+  const heightInMeters = height / 100;
+  return Number((weight / (heightInMeters * heightInMeters)).toFixed(2));
+};
+
 const BodyRecordService = {
   findAll: async () => {
     const bodyRecords = await BodyRecordModel.find()
-      .populate('userId')
+      .populate('user')
       .populate('bodyClassification');
 
     return bodyRecords;
@@ -34,7 +42,7 @@ const BodyRecordService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const bodyRecord = await BodyRecordModel.find({ userId: userId });
+    const bodyRecord = await BodyRecordModel.find({ user: userId });
 
     if (!bodyRecord) {
       throw createHttpError(404, 'Records not found');
@@ -44,25 +52,28 @@ const BodyRecordService = {
   },
 
   create: async (bodyRecordData: IBodyRecord) => {
-    if (!Types.ObjectId.isValid(bodyRecordData.userId)) {
+    if (!Types.ObjectId.isValid(bodyRecordData.user)) {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const user = await UserModel.findById(bodyRecordData.userId);
+    const user = await UserModel.findById(bodyRecordData.user);
     if (!user) {
       throw createHttpError(404, 'User not found');
     }
 
-    if (!Types.ObjectId.isValid(bodyRecordData.bodyClassificationId)) {
-      throw createHttpError(400, 'Invalid bodyClassificationId');
+    const bmi = calculateBMI(bodyRecordData.height, bodyRecordData.weight);
+    bodyRecordData.bmi = bmi;
+
+    const bodyClassification = await BodyClassificationModel.findOne({
+      'weightFactor.min': { $lte: bmi },
+      'weightFactor.max': { $gte: bmi }
+    });
+
+    if (!bodyClassification) {
+      throw createHttpError(404, 'No classification found for the given BMI');
     }
 
-    const bodyClassification = await BodyClassificationModel.findById(
-      bodyRecordData.bodyClassificationId
-    );
-    if (!bodyClassification) {
-      throw createHttpError(404, 'Body Classification not found');
-    }
+    bodyRecordData.bodyClassification = bodyClassification._id;
 
     const bodyRecord = await BodyRecordModel.create(bodyRecordData);
 
@@ -81,30 +92,29 @@ const BodyRecordService = {
       throw createHttpError(400, 'Invalid ObjectId');
     }
 
-    if (
-      bodyRecordData.userId &&
-      !Types.ObjectId.isValid(bodyRecordData.userId)
-    ) {
+    if (bodyRecordData.user && !Types.ObjectId.isValid(bodyRecordData.user)) {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const user = await UserModel.findById(bodyRecordData.userId);
+    const user = await UserModel.findById(bodyRecordData.user);
     if (!user) {
       throw createHttpError(404, 'User not found');
     }
 
-    if (
-      bodyRecordData.bodyClassificationId &&
-      !Types.ObjectId.isValid(bodyRecordData.bodyClassificationId)
-    ) {
-      throw createHttpError(400, 'Invalid bodyClassificationId');
-    }
+    if (bodyRecordData.height && bodyRecordData.weight) {
+      const bmi = calculateBMI(bodyRecordData.height, bodyRecordData.weight);
+      bodyRecordData.bmi = bmi;
 
-    const bodyClassification = await BodyClassificationModel.findById(
-      bodyRecordData.bodyClassificationId
-    );
-    if (!bodyClassification) {
-      throw createHttpError(404, 'Body Classification not found');
+      const bodyClassification = await BodyClassificationModel.findOne({
+        'weightFactor.min': { $lte: bmi },
+        'weightFactor.max': { $gte: bmi }
+      });
+
+      if (!bodyClassification) {
+        throw createHttpError(404, 'No classification found for the given BMI');
+      }
+
+      bodyRecordData.bodyClassification = bodyClassification._id;
     }
 
     const bodyRecord = await BodyRecordModel.findByIdAndUpdate(

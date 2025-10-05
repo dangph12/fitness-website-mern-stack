@@ -6,8 +6,9 @@ const BodyRecordSchema = new Schema<IBodyRecord>(
   {
     height: { type: Number, required: true },
     weight: { type: Number, required: true },
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    bodyClassificationId: {
+    bmi: { type: Number, required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    bodyClassification: {
       type: Schema.Types.ObjectId,
       ref: 'BodyClassification',
       required: true
