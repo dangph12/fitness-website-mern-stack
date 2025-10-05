@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { AdminSidebar } from '../components/admin-sidebar.jsx';
+import { AdminSidebar } from '../components/admin/admin-sidebar.jsx';
+import { SearchInput } from '../components/admin/search.jsx';
 import { ProfileDropdown } from '../components/profile-dropdown';
-import { SearchInput } from '../components/search';
 import {
   Breadcrumb,
   BreadcrumbItem,
