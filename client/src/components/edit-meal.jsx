@@ -3,6 +3,7 @@ import { FaClipboardList, FaHamburger } from 'react-icons/fa';
 import { MdFileUpload } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
+import { toast } from 'sonner';
 
 import { fetchMealById, updateMeal } from '~/store/features/meal-slice';
 
@@ -51,7 +52,7 @@ const EditMeal = () => {
     if (file && file.type.startsWith('image/')) {
       setImage(file);
     } else {
-      alert('Please select a valid image file.');
+      toast.warning('Please select a valid image file.');
       setImage(null);
     }
   };
@@ -71,11 +72,11 @@ const EditMeal = () => {
 
     try {
       await dispatch(updateMeal({ id, updateData: formData }));
-      alert('Meal updated successfully!');
+      toast.success('Meal updated successfully!');
       navigate('/nutrition');
     } catch (err) {
       console.error('Error updating meal:', err);
-      alert('Failed to update meal!');
+      toast.error('Failed to update meal!');
     } finally {
       setLoading(false);
     }
