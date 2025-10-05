@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { fetchEquipments } from '~/store/features/equipment-slice';
+import { fetchMuscles } from '~/store/features/muscles-slice';
 
 const ExerciseFilterModal = ({
   isOpen,
@@ -8,6 +12,18 @@ const ExerciseFilterModal = ({
   setFilters,
   onApply
 }) => {
+  const dispatch = useDispatch();
+
+  const { muscles } = useSelector(state => state.muscles);
+  const { equipments } = useSelector(state => state.equipments);
+
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(fetchMuscles());
+      dispatch(fetchEquipments());
+    }
+  }, [isOpen, dispatch]);
+
   if (!isOpen) return null;
 
   return (
@@ -37,9 +53,12 @@ const ExerciseFilterModal = ({
               setFilters(prev => ({ ...prev, muscle: e.target.value }))
             }
           >
-            <option>All</option>
-            <option value='68dbfb24b959a26b9a83fad4'>Abs</option>
-            <option value='68dc003196c0756913d0a587'>Back</option>
+            <option value='All'>All</option>
+            {muscles?.map(m => (
+              <option key={m._id} value={m._id}>
+                {m.title}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -52,7 +71,7 @@ const ExerciseFilterModal = ({
               setFilters(prev => ({ ...prev, difficulty: e.target.value }))
             }
           >
-            <option>All</option>
+            <option value='All'>All</option>
             <option value='Beginner'>Beginner</option>
             <option value='Intermediate'>Intermediate</option>
             <option value='Advanced'>Advanced</option>
@@ -68,9 +87,12 @@ const ExerciseFilterModal = ({
               setFilters(prev => ({ ...prev, equipment: e.target.value }))
             }
           >
-            <option>All</option>
-            <option value='68e16c81f5caf5d27d7763c8'>Body Weight</option>
-            <option value='68e16d38f5caf5d27d7763ce'>Machine</option>
+            <option value='All'>All</option>
+            {equipments?.map(eq => (
+              <option key={eq._id} value={eq._id}>
+                {eq.title}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -83,10 +105,15 @@ const ExerciseFilterModal = ({
               setFilters(prev => ({ ...prev, type: e.target.value }))
             }
           >
-            <option>All</option>
+            <option value='All'>All</option>
             <option value='Strength'>Strength</option>
             <option value='Stretching'>Stretching</option>
             <option value='Power'>Power</option>
+            <option value='Olympic'>Olympic</option>
+            <option value='Explosive'>Explosive</option>
+            <option value='Mobility'>Mobility</option>
+            <option value='Dynamic'>Dynamic</option>
+            <option value='Yoga'>Yoga</option>
           </select>
         </div>
 
