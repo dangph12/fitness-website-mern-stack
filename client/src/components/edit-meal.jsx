@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { FaClipboardList, FaHamburger } from 'react-icons/fa';
+import {
+  FaClipboardList,
+  FaDrumstickBite,
+  FaFire,
+  FaHamburger
+} from 'react-icons/fa';
 import { MdFileUpload } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
@@ -41,6 +46,8 @@ const EditMeal = () => {
           foodId: food.foodId._id,
           title: food.foodId.title,
           image: food.foodId.image,
+          calories: food.foodId.calories,
+          fats: food.foodId.fats,
           quantity: food.quantity
         }))
       );
@@ -81,6 +88,16 @@ const EditMeal = () => {
       setLoading(false);
     }
   };
+
+  const totalNutrients = selectedFoods.reduce(
+    (totals, food) => {
+      const qty = Number(food.quantity) || 1;
+      totals.calories += (food.calories || 0) * qty;
+      totals.fats += (food.fats || 0) * qty;
+      return totals;
+    },
+    { calories: 0, fats: 0 }
+  );
 
   if (mealLoading) return <div>Loading meal data...</div>;
   if (error) return <div className='text-red-500'>{error}</div>;
@@ -154,6 +171,30 @@ const EditMeal = () => {
               <option value='Brunch'>Brunch</option>
               <option value='Dessert'>Dessert</option>
             </select>
+          </div>
+
+          <div className='flex justify-around items-center mt-6 bg-gradient-to-r from-blue-100 to-blue-50 border border-blue-200 rounded-lg p-4 text-center shadow-sm'>
+            <div className='flex items-center gap-3'>
+              <FaFire className='text-red-500 text-2xl' />
+              <div>
+                <p className='text-gray-700 text-sm font-semibold'>
+                  Total Calories
+                </p>
+                <p className='text-blue-700 font-bold text-xl'>
+                  {totalNutrients.calories.toFixed(0)} kcal
+                </p>
+              </div>
+            </div>
+
+            <div className='flex items-center gap-3'>
+              <FaDrumstickBite className='text-yellow-500 text-2xl' />
+              <div>
+                <p className='text-gray-700 text-sm font-semibold'>Total Fat</p>
+                <p className='text-blue-700 font-bold text-xl'>
+                  {totalNutrients.fats.toFixed(1)} g
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
