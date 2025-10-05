@@ -52,8 +52,9 @@ const MealsList = () => {
       return;
     }
 
-    if (toast.warning('Are you sure you want to delete this meal?')) {
+    if (window.confirm('Are you sure you want to delete this meal?')) {
       dispatch(deleteMeal(mealId));
+      toast.success('Meal deleted successfully!');
     }
   };
 
