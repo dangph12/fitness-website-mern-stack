@@ -11,11 +11,15 @@ const MealsList = () => {
   const navigate = useNavigate();
 
   const { meals, loading, error } = useSelector(state => state.meals);
+  const userId = useSelector(state => state.auth.user?.id);
+
   const [selectedMeal, setSelectedMeal] = useState(null);
 
   useEffect(() => {
-    dispatch(fetchMeals({ page: 1, limit: 10 }));
-  }, [dispatch]);
+    if (userId) {
+      dispatch(fetchMeals({ page: 1, limit: 10 }));
+    }
+  }, [dispatch, userId]);
 
   const handleSelectMeal = meal => {
     setSelectedMeal(meal);
@@ -41,10 +45,34 @@ const MealsList = () => {
   };
 
   const handleDeleteMeal = mealId => {
+    if (!userId) {
+      alert('Bạn chưa đăng nhập, không thể xóa meal!');
+      navigate('/auth/login');
+      return;
+    }
+
     if (window.confirm('Are you sure you want to delete this meal?')) {
       dispatch(deleteMeal(mealId));
     }
   };
+
+  if (!userId) {
+    return (
+      <div className='flex justify-center items-center'>
+        <div className='text-center'>
+          <p className='text-xl text-red-500 font-semibold mb-4'>
+            Bạn chưa đăng nhập!
+          </p>
+          <button
+            onClick={() => navigate('/auth/login')}
+            className='bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition mb-4'
+          >
+            Đăng nhập để xem Meals
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading)
     return (
