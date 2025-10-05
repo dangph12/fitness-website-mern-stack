@@ -27,9 +27,20 @@ const ExerciseList = () => {
             className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all cursor-pointer'
           >
             <img
-              src={exercise.tutorial}
+              src={
+                exercise.tutorial.endsWith('.gif')
+                  ? exercise.tutorial.replace('/upload/', '/upload/f_jpg/so_0/')
+                  : exercise.tutorial
+              }
+              onMouseEnter={e => (e.currentTarget.src = exercise.tutorial)}
+              onMouseLeave={e =>
+                (e.currentTarget.src = exercise.tutorial.replace(
+                  '/upload/',
+                  '/upload/f_jpg/so_0/'
+                ))
+              }
               alt={exercise.title}
-              className='w-full h-48 object-cover'
+              className='w-full h-48 object-cover rounded-md transition-all duration-200'
             />
             <div className='p-4'>
               <h3 className='text-lg font-semibold mb-1'>{exercise.title}</h3>
