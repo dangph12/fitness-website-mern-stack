@@ -56,7 +56,7 @@ const ExerciseDetail = () => {
 
         <div className='flex-1 space-y-6'>
           <div className='flex justify-between items-start'>
-            <h1 className='text-7xl font-extrabold text-gray-900'>{title}</h1>
+            <h1 className='text-6xl font-extrabold text-gray-900'>{title}</h1>
             <button className='bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-md font-semibold text-white text-sm transition'>
               Try it out
             </button>
@@ -67,14 +67,21 @@ const ExerciseDetail = () => {
               <GiMuscleUp className='text-blue-600 text-lg' /> Target Muscle
               Groups
             </h3>
-            <div className='flex flex-wrap gap-3'>
+            <div className='flex flex-wrap gap-4'>
               {muscles?.length ? (
                 muscles.map(m => (
                   <div
                     key={m._id || m}
-                    className='bg-blue-50 border border-blue-200 rounded-md px-4 py-2 text-center text-blue-700 font-medium text-sm'
+                    className='bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-center text-blue-700 font-medium text-sm w-24 shadow-sm hover:shadow-md transition'
                   >
-                    {m.title || m}
+                    {m.image && (
+                      <img
+                        src={m.image}
+                        alt={m.title}
+                        className='w-12 h-12 object-contain mx-auto mb-1'
+                      />
+                    )}
+                    <p className='truncate'>{m.title || m}</p>
                   </div>
                 ))
               ) : (
@@ -87,14 +94,21 @@ const ExerciseDetail = () => {
             <h3 className='text-sm font-bold uppercase text-gray-500 mb-2 flex items-center gap-2'>
               <FaDumbbell className='text-blue-600 text-lg' /> Equipment
             </h3>
-            <div className='flex flex-wrap gap-3'>
+            <div className='flex flex-wrap gap-4'>
               {equipments?.length ? (
                 equipments.map(e => (
                   <div
                     key={e._id || e}
-                    className='bg-blue-50 border border-blue-200 rounded-md px-4 py-2 text-center text-blue-700 font-medium text-sm'
+                    className='bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-center text-blue-700 font-medium text-sm w-24 shadow-sm hover:shadow-md transition'
                   >
-                    {e.title || e}
+                    {e.image && (
+                      <img
+                        src={e.image}
+                        alt={e.title}
+                        className='w-12 h-12 object-contain mx-auto mb-1'
+                      />
+                    )}
+                    <p className='truncate'>{e.title || e}</p>
                   </div>
                 ))
               ) : (
