@@ -37,6 +37,13 @@ const BodyClassificationService = {
       );
     }
 
+    if (
+      bodyClassificationData.weightFactor.min >=
+      bodyClassificationData.weightFactor.max
+    ) {
+      throw createHttpError(400, 'Invalid range of weightFactor');
+    }
+
     const newBodyClassification = await BodyClassificationModel.create(
       bodyClassificationData
     );
@@ -59,6 +66,13 @@ const BodyClassificationService = {
       await BodyClassificationModel.findById(bodyClassificationId);
     if (!existingBodyClassification) {
       throw createHttpError(404, 'Body classification not found');
+    }
+
+    if (
+      updateData.weightFactor &&
+      updateData.weightFactor?.min >= updateData.weightFactor?.max
+    ) {
+      throw createHttpError(400, 'Invalid range of weightFactor');
     }
 
     const updatedBodyClassification =

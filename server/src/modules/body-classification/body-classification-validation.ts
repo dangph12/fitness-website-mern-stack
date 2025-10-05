@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 const BodyClassificationValidation = {
   title: z.string(),
-  weightFactor: z.number(),
+  weightFactor: z.object({
+    min: z.number(),
+    max: z.number()
+  }),
   description: z.string()
 };
 
