@@ -40,6 +40,7 @@ const EditMeal = () => {
         currentMeal.foods.map(food => ({
           foodId: food.foodId._id,
           title: food.foodId.title,
+          image: food.foodId.image,
           quantity: food.quantity
         }))
       );
@@ -48,7 +49,6 @@ const EditMeal = () => {
 
   const handleImageChange = e => {
     const file = e.target.files[0];
-
     if (file && file.type.startsWith('image/')) {
       setImage(file);
     } else {
@@ -83,100 +83,105 @@ const EditMeal = () => {
   };
 
   if (mealLoading) return <div>Loading meal data...</div>;
-
   if (error) return <div className='text-red-500'>{error}</div>;
 
   return (
-    <div className='max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-lg'>
-      <h1 className='text-4xl font-semibold text-center text-gray-800 mb-8'>
+    <div className='max-w-6xl mx-auto p-8 bg-white rounded-xl shadow-lg'>
+      <h1 className='text-4xl font-semibold text-center text-gray-800 mb-10'>
         Edit Meal
       </h1>
 
-      <div className='space-y-6'>
-        <div>
-          <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
-            <FaClipboardList className='mr-2 text-blue-600' /> Meal Title
+      <div className='flex flex-col lg:flex-row-reverse gap-10'>
+        <div className='flex flex-col w-full lg:w-1/2 border border-gray-200 rounded-xl p-6 bg-gray-50'>
+          <h2 className='text-lg font-semibold text-gray-700 mb-3 text-center'>
+            Current Meal Image
+          </h2>
+
+          {image ? (
+            <img
+              src={image instanceof File ? URL.createObjectURL(image) : image}
+              alt='Meal'
+              className='w-full h-80 object-cover rounded-lg shadow-md mb-6 border border-gray-300'
+            />
+          ) : (
+            currentMeal?.image && (
+              <img
+                src={currentMeal.image}
+                alt='Meal'
+                className='w-full h-80 object-cover rounded-lg shadow-md mb-6 border border-gray-300'
+              />
+            )
+          )}
+
+          <label className='block text-lg font-medium text-gray-700 mb-2 flex items-center'>
+            <MdFileUpload className='mr-2 text-green-500' /> Upload New Image
           </label>
           <input
-            type='text'
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            required
-            className='w-full p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg'
+            type='file'
+            onChange={handleImageChange}
+            className='w-full p-3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-6'
           />
         </div>
 
-        <div>
-          <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
-            <FaHamburger className='mr-2 text-yellow-500' /> Meal Type
-          </label>
-          <select
-            value={mealType}
-            onChange={e => setMealType(e.target.value)}
-            required
-            className='w-full p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg'
-          >
-            <option value='Breakfast'>Breakfast</option>
-            <option value='Lunch'>Lunch</option>
-            <option value='Dinner'>Dinner</option>
-            <option value='Snack'>Snack</option>
-            <option value='Brunch'>Brunch</option>
-            <option value='Dessert'>Dessert</option>
-          </select>
+        <div className='w-full lg:w-1/2 space-y-6'>
+          <div>
+            <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
+              <FaClipboardList className='mr-2 text-blue-600' /> Meal Title
+            </label>
+            <input
+              type='text'
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              required
+              className='w-full p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg'
+            />
+          </div>
+
+          <div>
+            <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
+              <FaHamburger className='mr-2 text-yellow-500' /> Meal Type
+            </label>
+            <select
+              value={mealType}
+              onChange={e => setMealType(e.target.value)}
+              required
+              className='w-full p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg'
+            >
+              <option value='Breakfast'>Breakfast</option>
+              <option value='Lunch'>Lunch</option>
+              <option value='Dinner'>Dinner</option>
+              <option value='Snack'>Snack</option>
+              <option value='Brunch'>Brunch</option>
+              <option value='Dessert'>Dessert</option>
+            </select>
+          </div>
         </div>
+      </div>
+
+      <div className='mt-10 border border-gray-200 rounded-xl p-8 bg-gray-50'>
+        <h3 className='text-2xl font-semibold text-gray-800 mb-5 text-center'>
+          Foods in this Meal
+        </h3>
 
         <FoodList
           selectedFoods={selectedFoods}
           setSelectedFoods={setSelectedFoods}
         />
+      </div>
 
-        {image ? (
-          <div className='mb-4'>
-            <label className='block text-lg font-medium text-gray-700 mb-2'>
-              Current Image
-            </label>
-            <img
-              src={image instanceof File ? URL.createObjectURL(image) : image}
-              alt='Current Meal'
-              className='w-32 h-32 object-cover rounded-lg mb-4'
-            />
-          </div>
-        ) : (
-          currentMeal?.image && (
-            <div className='mb-4'>
-              <label className='block text-lg font-medium text-gray-700 mb-2'>
-                Current Image
-              </label>
-              <img
-                src={currentMeal.image}
-                alt='Current Meal'
-                className='w-32 h-32 object-cover rounded-lg mb-4'
-              />
-            </div>
-          )
-        )}
-
-        <div>
-          <label className='block text-lg font-medium text-gray-700 mb-3 flex items-center'>
-            <MdFileUpload className='mr-2 text-green-500' /> Meal Image
-          </label>
-          <input
-            type='file'
-            onChange={handleImageChange}
-            className='w-full p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
-        </div>
-
-        <div className='mt-6'>
-          <button
-            type='button'
-            onClick={handleUpdateMeal}
-            className={`w-full p-4 text-white rounded-lg ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
-            disabled={loading}
-          >
-            {loading ? 'Updating Meal...' : 'Update Meal'}
-          </button>
-        </div>
+      <div className='mt-6'>
+        <button
+          type='button'
+          onClick={handleUpdateMeal}
+          className={`w-full p-4 text-white rounded-lg ${
+            loading
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
+          disabled={loading}
+        >
+          {loading ? 'Updating Meal...' : 'Update Meal'}
+        </button>
       </div>
     </div>
   );
