@@ -1,6 +1,10 @@
 import express, { Router } from 'express';
 import passport from 'passport';
 
+import {
+  facebookOAuthCallback,
+  googleOAuthCallback
+} from '~/middleware/oauth-callback';
 import validate from '~/middleware/validate';
 import asyncHandler from '~/utils/async-handler';
 import { uploadSingle } from '~/utils/multer';
@@ -52,28 +56,14 @@ router.get(
   passport.authenticate('google', { scope: ['email', 'profile'] })
 );
 
-router.get(
-  '/google/callback',
-  passport.authenticate('google', {
-    session: false,
-    failureRedirect: '/login'
-  }),
-  asyncHandler(AuthController.loginWithProvider)
-);
+router.get('/google/callback', googleOAuthCallback);
 
 router.get(
   '/facebook',
   passport.authenticate('facebook', { scope: ['email', 'public_profile'] })
 );
 
-router.get(
-  '/facebook/callback',
-  passport.authenticate('facebook', {
-    session: false,
-    failureRedirect: '/login'
-  }),
-  asyncHandler(AuthController.loginWithProvider)
-);
+router.get('/facebook/callback', facebookOAuthCallback);
 
 router.post(
   '/admin/login',

@@ -54,18 +54,18 @@ const configurePassport = () => {
               email: profile.emails?.[0]?.value || ''
             });
 
-            if (!user || !user.isActive) {
-              return done(null, false, {
-                message: 'User not found or inactive'
-              });
-            }
-
             if (!user) {
               user = await UserService.create({
                 email: profile.emails?.[0]?.value || '',
                 name: profile.displayName || '',
                 avatar: profile.photos?.[0]?.value || '',
                 role: 'user'
+              });
+            }
+
+            if (!user.isActive) {
+              return done(null, false, {
+                message: 'user_inactive'
               });
             }
 
@@ -94,18 +94,18 @@ const configurePassport = () => {
               email: profile.emails?.[0]?.value || ''
             });
 
-            if (!user || !user.isActive) {
-              return done(null, false, {
-                message: 'User not found or inactive'
-              });
-            }
-
             if (!user) {
               user = await UserService.create({
                 email: profile.emails?.[0]?.value || '',
                 name: profile.displayName || '',
                 avatar: profile.photos?.[0]?.value || '',
                 role: 'user'
+              });
+            }
+
+            if (!user.isActive) {
+              return done(null, false, {
+                message: 'user_inactive'
               });
             }
 

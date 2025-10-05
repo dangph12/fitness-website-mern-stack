@@ -5,6 +5,7 @@ import AuthRoutes from '~/modules/auth/auth-route';
 import BodyClassificationRouter from '~/modules/body-classification/body-classification-route';
 import BodyRecordRoute from '~/modules/body-records/body-record-route';
 import EquipmentRoute from '~/modules/equipments/equipment-route';
+import ExerciseRoute from '~/modules/exercises/exercise-route';
 import FoodRoute from '~/modules/foods/food-route';
 import MealRoute from '~/modules/meals/meal-route';
 import MuscleRouter from '~/modules/muscles/muscle-route';
@@ -34,5 +35,8 @@ router.use('/meals', MealRoute);
 
 // Body record routes
 router.use('/body-records', BodyRecordRoute);
+
+// Exercise routes
+router.use('/exercises', ExerciseRoute);
 
 export default router;
