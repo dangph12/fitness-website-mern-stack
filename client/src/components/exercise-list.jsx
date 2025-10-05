@@ -1,18 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Input } from '~/components/ui/input';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious
+} from '~/components/ui/pagination';
 import { fetchExercises } from '~/store/features/exercise-slice';
 
 import ExerciseFilterModal from './exercise-filter-modal';
 
 const ExerciseList = () => {
   const dispatch = useDispatch();
-  const { exercises, loading, error } = useSelector(state => state.exercises);
+  const { exercises, loading, error, totalExercises, totalPages } = useSelector(
+    state => state.exercises
+  );
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   const [filters, setFilters] = useState({
     muscle: 'All',
@@ -21,7 +33,7 @@ const ExerciseList = () => {
     type: 'All'
   });
 
-  const handleApplyFilters = () => {
+  useEffect(() => {
     const filterParams = {};
     if (filters.muscle !== 'All') filterParams.muscles = filters.muscle;
     if (filters.equipment !== 'All')
@@ -32,21 +44,39 @@ const ExerciseList = () => {
 
     dispatch(
       fetchExercises({
-        page: 1,
-        limit: 12,
+        page: currentPage,
+        limit: itemsPerPage,
         sortBy: 'createdAt',
         sortOrder: 'desc',
         filterParams
       })
     );
+  }, [dispatch, currentPage, filters]);
+
+  const handleApplyFilters = () => {
+    setCurrentPage(1);
+    setIsFilterOpen(false);
   };
 
-  const filteredExercises = exercises?.filter(ex =>
-    ex.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredExercises = Array.isArray(exercises)
+    ? exercises.filter(ex =>
+        ex.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
-  if (loading) return <div className='text-center'>Loading exercises...</div>;
+  if (loading && !exercises.length) {
+    return (
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 animate-pulse'>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className='bg-gray-200 h-64 rounded-lg'></div>
+        ))}
+      </div>
+    );
+  }
   if (error) return <div className='text-center text-red-500'>{error}</div>;
+
+  console.log('EXERCISES FROM REDUX:', exercises);
+  console.log('totalPages:', totalPages, '| totalExercises:', totalExercises);
 
   return (
     <div className='container mx-auto p-6 text-black'>
@@ -76,11 +106,11 @@ const ExerciseList = () => {
       </div>
 
       <div className='mb-4 text-sm text-gray-500'>
-        <strong className='text-black'>{filteredExercises?.length || 0}</strong>{' '}
-        EXERCISES FOUND
+        <strong className='text-black'>{totalExercises || 0}</strong> EXERCISES
+        FOUND
       </div>
 
-      {filteredExercises?.length ? (
+      {filteredExercises.length ? (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
           {filteredExercises.map(exercise => (
             <div
@@ -123,6 +153,37 @@ const ExerciseList = () => {
         <div className='text-gray-500 text-center mt-8'>
           No exercises found. Please adjust your search or filters.
         </div>
+      )}
+
+      {totalPages > 1 && (
+        <Pagination className='mt-8'>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              />
+            </PaginationItem>
+
+            {Array.from({ length: totalPages }, (_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  isActive={currentPage === index + 1}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={() =>
+                  setCurrentPage(prev => Math.min(prev + 1, totalPages))
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       )}
 
       <ExerciseFilterModal
