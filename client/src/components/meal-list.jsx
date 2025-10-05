@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FaFireAlt, FaLeaf } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -107,14 +108,22 @@ const MealsList = () => {
                 <p className='text-sm text-gray-500 mt-1'>{meal.mealType}</p>
 
                 <div className='mt-3 bg-gradient-to-r from-blue-100 to-blue-50 border border-blue-200 rounded-md p-3 text-center'>
-                  <p className='text-sm font-semibold text-gray-700'>
-                    Calories:{' '}
-                    <span className='text-blue-600'>{totals.calories}</span>{' '}
-                    kcal
-                  </p>
-                  <p className='text-sm font-semibold text-gray-700'>
-                    Fat: <span className='text-blue-600'>{totals.fats}</span> g
-                  </p>
+                  <div className='flex items-center gap-2 text-sm font-semibold text-gray-700'>
+                    <FaFireAlt className='text-orange-500 text-lg' />
+                    <span>
+                      Calories:{' '}
+                      <span className='text-blue-600'>{totals.calories}</span>{' '}
+                      kcal
+                    </span>
+                  </div>
+
+                  <div className='flex items-center gap-2 mt-1 text-sm font-semibold text-gray-700'>
+                    <FaLeaf className='text-green-600 text-lg' />
+                    <span>
+                      Fat: <span className='text-blue-600'>{totals.fats}</span>{' '}
+                      g
+                    </span>
+                  </div>
                 </div>
 
                 <div className='mt-4 flex justify-between space-x-4'>
