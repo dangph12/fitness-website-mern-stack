@@ -68,7 +68,7 @@ const MuscleList = () => {
                 alt={muscle.title}
                 className='w-24 h-24 object-cover rounded-lg mb-2 mx-auto transition-transform duration-300 hover:scale-110'
               />
-              <h3 className='text-lg font-medium text-blue-600'>
+              <h3 className='text-lg font-medium text-blue-600 whitespace-nowrap'>
                 {muscle.title}
               </h3>
             </div>
