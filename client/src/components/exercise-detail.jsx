@@ -83,7 +83,6 @@ const ExerciseDetail = () => {
             </div>
           </div>
 
-          {/* Equipment */}
           <div>
             <h3 className='text-sm font-bold uppercase text-gray-500 mb-2 flex items-center gap-2'>
               <FaDumbbell className='text-blue-600 text-lg' /> Equipment
@@ -104,7 +103,6 @@ const ExerciseDetail = () => {
             </div>
           </div>
 
-          {/* Metadata Row */}
           <div className='grid grid-cols-3 gap-6 mt-4'>
             <div className='flex items-center gap-3'>
               <FaUserAlt className='text-blue-600 text-xl' />
@@ -137,7 +135,6 @@ const ExerciseDetail = () => {
             </div>
           </div>
 
-          {/* Instructions */}
           <div className='mt-6'>
             <h3 className='text-2xl font-bold mb-3 text-gray-900'>
               Instructions
