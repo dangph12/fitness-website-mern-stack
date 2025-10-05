@@ -136,7 +136,7 @@ const ExerciseList = () => {
                     ))
                   }
                   alt={exercise.title}
-                  className='w-full h-48 object-cover rounded-md transition-all duration-200'
+                  className='w-full h-60 object-cover rounded-md transition-all duration-200'
                 />
               </Link>
               <div className='p-4'>
