@@ -44,7 +44,7 @@ const CreateMeal = () => {
 
     try {
       await dispatch(createMeal(formData));
-      toast('Meal created successfully!');
+      toast.success('Meal created successfully!');
 
       navigate('/nutrition');
 
