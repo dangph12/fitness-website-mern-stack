@@ -3,6 +3,7 @@ import { FaClipboardList, FaHamburger, FaPhotoVideo } from 'react-icons/fa';
 import { MdFileUpload } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 import { createMeal } from '~/store/features/meal-slice';
 
@@ -43,7 +44,7 @@ const CreateMeal = () => {
 
     try {
       await dispatch(createMeal(formData));
-      alert('Meal created successfully!');
+      toast('Meal created successfully!');
 
       navigate('/nutrition');
 
