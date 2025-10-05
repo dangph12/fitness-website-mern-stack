@@ -5,7 +5,10 @@ import { IBodyClassification } from './body-classification-type';
 const BodyClassificationSchema = new Schema<IBodyClassification>(
   {
     title: { type: String, required: true },
-    weightFactor: { type: Number, required: true },
+    weightFactor: {
+      min: { type: Number, required: true },
+      max: { type: Number, required: true }
+    },
     description: { type: String, required: true }
   },
   { timestamps: true }

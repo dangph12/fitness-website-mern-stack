@@ -50,19 +50,7 @@ const AuthService = {
     password: string,
     avatarFile?: Express.Multer.File
   ) => {
-    const user = await UserService.create(userData);
-
-    if (avatarFile) {
-      const uploadResult = await uploadAvatar(
-        avatarFile.buffer,
-        user._id.toString()
-      );
-      if (uploadResult.success && uploadResult.data) {
-        await UserService.update(user._id.toString(), {
-          avatar: uploadResult.data.secure_url
-        });
-      }
-    }
+    const user = await UserService.create(userData, avatarFile);
 
     const hashedPassword = await hashPassword(password);
 

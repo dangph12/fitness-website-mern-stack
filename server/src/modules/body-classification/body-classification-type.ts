@@ -1,5 +1,8 @@
 export interface IBodyClassification {
   title: string;
-  weightFactor: number;
+  weightFactor: {
+    min: number;
+    max: number;
+  };
   description: string;
 }
