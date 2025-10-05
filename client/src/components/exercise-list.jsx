@@ -16,9 +16,16 @@ const ExerciseList = () => {
 
   return (
     <div className='container mx-auto p-6'>
-      <h2 className='text-4xl font-bold mb-6 text-gray-800'>
-        Exercise Results
-      </h2>
+      <div className='mb-8'>
+        <h2 className='text-4xl font-bold mb-6 text-gray-800'>
+          Exercise Results
+        </h2>
+
+        <p className='text-lg text-black-400'>
+          Filter and refine your search to find the perfect exercise for your
+          fitness goals
+        </p>
+      </div>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
         {exercises.map(exercise => (
