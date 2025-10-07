@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { DataTable } from '../../../components/admin/data-table';
-import { columns } from '../../../components/admin/users-columns'; // Thay đổi từ createColumns thành columns
+import { Columns } from '../../../components/admin/users-columns'; // Thay đổi từ createColumns thành columns
 import { Alert, AlertDescription } from '../../../components/ui/alert';
 import { Button } from '../../../components/ui/button';
 import {
@@ -83,59 +83,57 @@ export default function ManageUsersPage() {
   }
 
   return (
-    <AdminLayout>
-      <div className='space-y-6'>
-        <div className='flex items-center justify-between'>
-          <div>
-            <h1 className='text-3xl font-bold tracking-tight'>
-              Users Management
-            </h1>
-            <p className='text-muted-foreground'>
-              Manage user accounts, roles, and permissions
-            </p>
-          </div>
-          <div className='flex items-center space-x-2'>
-            <Button>
-              <Plus className='mr-2 h-4 w-4' />
-              Add User
-            </Button>
-          </div>
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <div>
+          <h1 className='text-3xl font-bold tracking-tight'>
+            Users Management
+          </h1>
+          <p className='text-muted-foreground'>
+            Manage user accounts, roles, and permissions
+          </p>
         </div>
-
-        {error && (
-          <Alert variant='destructive'>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <Card>
-          <CardHeader>
-            <CardTitle>All Users ({totalUsers})</CardTitle>
-            <CardDescription>
-              A list of all users in your system including their name, email,
-              role, and status.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DataTable
-              columns={columns}
-              data={users}
-              loading={loading}
-              pagination={{
-                page: currentPage,
-                pageSize: limit,
-                totalPages,
-                totalItems: totalUsers,
-                onPageChange: handlePageChange,
-                onPageSizeChange: handleLimitChange
-              }}
-              filters={filters}
-              onFiltersChange={handleFiltersChange}
-              onClearFilters={handleClearFilters}
-            />
-          </CardContent>
-        </Card>
+        <div className='flex items-center space-x-2'>
+          <Button>
+            <Plus className='mr-2 h-4 w-4' />
+            Add User
+          </Button>
+        </div>
       </div>
-    </AdminLayout>
+
+      {error && (
+        <Alert variant='destructive'>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Users ({totalUsers})</CardTitle>
+          <CardDescription>
+            A list of all users in your system including their name, email,
+            role, and status.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DataTable
+            columns={Columns}
+            data={users}
+            loading={loading}
+            pagination={{
+              page: currentPage,
+              pageSize: limit,
+              totalPages,
+              totalItems: totalUsers,
+              onPageChange: handlePageChange,
+              onPageSizeChange: handleLimitChange
+            }}
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onClearFilters={handleClearFilters}
+          />
+        </CardContent>
+      </Card>
+    </div>
   );
 }
