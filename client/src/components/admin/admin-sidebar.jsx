@@ -1,20 +1,22 @@
 import {
+  Activity,
   BarChart3,
-  Calendar,
   ChevronRight,
+  Dumbbell,
+  FileText,
   HelpCircle,
   Home,
-  Inbox,
   LogOut,
   MessageSquare,
-  Search,
   Settings,
   Shield,
   ShoppingCart,
   User,
-  Users
+  Users,
+  Utensils
 } from 'lucide-react';
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
 
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -37,13 +39,16 @@ import {
   SidebarSeparator
 } from '../ui/sidebar';
 
-const data = {
-  user: {
-    name: 'Fitness Admin',
-    email: 'admin@fitness.com',
-    avatar: '/avatar.jpg'
-  },
-  navMain: [
+export function AdminSidebar({ ...props }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+  // Lấy thông tin user từ Redux store
+  const { user } = useSelector(state => state.auth);
+
+  // Routes thực tế từ router.jsx
+  const navMain = [
     {
       title: 'General',
       items: [
@@ -56,68 +61,14 @@ const data = {
           title: 'Users Management',
           url: '/admin/manage-users',
           icon: Users
-        },
-        {
-          title: 'Analytics',
-          url: '/admin/analytics',
-          icon: BarChart3
-        },
-        {
-          title: 'Orders',
-          url: '/admin/orders',
-          icon: ShoppingCart
-        },
-        {
-          title: 'Messages',
-          url: '/admin/messages',
-          icon: MessageSquare,
-          badge: '3'
-        }
-      ]
-    },
-    {
-      title: 'Security',
-      items: [
-        {
-          title: 'Authentication',
-          url: '/admin/auth',
-          icon: Shield,
-          items: [
-            {
-              title: 'Login Settings',
-              url: '/admin/auth/login-settings'
-            },
-            {
-              title: 'User Permissions',
-              url: '/admin/auth/permissions'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      title: 'Support',
-      items: [
-        {
-          title: 'Help Center',
-          url: '/admin/help',
-          icon: HelpCircle
-        },
-        {
-          title: 'Settings',
-          url: '/admin/settings',
-          icon: Settings
         }
       ]
     }
-  ]
-};
-
-export function AdminSidebar({ ...props }) {
-  const navigate = useNavigate();
-  const location = useLocation();
+    // Có thể thêm các routes admin khác khi chúng được tạo
+  ];
 
   const handleLogout = () => {
+    dispatch({ type: 'auth/logout' });
     navigate('/admin/login');
   };
 
@@ -134,17 +85,17 @@ export function AdminSidebar({ ...props }) {
           </div>
           <div className='grid flex-1 text-left text-sm leading-tight transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 overflow-hidden'>
             <span className='truncate font-semibold transition-all duration-300 ease-in-out'>
-              Fitness Admin
+              F-Fitness
             </span>
             <span className='truncate text-xs transition-all duration-300 ease-in-out'>
-              FFitness
+              Admin Panel
             </span>
           </div>
         </div>
       </SidebarHeader>
 
       <SidebarContent className='transition-all duration-300 ease-in-out'>
-        {data.navMain.map(group => (
+        {navMain.map(group => (
           <SidebarGroup
             key={group.title}
             className='transition-all duration-300 ease-in-out'
@@ -169,35 +120,7 @@ export function AdminSidebar({ ...props }) {
                       <span className='transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 overflow-hidden'>
                         {item.title}
                       </span>
-                      {item.badge && (
-                        <span className='ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 overflow-hidden'>
-                          {item.badge}
-                        </span>
-                      )}
-                      {item.items && (
-                        <ChevronRight className='ml-auto transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 overflow-hidden' />
-                      )}
                     </SidebarMenuButton>
-                    {item.items && (
-                      <SidebarMenuSub className='transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden'>
-                        {item.items.map(subItem => (
-                          <SidebarMenuSubItem
-                            key={subItem.title}
-                            className='transition-all duration-300 ease-in-out'
-                          >
-                            <SidebarMenuSubButton
-                              isActive={location.pathname === subItem.url}
-                              onClick={() => handleNavigation(subItem.url)}
-                              className='transition-all duration-300 ease-in-out'
-                            >
-                              <span className='transition-all duration-300 ease-in-out'>
-                                {subItem.title}
-                              </span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    )}
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
@@ -211,20 +134,25 @@ export function AdminSidebar({ ...props }) {
           <SidebarMenuItem className='transition-all duration-300 ease-in-out'>
             <div className='flex items-center gap-2 px-2 py-1.5 transition-all duration-300 ease-in-out group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:gap-0'>
               <Avatar className='h-8 w-8 transition-all duration-300 ease-in-out'>
-                <AvatarImage src={data.user.avatar} alt={data.user.name} />
+                <AvatarImage
+                  src={user?.avatar || user?.profilePicture}
+                  alt={user?.name || 'Admin'}
+                />
                 <AvatarFallback className='bg-gradient-to-r from-green-400 to-blue-500 text-white transition-all duration-300 ease-in-out'>
-                  {data.user.name
-                    .split(' ')
-                    .map(n => n[0])
-                    .join('')}
+                  {user?.name
+                    ? user.name
+                        .split(' ')
+                        .map(n => n[0])
+                        .join('')
+                    : 'AD'}
                 </AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 overflow-hidden'>
                 <span className='truncate font-semibold transition-all duration-300 ease-in-out'>
-                  {data.user.name}
+                  {user?.name || 'Admin User'}
                 </span>
                 <span className='truncate text-xs text-muted-foreground transition-all duration-300 ease-in-out'>
-                  {data.user.email}
+                  {user?.email || 'admin@fitness.com'}
                 </span>
               </div>
               <Button
@@ -232,6 +160,7 @@ export function AdminSidebar({ ...props }) {
                 size='icon'
                 className='h-8 w-8 transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 overflow-hidden'
                 onClick={handleLogout}
+                title='Logout'
               >
                 <LogOut className='h-4 w-4 transition-all duration-300 ease-in-out' />
               </Button>
