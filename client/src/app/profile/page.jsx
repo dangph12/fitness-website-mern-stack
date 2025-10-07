@@ -4,10 +4,12 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Spinner } from '~/components/ui/spinner';
 import axiosInstance from '~/lib/axios-instance';
 import { avatarSchema } from '~/lib/validations/avatar';
+import { logout } from '~/store/features/auth-slice';
 import { setAvatar, updateAvatar } from '~/store/features/avatar-slice';
 
 const Page = () => {
@@ -57,6 +59,10 @@ const Page = () => {
   const onSubmit = async data => {
     if (!data.avatar || !data.avatar[0]) return;
     dispatch(updateAvatar({ userId: user.id, file: data.avatar[0] }));
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
   };
 
   const { ref, ...registerProps } = register('avatar');
@@ -144,6 +150,7 @@ const Page = () => {
         <p>
           <strong>Email:</strong> {userData?.email}
         </p>
+        <Button onClick={() => handleLogout()}>Logout</Button>
       </div>
     </div>
   );

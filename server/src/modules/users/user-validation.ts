@@ -3,11 +3,18 @@ import { z } from 'zod';
 const UserValidation = {
   email: z.email(),
   name: z.string(),
-  avatar: z.string(),
-  gender: z.string().optional(),
+  gender: z.string(),
+  dob: z.preprocess(val => {
+    if (typeof val === 'string' || val instanceof Date) return new Date(val);
+  }, z.date()),
   role: z.enum(['user', 'admin']),
-  providers: z.array(z.string()),
-  isActive: z.boolean().optional()
+  isActive: z.preprocess(val => {
+    if (typeof val === 'string') {
+      return val.toLowerCase() === 'true';
+    } else if (typeof val === 'boolean') {
+      return val;
+    }
+  }, z.boolean())
 };
 
 const UserValidationSchema = z.object(UserValidation);

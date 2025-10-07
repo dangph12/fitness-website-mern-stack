@@ -24,6 +24,30 @@ const router = createBrowserRouter([
       {
         path: 'profile',
         Component: lazy(() => import('~/app/profile/page'))
+      },
+      {
+        path: 'nutrition',
+        Component: lazy(() => import('~/app/nutrition/page'))
+      },
+      {
+        path: 'nutrition/create-meal',
+        Component: lazy(() => import('~/app/nutrition/create-meal/page'))
+      },
+      {
+        path: 'nutrition/food/:foodId',
+        Component: lazy(() => import('~/app/nutrition/food/[id]/page'))
+      },
+      {
+        path: 'nutrition/edit-meal/:id',
+        Component: lazy(() => import('~/app/nutrition/edit-meal/page'))
+      },
+      {
+        path: 'exercise',
+        Component: lazy(() => import('~/app/exercises/page'))
+      },
+      {
+        path: 'exercise/:id',
+        Component: lazy(() => import('~/app/exercises/[id]/page'))
       }
     ],
     ErrorBoundary: ErrorComponent

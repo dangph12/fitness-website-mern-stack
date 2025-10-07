@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { FaBars, FaTimes, FaUser } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
 
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 
 import logo from '../assets/logo.png';
@@ -37,6 +39,9 @@ const MenuItem = ({ label, links, isDropdown }) => (
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const { user } = useSelector(state => state.auth);
+  const { url: avatarUrl } = useSelector(state => state.avatar);
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -62,7 +67,7 @@ function Header() {
       </div>
 
       <motion.nav
-        className={`lg:flex space-x-10 font-bold relative ${menuOpen ? 'block' : 'hidden'} lg:block`}
+        className={`lg:flex space-x-15 font-bold relative ${menuOpen ? 'block' : 'hidden'} lg:block`}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -85,52 +90,59 @@ function Header() {
             { label: 'Advanced', href: '#advanced' }
           ]}
         />
-        <motion.div
-          className='hover:text-gray-300 text-lg'
-          whileHover={{ scale: 1.1 }}
-          transition={{ duration: 0.3 }}
-        >
+        <Link to='/nutrition' className='hover:text-gray-300 text-lg'>
           Nutrition
-        </motion.div>
-        <motion.div
-          className='hover:text-gray-300 text-lg'
-          whileHover={{ scale: 1.1 }}
-          transition={{ duration: 0.3 }}
-        >
+        </Link>
+        <Link to='/community' className='hover:text-gray-300 text-lg'>
           Community
-        </motion.div>
-        <motion.div
-          className='hover:text-gray-300 text-lg'
-          whileHover={{ scale: 1.1 }}
-          transition={{ duration: 0.3 }}
-        >
-          Challenging
-        </motion.div>
-        <motion.div
-          className='hover:text-gray-300 text-lg'
-          whileHover={{ scale: 1.1 }}
-          transition={{ duration: 0.3 }}
-        >
+        </Link>
+        <Link to='/exercise' className='hover:text-gray-300 text-lg'>
+          Exercise
+        </Link>
+        <Link to='/about' className='hover:text-gray-300 text-lg'>
           About
-        </motion.div>
+        </Link>
       </motion.nav>
 
       <div className='flex space-x-5'>
-        <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-          <Button className='bg-yellow-400 text-black px-5 py-2 rounded-full font-medium hover:bg-yellow-500 transition'>
-            <Link to='/auth/login'>Login</Link>
-          </Button>
-        </motion.div>
+        {!user ? (
+          <>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button className='bg-yellow-400 text-black px-5 py-2 rounded-full font-medium hover:bg-yellow-500 transition'>
+                <Link to='/auth/login'>Login</Link>
+              </Button>
+            </motion.div>
 
-        <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-          <Button className='bg-[#3067B6] text-[#F5F2EC] px-5 py-2 rounded-full font-medium transition'>
-            <Link to='/auth/sign-up'>Sign Up</Link>
-          </Button>
-        </motion.div>
-
-        <Link to='/profile' className='text-[#3067B6] hover:text-gray-500'>
-          <FaUser size={30} />
-        </Link>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button className='bg-[#3067B6] text-[#F5F2EC] px-5 py-2 rounded-full font-medium transition'>
+                <Link to='/auth/sign-up'>Sign Up</Link>
+              </Button>
+            </motion.div>
+          </>
+        ) : (
+          <Link to='/profile' className='flex items-center space-x-2'>
+            {avatarUrl ? (
+              <Avatar className='w-15 h-15'>
+                <AvatarImage
+                  src={avatarUrl}
+                  alt='User Avatar'
+                  className='rounded-full border-2 border-[#3067B6]'
+                />
+                <AvatarFallback className='text-[#3067B6]'>
+                  {user.name ? user.name[0] : 'U'}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <FaUser size={30} />
+            )}
+          </Link>
+        )}
       </div>
     </header>
   );

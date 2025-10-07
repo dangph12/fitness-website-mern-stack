@@ -1,0 +1,1924 @@
+{
+	"info": {
+		"_postman_id": "5485b545-27fa-45c1-8cd9-0178f719689a",
+		"name": "F-Fitness",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48985284",
+		"_collection_link": "https://fhd-cinema.postman.co/workspace/Team-Workspace~fcbca013-e3d1-454a-86f8-8ee6ecd48cd5/collection/48985284-5485b545-27fa-45c1-8cd9-0178f719689a?action=share&source=collection_link&creator=48985284"
+	},
+	"item": [
+		{
+			"name": "Food",
+			"item": [
+				{
+					"name": "Get All Foods",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/foods",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"foods"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Food",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								},
+								{
+									"key": "title",
+									"value": "Chicken Meat",
+									"type": "text"
+								},
+								{
+									"key": "unit",
+									"value": "100",
+									"type": "text"
+								},
+								{
+									"key": "protein",
+									"value": "239",
+									"type": "text"
+								},
+								{
+									"key": "fat",
+									"value": "27.3",
+									"type": "text"
+								},
+								{
+									"key": "carbonhydrate",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "calories",
+									"value": "14",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Meat",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/foods",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"foods"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Food By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Chicken Breast\",\r\n    \"image\": \"https://picsum.photos/seed/chicken/400/300\",\r\n    \"calories\": 135,\r\n    \"proteins\": 27,\r\n    \"carbs\": 0,\r\n    \"fats\": 3\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/foods/68dd419e3c07175508b08f01",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"foods",
+								"68dd419e3c07175508b08f01"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Food By Id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								},
+								{
+									"key": "title",
+									"value": "Chicken Meat",
+									"type": "text"
+								},
+								{
+									"key": "unit",
+									"value": "1001",
+									"type": "text"
+								},
+								{
+									"key": "protein",
+									"value": "2391",
+									"type": "text"
+								},
+								{
+									"key": "fat",
+									"value": "27.31",
+									"type": "text"
+								},
+								{
+									"key": "carbonhydrate",
+									"value": "01",
+									"type": "text"
+								},
+								{
+									"key": "calories",
+									"value": "141",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Meat",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/foods/68dd419e3c07175508b08f01",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"foods",
+								"68dd419e3c07175508b08f01"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Food By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Chicken Breast\",\r\n    \"image\": \"https://picsum.photos/seed/chicken/400/300\",\r\n    \"calories\": 135,\r\n    \"proteins\": 27,\r\n    \"carbs\": 0,\r\n    \"fats\": 3\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/foods/68da00cc9ab92c3a514cbb4f",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"foods",
+								"68da00cc9ab92c3a514cbb4f"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Exercise",
+			"item": [
+				{
+					"name": "Filter Exercise",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises?page=1&limit=10&sortBy=createdAt&sortOrder=desc&title=Plank&type=Strength&difficulty=Beginner&muscles=68dbfb24b959a26b9a83fad4&muscles=68dc003196c0756913d0a587&equipments=68e16c81f5caf5d27d7763c8",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								},
+								{
+									"key": "title",
+									"value": "Plank"
+								},
+								{
+									"key": "type",
+									"value": "Strength",
+									"description": "'Strength', 'Stretching', 'Power', 'Olympic', 'Explosive', 'Mobility', 'Dynamic', 'Yoga'"
+								},
+								{
+									"key": "difficulty",
+									"value": "Beginner",
+									"description": "'Beginner', 'Intermediate', 'Advanced'"
+								},
+								{
+									"key": "muscles",
+									"value": "68dbfb24b959a26b9a83fad4"
+								},
+								{
+									"key": "muscles",
+									"value": "68dc003196c0756913d0a587"
+								},
+								{
+									"key": "equipments",
+									"value": "68e16c81f5caf5d27d7763c8"
+								},
+								{
+									"key": "equipments",
+									"value": "68e16d38f5caf5d27d7763ce",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Exercise",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Exercise By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Chicken Breast\",\r\n    \"image\": \"https://picsum.photos/seed/chicken/400/300\",\r\n    \"calories\": 135,\r\n    \"proteins\": 27,\r\n    \"carbs\": 0,\r\n    \"fats\": 3\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises/{{exerciseId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises",
+								"{{exerciseId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Exercise",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"if (jsonData.data && jsonData.data._id) {",
+									"    pm.collectionVariables.set(\"exerciseId\", jsonData.data._id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tutorial",
+									"type": "file",
+									"src": "postman-cloud:///1f0a1518-b881-46a0-ab3c-46c77502c414"
+								},
+								{
+									"key": "title",
+									"value": "Plank",
+									"type": "text"
+								},
+								{
+									"key": "difficulty",
+									"value": "Beginner",
+									"description": "'Beginner', 'Intermediate', 'Advanced'",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "Strength",
+									"description": "'Strength', 'Stretching', 'Power', 'Olympic', 'Explosive', 'Mobility', 'Dynamic', 'Yoga'",
+									"type": "text"
+								},
+								{
+									"key": "instructions",
+									"value": "Steps : \n1.) Start by kneeling on all fours and aligning both hands right below your shoulders keep your knees beneath your hips.\n\n2.) Extend both of your feet out behind you and squeeze on your core muscles, making sure that your body is aligned straight \n\n3.) Hold this position for about 30 seconds to a minute.\n\n4.) Release, return back to the starting position and repeat for as many times as you would like to perform this exercise.",
+									"type": "text"
+								},
+								{
+									"key": "muscles[0]",
+									"value": "68dbfb24b959a26b9a83fad4",
+									"type": "text"
+								},
+								{
+									"key": "muscles[1]",
+									"value": "68dc003196c0756913d0a587",
+									"type": "text"
+								},
+								{
+									"key": "equipments[0]",
+									"value": "68e16c81f5caf5d27d7763c8",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Exercise By Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tutorial",
+									"type": "file",
+									"src": "postman-cloud:///1f0a1518-b881-46a0-ab3c-46c77502c414"
+								},
+								{
+									"key": "title",
+									"value": "Plank",
+									"type": "text"
+								},
+								{
+									"key": "difficulty",
+									"value": "Beginner",
+									"description": "'Beginner', 'Intermediate', 'Advanced'",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "Strength",
+									"description": "'Strength', 'Stretching', 'Power', 'Olympic', 'Explosive', 'Mobility', 'Dynamic', 'Yoga'",
+									"type": "text"
+								},
+								{
+									"key": "instructions",
+									"value": "Steps : \n1.) Start by kneeling on all fours and aligning both hands right below your shoulders keep your knees beneath your hips.\n\n2.) Extend both of your feet out behind you and squeeze on your core muscles, making sure that your body is aligned straight \n\n3.) Hold this position for about 30 seconds to a minute.\n\n4.) Release, return back to the starting position and repeat for as many times as you would like to perform this exercise.",
+									"type": "text"
+								},
+								{
+									"key": "muscles[0]",
+									"value": "68dbfb24b959a26b9a83fad4",
+									"type": "text"
+								},
+								{
+									"key": "muscles[1]",
+									"value": "68dc003196c0756913d0a587",
+									"type": "text"
+								},
+								{
+									"key": "equipments[0]",
+									"value": "68e16c81f5caf5d27d7763c8",
+									"type": "text"
+								},
+								{
+									"key": "equipments[1]",
+									"value": "68e16cbef5caf5d27d7763cb",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises/{{exerciseId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises",
+								"{{exerciseId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Exercise By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Chicken Breast\",\r\n    \"image\": \"https://picsum.photos/seed/chicken/400/300\",\r\n    \"calories\": 135,\r\n    \"proteins\": 27,\r\n    \"carbs\": 0,\r\n    \"fats\": 3\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/exercises/{{exerciseId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"exercises",
+								"{{exerciseId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Filter User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users?page=1&limit=10&name=&email=&gender&role=user&sortBy=createdAt&sortOrder=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "name",
+									"value": ""
+								},
+								{
+									"key": "email",
+									"value": ""
+								},
+								{
+									"key": "gender",
+									"value": null
+								},
+								{
+									"key": "role",
+									"value": "user"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Anh Duc",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "anhduck120212121212@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								},
+								{
+									"key": "role",
+									"value": "user",
+									"type": "text"
+								},
+								{
+									"key": "dob",
+									"value": "02/12/2004",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text"
+								},
+								{
+									"key": "isActive",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/68d352760c121fa66fb1fac1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"68d352760c121fa66fb1fac1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/email/anhduck0212@gmail.com",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"email",
+								"anhduck0212@gmail.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User By Id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Anh Duc 123",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "anhduck1202@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/anh_duc.jpg"
+								},
+								{
+									"key": "role",
+									"value": "user",
+									"type": "text"
+								},
+								{
+									"key": "dob",
+									"value": "02/12/2004",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text"
+								},
+								{
+									"key": "isActive",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/68de803d557a2c84c717321a",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"68de803d557a2c84c717321a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Avatar By Id",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/68de803d557a2c84c717321a/avatar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"68de803d557a2c84c717321a",
+								"avatar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/68e0fea721f293698bb244c1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"68e0fea721f293698bb244c1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"if (jsonData.data && jsonData.data.accessToken) {\r",
+									"    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"anhduck0212@gmail.com\",\r\n    \"password\": \"0344420156\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Nguyen Dinh Anh Duc\",\r\n    \"email\": \"anhduck0212@gmail.com\",\r\n    \"role\": \"user\",\r\n    \"password\": \"0344420156\",\r\n    \"confirmPassword\": \"0344420156\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/sign-up",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"sign-up"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Equipment",
+			"item": [
+				{
+					"name": "Get All Equipments",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/equipments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Equipment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Weight Plate",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/download (6).jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/equipments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Equipment By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/equipments/68dd432010ffbae14dbcc5a8",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipments",
+								"68dd432010ffbae14dbcc5a8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Equipment By Id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "DSADAS",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/equipments/68dd432010ffbae14dbcc5a8",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipments",
+								"68dd432010ffbae14dbcc5a8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Equipment By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/equipments/68de4483d3574ce5f2e685d6",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"equipments",
+								"68de4483d3574ce5f2e685d6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Muscle",
+			"item": [
+				{
+					"name": "Get All Muscles",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/muscles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"muscles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Muscle",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Upper Chest",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/muscles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"muscles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Muscle By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/muscles/68dd43f510ffbae14dbcc5b2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"muscles",
+								"68dd43f510ffbae14dbcc5b2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Muscle By Id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "123123",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/muscles/68dd43f510ffbae14dbcc5b2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"muscles",
+								"68dd43f510ffbae14dbcc5b2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Muscle By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "123123",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/muscles/68dd43f510ffbae14dbcc5b2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"muscles",
+								"68dd43f510ffbae14dbcc5b2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Body Classification",
+			"item": [
+				{
+					"name": "Get All Body Classifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/body-classifications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-classifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Body Classification",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Béo phì độ III\",\r\n    \"weightFactor\": {\r\n        \"min\": 40,\r\n        \"max\": 56\r\n    },\r\n    \"description\": \"Béo phì rất nặng, nguy cơ cao biến chứng tim mạch, tiểu đường, đột quỵ.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-classifications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-classifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Body Classification By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/body-classifications/68e219d7a3786ffc3608907d",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-classifications",
+								"68e219d7a3786ffc3608907d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Body Classification By Id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Body Classification Test 1\",\r\n    \"weightFactor\": 123,\r\n    \"description\": \"Body Classification Description Test 1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-classifications/68de3711d3574ce5f2e685c8",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-classifications",
+								"68de3711d3574ce5f2e685c8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Body Classification By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-classifications/68e1640898bdfbd4afdf2d7c",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-classifications",
+								"68e1640898bdfbd4afdf2d7c"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Meal",
+			"item": [
+				{
+					"name": "Get All Meals",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/meals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meals"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Meal By Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/meals/68dc890947215cb2e5148f1d",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meals",
+								"68dc890947215cb2e5148f1d"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Meal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Tesst meal create2",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"contentType": "",
+									"type": "file",
+									"src": "postman-cloud:///1f09ee48-00be-4280-92bd-88319eb8fe50"
+								},
+								{
+									"key": "mealType",
+									"value": "Breakfast",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "userId",
+									"value": "68dd4aea2872890d70e038b9",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "foods[0][foodId]",
+									"value": "e3091a217f0c41e3a523fc39",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "foods[0][quantity]",
+									"value": "2",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "foods[1][foodId]",
+									"value": "eaf6588a1b834bc38e64f7da",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "foods[1][quantity]",
+									"value": "3",
+									"contentType": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/meals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meals"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Meal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Tesst meal create",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"contentType": "",
+									"type": "file",
+									"src": "postman-cloud:///1f09ed78-c017-4b70-b34a-b13fbcf63b6c"
+								},
+								{
+									"key": "mealType",
+									"value": "Breakfast",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "userId",
+									"value": "68dd4aea2872890d70e038b9",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "foods[0][foodId]",
+									"value": "68dd4ea44bebe3de1454b595",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "foods[0][quantity]",
+									"value": "2",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "foods[1][foodId]",
+									"value": "eaf6588a1b834bc38e64f7da",
+									"contentType": "",
+									"type": "text"
+								},
+								{
+									"key": "foods[1][quantity]",
+									"value": "3",
+									"contentType": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/meals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meals"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Meal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/muscles/68dc8b5738b0b4f68cfde236",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"muscles",
+								"68dc8b5738b0b4f68cfde236"
+							]
+						},
+						"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Body Record",
+			"item": [
+				{
+					"name": "Get All Body Records",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Anh Duc",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "anhduck120212121212@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								},
+								{
+									"key": "role",
+									"value": "user",
+									"type": "text"
+								},
+								{
+									"key": "dob",
+									"value": "02/12/2004",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text"
+								},
+								{
+									"key": "isActive",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Body Record",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"height\": 168,\r\n    \"weight\": 65,\r\n    \"user\": \"68e15d4db4068819de9bced5\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Body Record By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"height\": ,\r\n    \"weight\": ,\r\n    \"userId\": \"\",\r\n    \"bodyClassificationId\": \"68e1640898bdfbd4afdf2d7c\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records/68e1669cb0df842f4ecc9347",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records",
+								"68e1669cb0df842f4ecc9347"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Body Record By User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"height\": ,\r\n    \"weight\": ,\r\n    \"userId\": \"\",\r\n    \"bodyClassificationId\": \"68e1640898bdfbd4afdf2d7c\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records/user/68e15d4db4068819de9bced5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records",
+								"user",
+								"68e15d4db4068819de9bced5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Body Record By Id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"height\": 168,\r\n    \"weight\": 65,\r\n    \"user\": \"68e15d4db4068819de9bced5\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records/68e228ea8be9cb666b085dd1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records",
+								"68e228ea8be9cb666b085dd1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Body Record By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"height\": 169,\r\n    \"weight\": 69,\r\n    \"userId\": \"68e15d4db4068819de9bced5\",\r\n    \"bodyClassificationId\": \"68e1640898bdfbd4afdf2d7c\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/body-records/68e1669cb0df842f4ecc9347",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"body-records",
+								"68e1669cb0df842f4ecc9347"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://template.postman-echo.com"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "exerciseId",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
