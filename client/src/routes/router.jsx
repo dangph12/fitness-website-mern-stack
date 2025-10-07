@@ -98,6 +98,7 @@ const router = createBrowserRouter([
         //     <AdminLayout />
         //   </PrivateRoute>
         // ),
+        Component: AdminLayout,
         children: [
           {
             index: true,
