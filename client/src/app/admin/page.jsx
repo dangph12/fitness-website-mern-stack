@@ -7,10 +7,10 @@ import Users from './manage-users/page';
 function Page() {
   return (
     <div>
-      <AdminLayout>
-        <Dashboard />
-        {/* <Users /> */}
-      </AdminLayout>
+      {/* <AdminLayout> */}
+      {/* <Dashboard /> */}
+      {/* <Users /> */}
+      {/* </AdminLayout> */}
     </div>
   );
 }
