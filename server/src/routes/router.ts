@@ -7,6 +7,7 @@ import BodyRecordRoute from '~/modules/body-records/body-record-route';
 import EquipmentRoute from '~/modules/equipments/equipment-route';
 import ExerciseRoute from '~/modules/exercises/exercise-route';
 import FoodRoute from '~/modules/foods/food-route';
+import GoalRoute from '~/modules/goals/goal-route';
 import MealRoute from '~/modules/meals/meal-route';
 import MuscleRouter from '~/modules/muscles/muscle-route';
 import UserRoute from '~/modules/users/user-route';
@@ -38,5 +39,8 @@ router.use('/body-records', BodyRecordRoute);
 
 // Exercise routes
 router.use('/exercises', ExerciseRoute);
+
+// Goal routes
+router.use('/goals', GoalRoute);
 
 export default router;
