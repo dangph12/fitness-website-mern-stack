@@ -1,4 +1,6 @@
 import React from 'react';
+import { useLocation } from 'react-router';
+import { Outlet } from 'react-router';
 
 import { AdminSidebar } from '../components/admin/admin-sidebar.jsx';
 import { SearchInput } from '../components/admin/search.jsx';
@@ -19,7 +21,16 @@ import {
   SidebarTrigger
 } from '../components/ui/sidebar';
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = () => {
+  const location = useLocation();
+
+  const getBreadcrumbTitle = () => {
+    const path = location.pathname;
+    if (path === '/admin') return 'Dashboard';
+    if (path === '/admin/manage-users') return 'Users Management';
+    return 'Admin Panel';
+  };
+
   return (
     <SidebarProvider defaultOpen={true}>
       <AdminSidebar />
@@ -35,7 +46,7 @@ const AdminLayout = ({ children }) => {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className='hidden md:block' />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Fitness Management</BreadcrumbPage>
+                  <BreadcrumbPage>{getBreadcrumbTitle()}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -49,7 +60,9 @@ const AdminLayout = ({ children }) => {
             <ProfileDropdown />
           </div>
         </header>
-        <div className='flex flex-1 flex-col p-6 overflow-auto'>{children}</div>
+        <div className='flex flex-1 flex-col p-6 overflow-auto'>
+          <Outlet />
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );
