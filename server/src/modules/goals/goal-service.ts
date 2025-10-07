@@ -67,6 +67,11 @@ const GoalService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
+    const existingUser = await UserModel.findById(goalData.user);
+    if (goalData.user && !existingUser) {
+      throw createHttpError(404, 'User not found');
+    }
+
     const existingGoal = await GoalModel.findById(goalId);
     if (!existingGoal) {
       throw createHttpError(404, 'Goal not found');
