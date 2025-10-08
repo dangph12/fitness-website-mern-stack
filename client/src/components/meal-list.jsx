@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { FaFireAlt, FaLeaf } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 import { deleteMeal, fetchMeals } from '~/store/features/meal-slice';
 
@@ -46,13 +48,14 @@ const MealsList = () => {
 
   const handleDeleteMeal = mealId => {
     if (!userId) {
-      alert('Bạn chưa đăng nhập, không thể xóa meal!');
+      toast.error('Bạn chưa đăng nhập, không thể xóa meal!');
       navigate('/auth/login');
       return;
     }
 
     if (window.confirm('Are you sure you want to delete this meal?')) {
       dispatch(deleteMeal(mealId));
+      toast.success('Meal deleted successfully!');
     }
   };
 
@@ -87,39 +90,61 @@ const MealsList = () => {
       <h1 className='text-3xl font-semibold mb-8'>Meals List</h1>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-        {meals.map(meal => (
-          <div
-            key={meal._id}
-            className='bg-white rounded-lg shadow-lg overflow-hidden transition-shadow duration-300 hover:shadow-2xl'
-          >
-            <img
-              src={meal.image}
-              alt={meal.title}
-              className='w-full h-48 object-cover rounded-t-lg'
-              onClick={() => handleSelectMeal(meal)}
-            />
-            <div className='p-4'>
-              <h2 className='text-xl font-semibold'>{meal.title}</h2>
-              <p className='text-sm text-gray-500 mt-2'>{meal.mealType}</p>
+        {meals.map(meal => {
+          const totals = getTotalNutrients(meal.foods);
+          return (
+            <div
+              key={meal._id}
+              className='bg-white rounded-lg shadow-lg overflow-hidden transition-shadow duration-300 hover:shadow-2xl'
+            >
+              <img
+                src={meal.image}
+                alt={meal.title}
+                className='w-full h-48 object-cover rounded-t-lg cursor-pointer'
+                onClick={() => handleSelectMeal(meal)}
+              />
+              <div className='p-4'>
+                <h2 className='text-xl font-semibold'>{meal.title}</h2>
+                <p className='text-sm text-gray-500 mt-1'>{meal.mealType}</p>
 
-              <div className='mt-4 flex justify-between space-x-4'>
-                <button
-                  className='w-full bg-gradient-to-r from-yellow-300 to-yellow-400 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-105'
-                  onClick={() => navigate(`/nutrition/edit-meal/${meal._id}`)}
-                >
-                  Edit
-                </button>
+                <div className='mt-3 bg-gradient-to-r from-blue-100 to-blue-50 border border-blue-200 rounded-md p-3 text-center'>
+                  <div className='flex items-center gap-2 text-sm font-semibold text-gray-700'>
+                    <FaFireAlt className='text-orange-500 text-lg' />
+                    <span>
+                      Calories:{' '}
+                      <span className='text-blue-600'>{totals.calories}</span>{' '}
+                      kcal
+                    </span>
+                  </div>
 
-                <button
-                  className='w-full bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-105'
-                  onClick={() => handleDeleteMeal(meal._id)}
-                >
-                  Delete
-                </button>
+                  <div className='flex items-center gap-2 mt-1 text-sm font-semibold text-gray-700'>
+                    <FaLeaf className='text-green-600 text-lg' />
+                    <span>
+                      Fat: <span className='text-blue-600'>{totals.fats}</span>{' '}
+                      g
+                    </span>
+                  </div>
+                </div>
+
+                <div className='mt-4 flex justify-between space-x-4'>
+                  <button
+                    className='w-full bg-gradient-to-r from-yellow-300 to-yellow-400 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-105'
+                    onClick={() => navigate(`/nutrition/edit-meal/${meal._id}`)}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    className='w-full bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-105'
+                    onClick={() => handleDeleteMeal(meal._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {selectedMeal && (

@@ -136,17 +136,29 @@ const ExerciseList = () => {
                     ))
                   }
                   alt={exercise.title}
-                  className='w-full h-48 object-cover rounded-md transition-all duration-200'
+                  className='w-full h-60 object-cover rounded-md transition-all duration-200'
                 />
               </Link>
               <div className='p-4'>
-                <h3 className='text-lg font-semibold mb-1'>{exercise.title}</h3>
-                <p className='text-blue-600 text-sm mb-1'>
-                  {exercise.muscles?.map(m => m.title).join(', ') || 'General'}
+                <h3 className='text-lg font-semibold mb-1 text-gray-900'>
+                  {exercise.title}
+                </h3>
+
+                <p className='text-blue-700 text-base font-semibold mb-1'>
+                  {exercise.muscles?.map(m => m.title).join(' / ') || 'General'}
                 </p>
-                <p className='text-gray-600 text-sm'>
+
+                <p className='text-gray-700 text-base font-semibold mb-2'>
                   {exercise.equipments?.map(e => e.title).join(', ') ||
                     'No equipment'}
+                </p>
+
+                <p className='text-gray-500 text-sm line-clamp-2'>
+                  {exercise.instructions
+                    ? exercise.instructions.length > 200
+                      ? `${exercise.instructions.slice(0, 200)}...`
+                      : exercise.instructions
+                    : 'No description available.'}
                 </p>
               </div>
             </div>
