@@ -11,17 +11,15 @@ const workoutValidation = {
     }
   }, z.boolean()),
   user: z.string(),
-  plan: z.string().optional(),
   exercises: z
     .preprocess(
       val => {
         if (Array.isArray(val)) {
           return val.map(exercise => {
             return {
-              exerciseId: z.string().parse(exercise.exerciseId),
+              exercise: z.string().parse(exercise.exercise),
               sets: z.number().parse(parseInt(exercise.sets, 10)),
-              reps: z.number().parse(parseInt(exercise.reps, 10)),
-              rest: z.number().optional().parse(parseInt(exercise.rest, 10))
+              reps: z.number().parse(parseInt(exercise.reps, 10))
             };
           });
         }
@@ -29,10 +27,9 @@ const workoutValidation = {
       },
       z.array(
         z.object({
-          exerciseId: z.string(),
+          exercise: z.string(),
           sets: z.number().positive(),
-          reps: z.number().positive(),
-          rest: z.number().optional()
+          reps: z.number().positive()
         })
       )
     )

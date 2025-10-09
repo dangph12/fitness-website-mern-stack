@@ -5,13 +5,11 @@ export interface IWorkout {
   image: string;
   isPublic?: boolean;
   user: Types.ObjectId;
-  plan?: Types.ObjectId;
   exercises: [
     {
-      exerciseId: Types.ObjectId;
+      exercise: Types.ObjectId;
       sets: number;
       reps: number;
-      rest?: number;
     }
   ];
 }

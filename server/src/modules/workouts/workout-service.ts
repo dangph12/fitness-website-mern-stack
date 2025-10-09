@@ -4,7 +4,6 @@ import { Types } from 'mongoose';
 import { uploadImage } from '~/utils/cloudinary';
 
 import ExerciseModel from '../exercises/exercise-model';
-import PlanModel from '../plans/plan-model';
 import UserModel from '../users/user-model';
 import WorkoutModel from './workout-model';
 import { IWorkout } from './workout-type';
@@ -13,8 +12,7 @@ const WorkoutService = {
   findAll: async () => {
     const workouts = await WorkoutModel.find()
       .populate('user')
-      .populate('plan')
-      .populate('exercises.exerciseId');
+      .populate('exercises.exercise');
     return workouts;
   },
 
@@ -25,8 +23,7 @@ const WorkoutService = {
 
     const workout = await WorkoutModel.findById(workoutId)
       .populate('user')
-      .populate('plan')
-      .populate('exercises.exerciseId');
+      .populate('exercises.exercise');
 
     if (!workout) {
       throw createHttpError(404, 'Workout not found');
@@ -42,8 +39,7 @@ const WorkoutService = {
 
     const workouts = await WorkoutModel.find({ user: userId })
       .populate('user')
-      .populate('plan')
-      .populate('exercises.exerciseId');
+      .populate('exercises.exercise');
 
     return workouts;
   },
@@ -58,30 +54,14 @@ const WorkoutService = {
       throw createHttpError(404, 'User not found');
     }
 
-    if (workoutData.plan) {
-      if (!Types.ObjectId.isValid(workoutData.plan)) {
-        throw createHttpError(400, 'Invalid planId');
-      }
-
-      const existingPlan = PlanModel.findById(workoutData.plan);
-      if (workoutData.plan && !existingPlan) {
-        throw createHttpError(404, 'Plan not found');
-      }
-    }
-
     for (const exercise of workoutData.exercises) {
-      if (!Types.ObjectId.isValid(exercise.exerciseId)) {
+      if (!Types.ObjectId.isValid(exercise.exercise)) {
         throw createHttpError(400, 'Invalid exerciseId');
       }
 
-      const existingExercise = await ExerciseModel.findById(
-        exercise.exerciseId
-      );
+      const existingExercise = await ExerciseModel.findById(exercise.exercise);
       if (!existingExercise) {
-        throw createHttpError(
-          404,
-          `Exercise not found: ${exercise.exerciseId}`
-        );
+        throw createHttpError(404, `Exercise not found: ${exercise.exercise}`);
       }
     }
 
@@ -101,15 +81,9 @@ const WorkoutService = {
 
     const newWorkoutData = { ...workoutData, image: imageUrl };
 
-    const workout = await WorkoutModel.create(newWorkoutData);
-
-    if (workout.plan) {
-      await PlanModel.findByIdAndUpdate(
-        workout.plan,
-        { $push: { workouts: workout._id } },
-        { new: true }
-      );
-    }
+    const workout = (await WorkoutModel.create(newWorkoutData)).populate(
+      'exercises.exercise user'
+    );
 
     if (!workout) {
       throw createHttpError(500, 'Failed to create workout');
@@ -136,30 +110,19 @@ const WorkoutService = {
       throw createHttpError(404, 'User not found');
     }
 
-    if (workoutData.plan) {
-      if (!Types.ObjectId.isValid(workoutData.plan)) {
-        throw createHttpError(400, 'Invalid planId');
-      }
-
-      const existingPlan = PlanModel.findById(workoutData.plan);
-      if (workoutData.plan && !existingPlan) {
-        throw createHttpError(404, 'Plan not found');
-      }
-    }
-
     if (workoutData.exercises) {
       for (const exercise of workoutData.exercises) {
-        if (!Types.ObjectId.isValid(exercise.exerciseId)) {
+        if (!Types.ObjectId.isValid(exercise.exercise)) {
           throw createHttpError(400, 'Invalid exerciseId');
         }
 
         const existingExercise = await ExerciseModel.findById(
-          exercise.exerciseId
+          exercise.exercise
         );
         if (!existingExercise) {
           throw createHttpError(
             404,
-            `Exercise not found: ${exercise.exerciseId}`
+            `Exercise not found: ${exercise.exercise}`
           );
         }
       }
@@ -196,9 +159,7 @@ const WorkoutService = {
         new: true,
         runValidators: true
       }
-    )
-      .populate('user')
-      .populate('plan');
+    ).populate('exercises.exercise user');
 
     if (!updatedWorkout) {
       throw createHttpError(500, 'Failed to update workout');
@@ -217,15 +178,6 @@ const WorkoutService = {
     if (!workout) {
       throw createHttpError(404, 'Workout not found');
     }
-
-    if (workout.plan) {
-      await PlanModel.findByIdAndUpdate(
-        workout.plan,
-        { $pull: { workouts: workout._id } },
-        { new: true }
-      );
-    }
-    return workout;
   }
 };
 
