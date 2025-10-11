@@ -98,6 +98,7 @@ const router = createBrowserRouter([
             <AdminLayout />
           </PrivateRoute>
         ),
+        // Component: AdminLayout,
         children: [
           {
             index: true,
@@ -106,6 +107,18 @@ const router = createBrowserRouter([
           {
             path: 'manage-users',
             Component: lazy(() => import('~/app/admin/manage-users/page'))
+          },
+          {
+            path: 'manage-users/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-users/create-user/page')
+            )
+          },
+          {
+            path: 'manage-users/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-users/update-user/page')
+            )
           }
         ]
       }
