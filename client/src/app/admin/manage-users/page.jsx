@@ -1,139 +1,101 @@
-import { Loader2, Plus } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+'use client';
+
+import { RefreshCw } from 'lucide-react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { DataTable } from '../../../components/admin/data-table';
-import { Columns } from '../../../components/admin/users-columns'; // Thay đổi từ createColumns thành columns
-import { Alert, AlertDescription } from '../../../components/ui/alert';
-import { Button } from '../../../components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '../../../components/ui/card';
-import AdminLayout from '../../../layouts/admin-layout.jsx';
-import {
-  clearErrors,
-  clearFilters,
-  deleteUser,
-  fetchUsers,
-  setCurrentPage,
-  setFilters,
-  setLimit
-} from '../../../store/features/users-slice';
+import { UsersDialogs } from '~/components/admin/users/users-dialogs';
+import { UsersFilters } from '~/components/admin/users/users-filters';
+import { UsersPrimaryButtons } from '~/components/admin/users/users-primary-buttons';
+import { UsersProvider } from '~/components/admin/users/users-provider';
+import { UsersStats } from '~/components/admin/users/users-stats';
+import { UsersTable } from '~/components/admin/users/users-table';
+import { Button } from '~/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
+import { Separator } from '~/components/ui/separator';
+import { clearErrors, fetchUsers } from '~/store/features/users-slice';
 
-export default function ManageUsersPage() {
+function ManageUsersContent() {
   const dispatch = useDispatch();
-  const {
-    users,
-    loading,
-    error,
-    totalPages,
-    totalUsers,
-    currentPage,
-    limit,
-    filters
-  } = useSelector(state => state.users);
+  const { loading, error, currentPage, limit, filters } = useSelector(
+    state => state.users
+  );
 
-  // Fetch users on component mount and when filters change
-  useEffect(() => {
-    dispatch(
-      fetchUsers({
-        page: currentPage,
-        limit,
-        name: filters.search,
-        role: filters.role,
-        gender: filters.gender
-      })
-    );
+  // Memoized fetch function
+  const fetchUsersData = useCallback(() => {
+    const searchParams = {
+      page: currentPage,
+      limit,
+      search: filters.search || '',
+      role: Array.isArray(filters.role) ? filters.role : [],
+      gender: Array.isArray(filters.gender) ? filters.gender : []
+    };
+
+    console.log('Fetching users with params:', searchParams);
+    dispatch(fetchUsers(searchParams));
   }, [dispatch, currentPage, limit, filters]);
 
-  // Clear errors on component mount
+  // Initial fetch and when dependencies change
   useEffect(() => {
+    fetchUsersData();
+  }, [fetchUsersData]);
+
+  const handleRefresh = useCallback(() => {
     dispatch(clearErrors());
-  }, [dispatch]);
-
-  const handlePageChange = page => {
-    dispatch(setCurrentPage(page));
-  };
-
-  const handleLimitChange = newLimit => {
-    dispatch(setLimit(newLimit));
-  };
-
-  const handleFiltersChange = newFilters => {
-    dispatch(setFilters(newFilters));
-  };
-
-  const handleClearFilters = () => {
-    dispatch(clearFilters());
-  };
-
-  if (loading && users.length === 0) {
-    return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <div className='flex items-center space-x-2'>
-          <Loader2 className='h-6 w-6 animate-spin' />
-          <span>Loading users...</span>
-        </div>
-      </div>
-    );
-  }
+    fetchUsersData();
+  }, [dispatch, fetchUsersData]);
 
   return (
-    <div className='space-y-6'>
-      <div className='flex items-center justify-between'>
+    <div className='container mx-auto py-6 space-y-6'>
+      {/* Header */}
+      <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
         <div>
-          <h1 className='text-3xl font-bold tracking-tight'>
-            Users Management
-          </h1>
+          <h1 className='text-3xl font-bold tracking-tight'>Manage Users</h1>
           <p className='text-muted-foreground'>
             Manage user accounts, roles, and permissions
           </p>
         </div>
-        <div className='flex items-center space-x-2'>
-          <Button>
-            <Plus className='mr-2 h-4 w-4' />
-            Add User
+        <div className='flex items-center gap-2'>
+          <Button variant='outline' onClick={handleRefresh} disabled={loading}>
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`}
+            />
+            Refresh
           </Button>
+          <UsersPrimaryButtons />
         </div>
       </div>
 
+      <Separator />
+
+      {/* Error Display */}
       {error && (
-        <Alert variant='destructive'>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <div className='bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4'>
+          <p className='text-red-800 dark:text-red-200'>{error}</p>
+        </div>
       )}
 
+      {/* Stats Cards */}
+      <UsersStats />
+
+      {/* Users Table */}
       <Card>
-        <CardHeader>
-          <CardTitle>All Users ({totalUsers})</CardTitle>
-          <CardDescription>
-            A list of all users in your system including their name, email,
-            role, and status.
-          </CardDescription>
-        </CardHeader>
         <CardContent>
-          <DataTable
-            columns={Columns}
-            data={users}
-            loading={loading}
-            pagination={{
-              page: currentPage,
-              pageSize: limit,
-              totalPages,
-              totalItems: totalUsers,
-              onPageChange: handlePageChange,
-              onPageSizeChange: handleLimitChange
-            }}
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-            onClearFilters={handleClearFilters}
-          />
+          <UsersFilters />
+          <UsersTable />
         </CardContent>
       </Card>
+
+      {/* Dialogs */}
+      <UsersDialogs />
     </div>
+  );
+}
+
+export default function ManageUsersPage() {
+  return (
+    <UsersProvider>
+      <ManageUsersContent />
+    </UsersProvider>
   );
 }
