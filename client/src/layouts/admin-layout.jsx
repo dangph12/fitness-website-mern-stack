@@ -3,7 +3,7 @@ import { useLocation } from 'react-router';
 import { Outlet } from 'react-router';
 
 import { AdminSidebar } from '../components/admin/admin-sidebar.jsx';
-import { SearchInput } from '../components/admin/search.jsx';
+// import { SearchInput } from '../components/admin/search.jsx';
 import { ProfileDropdown } from '../components/profile-dropdown';
 import {
   Breadcrumb,
@@ -24,12 +24,60 @@ import {
 const AdminLayout = () => {
   const location = useLocation();
 
-  const getBreadcrumbTitle = () => {
+  const getBreadcrumbItems = () => {
     const path = location.pathname;
-    if (path === '/admin') return 'Dashboard';
-    if (path === '/admin/manage-users') return 'Users Management';
-    return 'Admin Panel';
+    const segments = path.split('/').filter(Boolean);
+
+    // Generate breadcrumb items based on path
+    const breadcrumbMap = {
+      admin: 'Dashboard',
+      'manage-users': 'Users Management',
+      'add-user': 'Add User',
+      'edit-user': 'Edit User',
+      'manage-workouts': 'Workouts Management',
+      'manage-exercises': 'Exercises Management',
+      'manage-nutrition': 'Nutrition Management',
+      analytics: 'Analytics',
+      settings: 'Settings'
+    };
+
+    const items = [];
+    let currentPath = '';
+
+    segments.forEach((segment, index) => {
+      currentPath += `/${segment}`;
+      const title =
+        breadcrumbMap[segment] ||
+        segment.charAt(0).toUpperCase() + segment.slice(1);
+
+      if (index === 0) {
+        // First item (admin) is always a link to dashboard
+        items.push({
+          title: title,
+          href: currentPath,
+          isLast: false
+        });
+      } else if (index === segments.length - 1) {
+        // Last item is current page
+        items.push({
+          title: title,
+          href: currentPath,
+          isLast: true
+        });
+      } else {
+        // Middle items are links
+        items.push({
+          title: title,
+          href: currentPath,
+          isLast: false
+        });
+      }
+    });
+
+    return items;
   };
+
+  const breadcrumbItems = getBreadcrumbItems();
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -41,21 +89,30 @@ const AdminLayout = () => {
             <Separator orientation='vertical' className='mr-2 h-4' />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className='hidden md:block'>
-                  <BreadcrumbLink href='/admin'>Admin Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className='hidden md:block' />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{getBreadcrumbTitle()}</BreadcrumbPage>
-                </BreadcrumbItem>
+                {breadcrumbItems.map((item, index) => (
+                  <React.Fragment key={item.href}>
+                    {index > 0 && (
+                      <BreadcrumbSeparator className='hidden md:block' />
+                    )}
+                    <BreadcrumbItem
+                      className={index === 0 ? 'hidden md:block' : ''}
+                    >
+                      {item.isLast ? (
+                        <BreadcrumbPage>{item.title}</BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink href={item.href}>
+                          {item.title}
+                        </BreadcrumbLink>
+                      )}
+                    </BreadcrumbItem>
+                  </React.Fragment>
+                ))}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
 
           <div className='flex items-center gap-4 ml-auto px-4'>
-            <div className='hidden md:block'>
-              <SearchInput />
-            </div>
+            <div className='hidden md:block'>{/* <SearchInput /> */}</div>
             <ModeToggle />
             <ProfileDropdown />
           </div>
