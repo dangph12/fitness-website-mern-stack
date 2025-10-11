@@ -1,20 +1,23 @@
-import { ArrowDown, ArrowUp, ArrowUpDown, EyeOff } from 'lucide-react';
-import React from 'react';
+'use client';
 
-import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
+import { ArrowDown, ArrowUp, ArrowUpDown, EyeOff } from 'lucide-react';
+
+import { Button } from '~/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from '../ui/dropdown-menu';
+} from '~/components/ui/dropdown-menu';
+import { cn } from '~/lib/utils';
 
 export function DataTableColumnHeader({ column, title, className }) {
   if (!column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>;
   }
+
+  const sorted = column.getIsSorted();
 
   return (
     <div className={cn('flex items-center space-x-2', className)}>
@@ -26,9 +29,9 @@ export function DataTableColumnHeader({ column, title, className }) {
             className='-ml-3 h-8 data-[state=open]:bg-accent'
           >
             <span>{title}</span>
-            {column.getIsSorted() === 'desc' ? (
+            {sorted === 'desc' ? (
               <ArrowDown className='ml-2 h-4 w-4' />
-            ) : column.getIsSorted() === 'asc' ? (
+            ) : sorted === 'asc' ? (
               <ArrowUp className='ml-2 h-4 w-4' />
             ) : (
               <ArrowUpDown className='ml-2 h-4 w-4' />
