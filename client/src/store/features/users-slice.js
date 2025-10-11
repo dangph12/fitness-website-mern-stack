@@ -5,7 +5,7 @@ import axiosInstance from '~/lib/axios-instance';
 export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
   async (
-    { page = 1, limit = 10, name = '', role = '', gender = '' },
+    { page = 1, limit = 10, search = '', role = [], gender = [] },
     { rejectWithValue }
   ) => {
     try {
@@ -16,14 +16,17 @@ export const fetchUsers = createAsyncThunk(
         sortOrder: 'desc'
       };
 
-      if (name) {
-        params.name = name;
+      if (search && search.trim()) {
+        const searchTerm = search.trim();
+        params.name = searchTerm;
       }
-      if (role) {
-        params.role = role;
+
+      if (role && role.length > 0) {
+        params.role = Array.isArray(role) ? role.join(',') : role;
       }
-      if (gender) {
-        params.gender = gender;
+
+      if (gender && gender.length > 0) {
+        params.gender = Array.isArray(gender) ? gender.join(',') : gender;
       }
 
       const response = await axiosInstance.get('/api/users', {
@@ -35,6 +38,34 @@ export const fetchUsers = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message || 'Failed to fetch users'
       );
+    }
+  }
+);
+
+export const fetchUsersExact = createAsyncThunk(
+  'users/fetchUsersExact',
+  async (
+    { name = '', email = '', role = '', gender = '' },
+    { rejectWithValue }
+  ) => {
+    try {
+      const params = {
+        page: 1,
+        limit: 10,
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      };
+
+      if (name && name.trim()) params.name = name.trim();
+      if (email && email.trim()) params.email = email.trim();
+      if (role && role.trim()) params.role = role.trim();
+      if (gender && gender.trim()) params.gender = gender.trim();
+
+      const response = await axiosInstance.get('/api/users', { params });
+
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Test failed');
     }
   }
 );
@@ -67,6 +98,44 @@ export const fetchUserDetails = createAsyncThunk(
   }
 );
 
+export const createUser = createAsyncThunk(
+  'users/createUser',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/api/users', userData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to create user'
+      );
+    }
+  }
+);
+
+export const updateUser = createAsyncThunk(
+  'users/updateUser',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.put(`/api/users/${id}`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to update user'
+      );
+    }
+  }
+);
+
 const initialState = {
   users: [],
   selectedUser: null,
@@ -78,13 +147,39 @@ const initialState = {
   limit: 10,
   filters: {
     search: '',
-    role: '',
-    gender: ''
+    role: [],
+    gender: []
   },
   deleteLoading: false,
   deleteError: null,
   userDetailsLoading: false,
-  userDetailsError: null
+  userDetailsError: null,
+  createLoading: false,
+  createError: null,
+  updateLoading: false,
+  updateError: null
+};
+
+const handleUsersResponse = (state, payload) => {
+  if (payload && typeof payload === 'object') {
+    if (payload.users && Array.isArray(payload.users)) {
+      state.users = payload.users;
+      state.totalPages = payload.totalPages || 1;
+      state.totalUsers = payload.totalUsers || payload.users.length;
+    } else if (Array.isArray(payload)) {
+      state.users = payload;
+      state.totalUsers = payload.length;
+      state.totalPages = Math.ceil(payload.length / state.limit);
+    } else {
+      state.users = [];
+      state.totalPages = 0;
+      state.totalUsers = 0;
+    }
+  } else {
+    state.users = [];
+    state.totalPages = 0;
+    state.totalUsers = 0;
+  }
 };
 
 const usersSlice = createSlice({
@@ -105,8 +200,8 @@ const usersSlice = createSlice({
     clearFilters: state => {
       state.filters = {
         search: '',
-        role: '',
-        gender: ''
+        role: [],
+        gender: []
       };
       state.currentPage = 1;
     },
@@ -121,6 +216,7 @@ const usersSlice = createSlice({
     }
   },
   extraReducers: builder => {
+    // Handle fetchUsers
     builder
       .addCase(fetchUsers.pending, state => {
         state.loading = true;
@@ -128,33 +224,32 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        // Handle structured response with metadata
-        if (
-          action.payload &&
-          typeof action.payload === 'object' &&
-          action.payload.users
-        ) {
-          state.users = action.payload.users;
-          state.totalPages = action.payload.totalPages;
-          state.totalUsers = action.payload.totalUsers;
-        } else if (Array.isArray(action.payload)) {
-          // Fallback for direct array response
-          state.users = action.payload;
-          state.totalUsers = action.payload.length;
-          state.totalPages = Math.ceil(action.payload.length / state.limit);
-        } else {
-          // Handle empty or invalid response
-          state.users = [];
-          state.totalPages = 0;
-          state.totalUsers = 0;
-        }
+        handleUsersResponse(state, action.payload);
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.users = [];
+        state.totalPages = 0;
+        state.totalUsers = 0;
       });
 
+    // Handle fetchUsersExact
+    builder
+      .addCase(fetchUsersExact.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUsersExact.fulfilled, (state, action) => {
+        state.loading = false;
+        handleUsersResponse(state, action.payload);
+      })
+      .addCase(fetchUsersExact.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Handle delete
     builder
       .addCase(deleteUser.pending, state => {
         state.deleteLoading = true;
@@ -170,6 +265,7 @@ const usersSlice = createSlice({
         state.deleteError = action.payload;
       });
 
+    // Handle fetchUserDetails
     builder
       .addCase(fetchUserDetails.pending, state => {
         state.userDetailsLoading = true;
@@ -183,6 +279,47 @@ const usersSlice = createSlice({
         state.userDetailsLoading = false;
         state.userDetailsError = action.payload;
       });
+
+    // Handle createUser
+    builder
+      .addCase(createUser.pending, state => {
+        state.createLoading = true;
+        state.createError = null;
+      })
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.createLoading = false;
+        if (action.payload) {
+          state.users.unshift(action.payload);
+          state.totalUsers += 1;
+        }
+      })
+      .addCase(createUser.rejected, (state, action) => {
+        state.createLoading = false;
+        state.createError = action.payload;
+      });
+
+    // Handle updateUser
+    builder
+      .addCase(updateUser.pending, state => {
+        state.updateLoading = true;
+        state.updateError = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.updateLoading = false;
+        if (action.payload) {
+          const index = state.users.findIndex(
+            user => user._id === action.payload._id
+          );
+          if (index !== -1) {
+            state.users[index] = action.payload;
+          }
+          state.selectedUser = action.payload;
+        }
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.updateLoading = false;
+        state.updateError = action.payload;
+      });
   }
 });
 
@@ -192,7 +329,9 @@ export const {
   setLimit,
   clearFilters,
   clearSelectedUser,
-  clearErrors
+  clearErrors,
+  clearCreateError,
+  clearUpdateError
 } = usersSlice.actions;
 
 export default usersSlice.reducer;
