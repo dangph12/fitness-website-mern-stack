@@ -39,48 +39,16 @@ const GoalService = {
     return goal;
   },
 
-  create: async (goalData: IGoal) => {
-    if (!Types.ObjectId.isValid(goalData.user)) {
+  update: async (userId: string, goalData: Partial<IGoal>) => {
+    if (!Types.ObjectId.isValid(userId)) {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const existingUser = await UserModel.findById(goalData.user);
-    if (!existingUser) {
-      throw createHttpError(404, 'User not found');
-    }
-
-    const goal = await GoalModel.create(goalData);
-
-    if (!goal) {
-      throw createHttpError(500, 'Failed to create goal');
-    }
-
-    return goal;
-  },
-
-  update: async (goalId: string, goalData: Partial<IGoal>) => {
-    if (!Types.ObjectId.isValid(goalId)) {
-      throw createHttpError(400, 'Invalid ObjectId');
-    }
-
-    if (goalData.user && !Types.ObjectId.isValid(goalData.user)) {
-      throw createHttpError(400, 'Invalid userId');
-    }
-
-    const existingUser = await UserModel.findById(goalData.user);
-    if (goalData.user && !existingUser) {
-      throw createHttpError(404, 'User not found');
-    }
-
-    const existingGoal = await GoalModel.findById(goalId);
-    if (!existingGoal) {
-      throw createHttpError(404, 'Goal not found');
-    }
-
-    const updatedGoal = await GoalModel.findByIdAndUpdate(goalId, goalData, {
-      new: true,
-      runValidators: true
-    });
+    const updatedGoal = await GoalModel.findOneAndUpdate(
+      { user: userId },
+      goalData,
+      { new: true, runValidators: true }
+    );
 
     if (!updatedGoal) {
       throw createHttpError(500, 'Failed to update goal');

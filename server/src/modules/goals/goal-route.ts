@@ -10,18 +10,12 @@ const router: Router = express.Router();
 
 router.get('/', asyncHandler(GoalController.findAll));
 
-router.post(
-  '/',
-  validate(GoalValidationSchema.shape),
-  asyncHandler(GoalController.create)
-);
-
 router.get('/user/:userId', asyncHandler(GoalController.findByUser));
 
 router.get('/:id', asyncHandler(GoalController.findById));
 
 router.put(
-  '/:id',
+  '/user/:userId',
   validate(GoalValidationSchema.shape),
   asyncHandler(GoalController.update)
 );

@@ -31,19 +31,10 @@ const GoalController = {
       .json(ApiResponse.success('Goal retrieved successfully', goal));
   },
 
-  create: async (req: Request, res: Response) => {
-    const goalData = req.body;
-    const newGoal = await GoalService.create(goalData);
-
-    return res
-      .status(201)
-      .json(ApiResponse.success('Goal created successfully', newGoal));
-  },
-
   update: async (req: Request, res: Response) => {
-    const goalId = req.params.id;
+    const userId = req.params.userId;
     const updateData = req.body;
-    const updatedGoal = await GoalService.update(goalId, updateData);
+    const updatedGoal = await GoalService.update(userId, updateData);
 
     return res
       .status(200)

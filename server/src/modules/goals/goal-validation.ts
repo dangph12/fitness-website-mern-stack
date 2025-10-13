@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 const goalValidation = {
-  user: z.string(),
   targetWeight: z.number()
 };
 
