@@ -57,8 +57,21 @@ const ExerciseLibrary = ({ handleAddExercise }) => {
             >
               <div className='flex items-center space-x-4'>
                 <img
-                  src={exercise.tutorial}
-                  alt={exercise.title}
+                  src={
+                    exercise.tutorial.endsWith('.gif')
+                      ? exercise.tutorial.replace(
+                          '/upload/',
+                          '/upload/f_jpg/so_0/'
+                        )
+                      : exercise.tutorial
+                  }
+                  onMouseEnter={e => (e.currentTarget.src = exercise.tutorial)}
+                  onMouseLeave={e =>
+                    (e.currentTarget.src = exercise.tutorial.replace(
+                      '/upload/',
+                      '/upload/f_jpg/so_0/'
+                    ))
+                  }
                   className='w-30 h-30 object-cover rounded-md'
                 />
                 <div className='text-left'>
