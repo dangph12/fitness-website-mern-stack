@@ -27,7 +27,7 @@ const ExerciseLibrary = ({ handleAddExercise }) => {
   }
 
   return (
-    <div className='bg-white p-6 rounded-lg shadow-md'>
+    <div className=''>
       <h3 className='text-xl font-semibold mb-4'>Exercise Library</h3>
 
       <div className='flex justify-between mb-4'>
