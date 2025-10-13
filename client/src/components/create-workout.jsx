@@ -2,81 +2,71 @@ import React, { useState } from 'react';
 import { FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { createWorkout } from '~/store/features/workout-slice'; // Import createWorkout action
+import { createWorkout } from '~/store/features/workout-slice';
 
-import ExerciseLibrary from './exercise-library'; // Import ExerciseLibrary
+import ExerciseLibrary from './exercise-library';
+import { Button } from './ui/button';
 
 const CreateWorkout = () => {
   const [days, setDays] = useState([{ dayName: 'Day 1', exercises: [] }]);
   const [selectedDay, setSelectedDay] = useState(0);
 
   const dispatch = useDispatch();
-  const { loading, error } = useSelector(state => state.workouts); // Get loading and error from state
+  const { loading, error } = useSelector(state => state.workouts);
 
-  // Add a new day
   const addDay = () => {
     const newDay = { dayName: `Day ${days.length + 1}`, exercises: [] };
     setDays([...days, newDay]);
   };
 
-  // Add exercise to the selected day
   const handleAddExercise = exercise => {
     const updatedDays = [...days];
 
-    // Check if the exercise already exists by its ID
     const exerciseExists = updatedDays[selectedDay].exercises.some(
       e => e.exercise._id === exercise._id
     );
 
     if (!exerciseExists) {
       updatedDays[selectedDay].exercises.push({
-        exercise: { _id: exercise._id, title: exercise.title }, // Ensure exercise._id is passed correctly
-        sets: 0, // Initialize sets with default values
-        reps: 0 // Initialize reps with default values
+        exercise: { _id: exercise._id, title: exercise.title },
+        sets: 0,
+        reps: 0
       });
 
       setDays(updatedDays);
     }
   };
 
-  // Remove exercise from the selected day
   const handleRemoveExercise = exerciseIndex => {
     const updatedDays = [...days];
     updatedDays[selectedDay].exercises.splice(exerciseIndex, 1);
     setDays(updatedDays);
   };
 
-  // Handle input change for sets and reps
   const handleInputChange = (exerciseIndex, field, value) => {
     const updatedDays = [...days];
     updatedDays[selectedDay].exercises[exerciseIndex][field] = value;
     setDays(updatedDays);
   };
 
-  // Handle form submission to create the workout
   const handleSubmitWorkout = () => {
-    // Create FormData object
     const formData = new FormData();
 
-    // Add basic fields to FormData
     formData.append('title', `Workout Day ${selectedDay + 1}`);
-    formData.append('image', ''); // If image is required, ensure it is not undefined
+    formData.append('image', '');
     formData.append('isPublic', true);
-    formData.append('user', '68dd311a1f6ef82b1f430d0f'); // User ID as string
+    formData.append('user', '68dd311a1f6ef82b1f430d0f');
 
-    // Add exercises in proper format
     days[selectedDay].exercises.forEach((exercise, index) => {
       formData.append(`exercises[${index}][exercise]`, exercise.exercise._id);
       formData.append(`exercises[${index}][sets]`, exercise.sets);
       formData.append(`exercises[${index}][reps]`, exercise.reps);
     });
 
-    // Log FormData content for debugging
     for (const [key, value] of formData.entries()) {
       console.log(key, value);
     }
 
-    // Dispatch the createWorkout action
     dispatch(createWorkout(formData));
   };
 
@@ -84,7 +74,6 @@ const CreateWorkout = () => {
     <div className='p-6 bg-white rounded-lg shadow-md'>
       <h2 className='text-2xl font-semibold mb-4'>Create Workout</h2>
 
-      {/* Day selection */}
       <div className='flex space-x-4 mb-4'>
         {days.map((day, dayIndex) => (
           <div
@@ -104,9 +93,7 @@ const CreateWorkout = () => {
         </button>
       </div>
 
-      {/* Main content split into two sections */}
       <div className='flex space-x-8'>
-        {/* Left: Exercises for the selected day */}
         <div className='w-4/5'>
           {days[selectedDay]?.exercises?.length === 0 ? (
             <p>
@@ -133,7 +120,6 @@ const CreateWorkout = () => {
                         <FaTrash />
                       </button>
                     </div>
-                    {/* Inputs for sets and reps */}
                     <div className='grid grid-cols-4 gap-4 mb-2'>
                       <input
                         type='number'
@@ -169,22 +155,19 @@ const CreateWorkout = () => {
           )}
         </div>
 
-        {/* Right: Exercise Library */}
         <div className='w-1/2'>
           <ExerciseLibrary handleAddExercise={handleAddExercise} />
         </div>
       </div>
 
-      {/* Submit Button */}
-      <button
+      <Button
         onClick={handleSubmitWorkout}
         className='mt-4 bg-blue-600 text-white px-4 py-2 rounded-md'
         disabled={loading}
       >
         {loading ? 'Creating Workout...' : 'Create Workout'}
-      </button>
+      </Button>
 
-      {/* Display Error if any */}
       {error && <p className='text-red-500 mt-2'>{error}</p>}
     </div>
   );
