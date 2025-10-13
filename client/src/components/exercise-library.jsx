@@ -57,16 +57,36 @@ const ExerciseLibrary = ({ handleAddExercise }) => {
             >
               <div className='flex items-center space-x-4'>
                 <img
-                  src={exercise.tutorial}
+                  src={
+                    exercise.tutorial.endsWith('.gif')
+                      ? exercise.tutorial.replace(
+                          '/upload/',
+                          '/upload/f_jpg/so_0/'
+                        )
+                      : exercise.tutorial
+                  }
+                  onMouseEnter={e => (e.currentTarget.src = exercise.tutorial)}
+                  onMouseLeave={e =>
+                    (e.currentTarget.src = exercise.tutorial.replace(
+                      '/upload/',
+                      '/upload/f_jpg/so_0/'
+                    ))
+                  }
                   alt={exercise.title}
-                  className='w-16 h-16 object-cover rounded-md'
+                  className='w-30 h-30 object-cover rounded-md'
                 />
                 <div className='text-left'>
                   <h4 className='font-medium text-gray-800'>
                     {exercise.title}
                   </h4>
-                  <p className='text-sm text-gray-600'>{exercise.difficulty}</p>
-                  <p className='text-sm text-gray-600'>{exercise.type}</p>
+                  <div className='flex space-x-2 mt-2'>
+                    <span className='bg-gray-300 px-2 py-1 rounded-full text-sm text-gray-700'>
+                      {exercise.difficulty}
+                    </span>
+                    <span className='bg-gray-300 px-2 py-1 rounded-full text-sm text-gray-700'>
+                      {exercise.type}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -74,8 +94,7 @@ const ExerciseLibrary = ({ handleAddExercise }) => {
                 onClick={() => handleAddExercise(exercise)}
                 className='bg-blue-500 text-white px-4 py-2 rounded-md flex items-center justify-center'
               >
-                <FaPlus className='mr-2' />
-                Add Exercise
+                <FaPlus />
               </button>
             </div>
           ))}
