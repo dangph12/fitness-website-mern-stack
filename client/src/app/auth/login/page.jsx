@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 
@@ -34,6 +34,7 @@ const Login = () => {
   const error = searchParams.get('error');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector(state => state.auth);
 
   const form = useForm({
     resolver: yupResolver(loginSchema),
@@ -64,12 +65,22 @@ const Login = () => {
       const response = await axiosInstance.post('/api/auth/login', loginData);
       const { accessToken } = response.data.data;
       dispatch(loadUser({ accessToken, isRemember }));
-      navigate('/');
       toast.success('Login successful!');
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Login failed.');
     }
   };
+
+  // Navigate based on profile completion status after user state updates
+  useEffect(() => {
+    if (user) {
+      if (user.profileCompleted === false) {
+        navigate('/onboarding');
+      } else {
+        navigate('/');
+      }
+    }
+  }, [user, navigate]);
 
   return (
     <div className='flex min-h-screen items-center justify-center p-4'>

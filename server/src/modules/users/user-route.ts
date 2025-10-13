@@ -6,7 +6,7 @@ import asyncHandler from '~/utils/async-handler';
 import { uploadSingle } from '~/utils/multer';
 
 import UserController from './user-controller';
-import UserValidationSchema from './user-validation';
+import UserValidationSchema, { OnboardingValidation } from './user-validation';
 
 const router: Router = express.Router();
 
@@ -25,6 +25,13 @@ router.get(
   '/email/:email',
   authenticate(),
   asyncHandler(UserController.findByEmail)
+);
+
+router.put(
+  '/onboarding',
+  authenticate(),
+  validate(OnboardingValidation.shape),
+  asyncHandler(UserController.completeOnboarding)
 );
 
 router.put(

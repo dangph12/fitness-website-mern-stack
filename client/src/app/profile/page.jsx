@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
@@ -13,6 +14,7 @@ import { logout } from '~/store/features/auth-slice';
 import { setAvatar, updateAvatar } from '~/store/features/avatar-slice';
 
 const Page = () => {
+  const navigate = useNavigate();
   const { user, loading } = useSelector(state => state.auth);
   const { url: avatarUrl, uploading } = useSelector(state => state.avatar);
   const dispatch = useDispatch();
@@ -63,6 +65,7 @@ const Page = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    navigate('/');
   };
 
   const { ref, ...registerProps } = register('avatar');

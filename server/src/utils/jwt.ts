@@ -3,20 +3,26 @@ import jwt from 'jsonwebtoken';
 
 export const generateToken = ({
   id,
-  role
+  role,
+  profileCompleted
 }: {
   id: string | number;
   role: string;
+  profileCompleted: boolean | undefined;
 }): { accessToken: string; refreshToken: string } => {
+  if (profileCompleted === undefined) {
+    profileCompleted = false;
+  }
+
   const accessToken = jwt.sign(
-    { id, role },
+    { id, role, profileCompleted },
     process.env.JWT_SECRET || 'your_jwt_secret',
     {
       expiresIn: '15m'
     }
   );
   const refreshToken = jwt.sign(
-    { id, role },
+    { id, role, profileCompleted },
     process.env.JWT_REFRESH_SECRET || 'your_jwt_secret',
     {
       expiresIn: '7d'

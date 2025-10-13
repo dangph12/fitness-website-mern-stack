@@ -103,7 +103,8 @@ const AuthController = {
 
     const { accessToken, refreshToken } = generateToken({
       id: user._id.toString(),
-      role: user.role
+      role: user.role,
+      profileCompleted: user.profileCompleted
     });
 
     res.cookie('refreshToken', refreshToken, {

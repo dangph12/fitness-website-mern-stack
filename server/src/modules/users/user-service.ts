@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 import { deleteAvatar, uploadAvatar } from '~/utils/cloudinary';
 import { uploadImage } from '~/utils/cloudinary';
 
+import BodyRecordModel from '../body-records/body-record-model';
 import UserModel from './user-model';
 import { IUser } from './user-type';
 
@@ -188,6 +189,47 @@ const UserService = {
     }
 
     return uploadResult.data.secure_url;
+  },
+
+  completeOnboarding: async (
+    userId: string,
+    onboardingData: {
+      dob: Date;
+      gender: string;
+      height: number;
+      weight: number;
+      bmi: number;
+    }
+  ) => {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw createHttpError(404, 'User not found');
+    }
+
+    if (user.profileCompleted) {
+      throw createHttpError(400, 'Profile already completed');
+    }
+
+    user.dob = onboardingData.dob;
+    user.gender = onboardingData.gender;
+    user.profileCompleted = true;
+    await user.save();
+
+    const bodyRecord = await BodyRecordModel.create({
+      user: userId,
+      height: onboardingData.height,
+      weight: onboardingData.weight,
+      bmi: onboardingData.bmi
+    });
+
+    return {
+      user,
+      bodyRecord
+    };
   }
 };
 
