@@ -48,7 +48,7 @@ const ExerciseLibrary = ({ handleAddExercise }) => {
         </div>
       </div>
 
-      <ScrollArea className='max-h-96 overflow-y-auto'>
+      <ScrollArea className='max-h-100 overflow-y-auto'>
         <div className='space-y-4'>
           {exercises.map(exercise => (
             <div
@@ -57,21 +57,7 @@ const ExerciseLibrary = ({ handleAddExercise }) => {
             >
               <div className='flex items-center space-x-4'>
                 <img
-                  src={
-                    exercise.tutorial.endsWith('.gif')
-                      ? exercise.tutorial.replace(
-                          '/upload/',
-                          '/upload/f_jpg/so_0/'
-                        )
-                      : exercise.tutorial
-                  }
-                  onMouseEnter={e => (e.currentTarget.src = exercise.tutorial)}
-                  onMouseLeave={e =>
-                    (e.currentTarget.src = exercise.tutorial.replace(
-                      '/upload/',
-                      '/upload/f_jpg/so_0/'
-                    ))
-                  }
+                  src={exercise.tutorial}
                   alt={exercise.title}
                   className='w-30 h-30 object-cover rounded-md'
                 />
@@ -91,7 +77,7 @@ const ExerciseLibrary = ({ handleAddExercise }) => {
               </div>
 
               <button
-                onClick={() => handleAddExercise(exercise)}
+                onClick={() => handleAddExercise(exercise)} // Pass the full exercise object
                 className='bg-blue-500 text-white px-4 py-2 rounded-md flex items-center justify-center'
               >
                 <FaPlus />
