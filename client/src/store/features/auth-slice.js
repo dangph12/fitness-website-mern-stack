@@ -52,15 +52,28 @@ export const authSlice = createSlice({
         return;
       }
       try {
-        if (isRemember) {
+        // if token exists in localStorage, overwrite it
+        const existsInLocalStorage = localStorage.getItem('accessToken');
+
+        if (existsInLocalStorage) {
           localStorage.setItem('accessToken', accessToken);
+          sessionStorage.removeItem('accessToken');
         } else {
-          sessionStorage.setItem('accessToken', accessToken);
+          if (isRemember) {
+            localStorage.setItem('accessToken', accessToken);
+            sessionStorage.removeItem('accessToken');
+          } else {
+            sessionStorage.setItem('accessToken', accessToken);
+            localStorage.removeItem('accessToken');
+          }
         }
+
         const decoded = jwtDecode(accessToken);
         state.user = decoded;
       } catch (error) {
         state.user = null;
+        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('accessToken');
       }
     }
   },

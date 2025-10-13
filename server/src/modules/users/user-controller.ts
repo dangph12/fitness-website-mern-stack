@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 import ApiResponse from '~/types/api-response';
+import { generateToken } from '~/utils/jwt';
 
 import UserService from './user-service';
 
@@ -75,9 +76,17 @@ const UserController = {
 
     const result = await UserService.completeOnboarding(userId, onboardingData);
 
-    return res
-      .status(200)
-      .json(ApiResponse.success('Onboarding completed successfully', result));
+    const { accessToken } = generateToken({
+      id: result.user._id.toString(),
+      role: result.user.role,
+      profileCompleted: result.user.profileCompleted
+    });
+
+    return res.status(200).json(
+      ApiResponse.success('Onboarding completed successfully', {
+        accessToken
+      })
+    );
   }
 };
 

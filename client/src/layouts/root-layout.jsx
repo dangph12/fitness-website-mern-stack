@@ -26,6 +26,11 @@ const RootLayout = () => {
         navigate('/onboarding', { replace: true });
       }
     }
+    if (!user) {
+      if (location.pathname !== '/login' && location.pathname !== '/register') {
+        navigate('/', { replace: true });
+      }
+    }
   }, [user, location.pathname, navigate]);
 
   return (

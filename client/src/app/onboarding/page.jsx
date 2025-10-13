@@ -23,7 +23,7 @@ import {
   CardHeader,
   CardTitle
 } from '~/components/ui/card';
-import { DateOfBirthPicker, DatePicker } from '~/components/ui/date-picker';
+import { DateOfBirthPicker } from '~/components/ui/date-picker';
 import {
   Form,
   FormControl,
@@ -85,11 +85,14 @@ const Onboarding = () => {
         bmi: finalBMI
       });
 
-      if (response.data.success) {
-        toast.success('Profile completed successfully!');
-        await dispatch(loadUser());
-        navigate('/');
-      }
+      const { accessToken } = response.data.data;
+
+      const { message } = response.data;
+
+      dispatch(loadUser({ accessToken }));
+
+      toast.success(message || 'Onboarding completed successfully!');
+      navigate('/');
     } catch (error) {
       console.error('Onboarding error:', error);
       if (error.response?.data?.message) {
