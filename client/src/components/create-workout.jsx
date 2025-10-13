@@ -9,7 +9,6 @@ const CreateWorkout = ({ selectedExercises, setSelectedExercises }) => {
   };
 
   const handleSubmit = () => {
-    // Submit logic for creating workout
     const workoutData = {
       title: 'New Workout',
       exercises: selectedExercises.map(ex => ({
@@ -20,7 +19,7 @@ const CreateWorkout = ({ selectedExercises, setSelectedExercises }) => {
       user: 'user-id-placeholder',
       isPublic: true
     };
-    console.log(workoutData); // Call your create workout action here
+    console.log(workoutData);
   };
 
   return (
