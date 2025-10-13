@@ -28,6 +28,13 @@ router.get(
 );
 
 router.put(
+  '/onboarding',
+  authenticate(),
+  validate(OnboardingValidation.shape),
+  asyncHandler(UserController.completeOnboarding)
+);
+
+router.put(
   '/:id',
   uploadSingle('avatar'),
   validate(UserValidationSchema.shape),
@@ -40,13 +47,6 @@ router.patch(
   '/:id/avatar',
   uploadSingle('avatar'),
   asyncHandler(UserController.updateAvatar)
-);
-
-router.put(
-  '/onboarding',
-  authenticate(),
-  validate(OnboardingValidation.shape),
-  asyncHandler(UserController.completeOnboarding)
 );
 
 export default router;
