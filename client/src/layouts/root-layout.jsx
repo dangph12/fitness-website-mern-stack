@@ -21,14 +21,24 @@ const RootLayout = () => {
   }, [dispatch, user?.id]);
 
   useEffect(() => {
-    if (user && user.profileCompleted === false) {
+    if (!user) {
+      if (location.pathname === '/onboarding') {
+        navigate('/login', { replace: true });
+        return;
+      }
+      if (
+        location.pathname !== '/login' &&
+        location.pathname !== '/register' &&
+        location.pathname !== '/'
+      ) {
+        navigate('/', { replace: true });
+      }
+      return;
+    }
+
+    if (user.profileCompleted === false) {
       if (location.pathname !== '/onboarding') {
         navigate('/onboarding', { replace: true });
-      }
-    }
-    if (!user) {
-      if (location.pathname !== '/login' && location.pathname !== '/register') {
-        navigate('/', { replace: true });
       }
     }
   }, [user, location.pathname, navigate]);

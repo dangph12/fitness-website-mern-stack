@@ -134,7 +134,7 @@ const Onboarding = () => {
           <CardTitle className='text-2xl'>
             {step === 1 && "Let's get to know you"}
             {step === 2 && 'Your body metrics'}
-            {step === 3 && 'Your fitness profile is ready! 🎉'}
+            {step === 3 && 'Your fitness profile is ready!'}
           </CardTitle>
           <CardDescription>
             {step === 1 && 'Help us personalize your fitness journey'}
@@ -224,11 +224,14 @@ const Onboarding = () => {
                           <DateOfBirthPicker
                             value={field.value ? new Date(field.value) : null}
                             onChange={date => {
-                              // Format date as YYYY-MM-DD for form
+                              // Format date as YYYY-MM-DD for form (timezone-safe)
                               if (date) {
-                                const formattedDate = date
-                                  .toISOString()
-                                  .split('T')[0];
+                                const pad = n => n.toString().padStart(2, '0');
+                                const formattedDate = [
+                                  date.getFullYear(),
+                                  pad(date.getMonth() + 1),
+                                  pad(date.getDate())
+                                ].join('-');
                                 field.onChange(formattedDate);
                               } else {
                                 field.onChange('');

@@ -21,7 +21,13 @@ const UserValidationSchema = z.object(UserValidation);
 
 export const OnboardingValidation = z.object({
   dob: z.preprocess(val => {
-    if (typeof val === 'string' || val instanceof Date) return new Date(val);
+    if (!val) return val;
+    if (val instanceof Date) return val;
+    if (typeof val === 'string') {
+      const date = new Date(val);
+      return isNaN(date.getTime()) ? val : date;
+    }
+    return val;
   }, z.date()),
   gender: z.enum(['male', 'female', 'other']),
   height: z.number().positive().min(50).max(300), // in cm
