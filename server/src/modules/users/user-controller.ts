@@ -67,6 +67,17 @@ const UserController = {
     return res
       .status(200)
       .json(ApiResponse.success('Avatar updated successfully', { avatar }));
+  },
+  completeOnboarding: async (req: Request, res: Response) => {
+    const user = req.user as any;
+    const userId = user._id || user.id;
+    const onboardingData = req.body;
+
+    const result = await UserService.completeOnboarding(userId, onboardingData);
+
+    return res
+      .status(200)
+      .json(ApiResponse.success('Onboarding completed successfully', result));
   }
 };
 

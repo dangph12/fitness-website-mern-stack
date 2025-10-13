@@ -19,4 +19,14 @@ const UserValidation = {
 
 const UserValidationSchema = z.object(UserValidation);
 
+export const OnboardingValidation = z.object({
+  dob: z.preprocess(val => {
+    if (typeof val === 'string' || val instanceof Date) return new Date(val);
+  }, z.date()),
+  gender: z.enum(['male', 'female', 'other']),
+  height: z.number().positive().min(50).max(300), // in cm
+  weight: z.number().positive().min(20).max(500), // in kg
+  bmi: z.number().positive().min(10).max(100)
+});
+
 export default UserValidationSchema;

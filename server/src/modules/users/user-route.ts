@@ -6,7 +6,7 @@ import asyncHandler from '~/utils/async-handler';
 import { uploadSingle } from '~/utils/multer';
 
 import UserController from './user-controller';
-import UserValidationSchema from './user-validation';
+import UserValidationSchema, { OnboardingValidation } from './user-validation';
 
 const router: Router = express.Router();
 
@@ -40,6 +40,13 @@ router.patch(
   '/:id/avatar',
   uploadSingle('avatar'),
   asyncHandler(UserController.updateAvatar)
+);
+
+router.put(
+  '/onboarding',
+  authenticate(),
+  validate(OnboardingValidation.shape),
+  asyncHandler(UserController.completeOnboarding)
 );
 
 export default router;

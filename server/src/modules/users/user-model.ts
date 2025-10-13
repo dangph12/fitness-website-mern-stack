@@ -15,7 +15,8 @@ const UserSchema = new Schema<IUser>(
       default: 'user'
     },
     dob: { type: Date },
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
+    profileCompleted: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
