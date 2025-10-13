@@ -36,7 +36,8 @@ const AuthService = {
 
     const { accessToken, refreshToken } = generateToken({
       id: user._id.toString(),
-      role: user.role
+      role: user.role,
+      profileCompleted: user.profileCompleted
     });
 
     return {
@@ -63,7 +64,8 @@ const AuthService = {
 
     const { accessToken, refreshToken } = generateToken({
       id: user._id.toString(),
-      role: user.role
+      role: user.role,
+      profileCompleted: user.profileCompleted
     });
 
     return {
@@ -143,7 +145,8 @@ const AuthService = {
 
     const { accessToken } = generateToken({
       id: user._id.toString(),
-      role: user.role
+      role: user.role,
+      profileCompleted: user.profileCompleted
     });
 
     return accessToken;
