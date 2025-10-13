@@ -90,7 +90,7 @@ const ExerciseLibrary = ({ handleAddExercise }) => {
               </div>
 
               <button
-                onClick={() => handleAddExercise(exercise)} // Pass the full exercise object
+                onClick={() => handleAddExercise(exercise)}
                 className='bg-blue-500 text-white px-4 py-2 rounded-md flex items-center justify-center'
               >
                 <FaPlus />
