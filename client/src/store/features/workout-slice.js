@@ -43,14 +43,21 @@ export const createWorkout = createAsyncThunk(
   'workouts/createWorkout',
   async workoutData => {
     try {
+      console.log('Creating workout with data:', workoutData);
+
       const response = await axiosInstance.post('/api/workouts', workoutData);
       return response.data.data;
     } catch (error) {
-      console.error(
-        'Error creating workout:',
-        error.response ? error.response.data : error.message
-      );
-      throw error;
+      console.error('Error creating workout:', error);
+
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+      }
+      if (error.message) {
+        console.error('Error message:', error.message);
+      }
+
+      throw new Error(error.response?.data?.message || error.message);
     }
   }
 );
