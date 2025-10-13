@@ -5,9 +5,14 @@ import asyncHandler from '~/utils/async-handler';
 import { uploadSingle } from '~/utils/multer';
 
 import PlanController from './plan-controller';
-import PlanValidationSchema from './plan-validation';
+import {
+  CreatePlanValidationSchema,
+  PlanValidationSchema
+} from './plan-validation';
 
 const router: Router = express.Router();
+
+router.get('/filter', asyncHandler(PlanController.find));
 
 router.get('/', asyncHandler(PlanController.findAll));
 
@@ -18,14 +23,14 @@ router.get('/:id', asyncHandler(PlanController.findById));
 router.post(
   '/',
   uploadSingle('image'),
-  validate(PlanValidationSchema.shape),
+  validate(CreatePlanValidationSchema.shape),
   asyncHandler(PlanController.create)
 );
 
 router.put(
   '/:id',
   uploadSingle('image'),
-  validate(PlanValidationSchema.shape),
+  validate(CreatePlanValidationSchema.shape),
   asyncHandler(PlanController.update)
 );
 

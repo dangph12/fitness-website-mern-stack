@@ -5,6 +5,27 @@ import ApiResponse from '~/types/api-response';
 import PlanService from './plan-service';
 
 const PlanController = {
+  find: async (req: Request, res: Response) => {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy,
+      sortOrder,
+      ...filterParams
+    } = req.query;
+
+    const plans = await PlanService.find({
+      page: Number(page),
+      limit: Number(limit),
+      filterParams: filterParams,
+      sortBy: sortBy as string,
+      sortOrder: sortOrder as string
+    });
+    return res
+      .status(200)
+      .json(ApiResponse.success('Plans retrieved successfully', plans));
+  },
+
   findAll: async (req: Request, res: Response) => {
     const plans = await PlanService.findAll();
 
