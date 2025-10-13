@@ -7,9 +7,12 @@ import BodyRecordRoute from '~/modules/body-records/body-record-route';
 import EquipmentRoute from '~/modules/equipments/equipment-route';
 import ExerciseRoute from '~/modules/exercises/exercise-route';
 import FoodRoute from '~/modules/foods/food-route';
+import GoalRoute from '~/modules/goals/goal-route';
 import MealRoute from '~/modules/meals/meal-route';
 import MuscleRouter from '~/modules/muscles/muscle-route';
+import PlanRoute from '~/modules/plans/plan-route';
 import UserRoute from '~/modules/users/user-route';
+import WorkoutRoute from '~/modules/workouts/workout-route';
 
 const router = Router();
 // Non-auth routes
@@ -38,5 +41,14 @@ router.use('/body-records', BodyRecordRoute);
 
 // Exercise routes
 router.use('/exercises', ExerciseRoute);
+
+// Goal routes
+router.use('/goals', GoalRoute);
+
+// Workout routes
+router.use('/workouts', WorkoutRoute);
+
+// Plan routes
+router.use('/plans', PlanRoute);
 
 export default router;

@@ -5,6 +5,29 @@ export interface IPlan {
   image: string;
   isPublic: boolean;
   description: string;
-  userId: Types.ObjectId;
+  user: Types.ObjectId;
   workouts: Types.ObjectId[];
+}
+
+export interface ICreatePlan {
+  title: string;
+  image: string;
+  isPublic: boolean;
+  description: string;
+  user: Types.ObjectId;
+  workouts: [
+    {
+      title: string;
+      image?: string;
+      isPublic?: boolean;
+      user: Types.ObjectId;
+      exercises: [
+        {
+          exercise: Types.ObjectId;
+          sets: number;
+          reps: number;
+        }
+      ];
+    }
+  ];
 }

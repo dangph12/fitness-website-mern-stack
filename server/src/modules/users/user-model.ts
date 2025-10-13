@@ -1,8 +1,11 @@
-import { model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 
+import GoalModel from '../goals/goal-model';
 import { IUser } from './user-type';
 
-const UserSchema = new Schema<IUser>(
+export interface IUserDocument extends IUser, Document {}
+
+const UserSchema = new Schema<IUserDocument>(
   {
     email: { type: String, lowercase: true, unique: true, sparse: true },
     name: { type: String, required: true },
@@ -20,6 +23,21 @@ const UserSchema = new Schema<IUser>(
   },
   { timestamps: true }
 );
+
+UserSchema.post('save', async (doc: IUserDocument, next) => {
+  try {
+    if (doc.role === 'user') {
+      await GoalModel.updateOne(
+        { user: doc._id },
+        { $setOnInsert: { user: doc._id, targetWeight: 0 } },
+        { upsert: true }
+      );
+    }
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
 
 const User = model<IUser>('User', UserSchema);
 export default User;
