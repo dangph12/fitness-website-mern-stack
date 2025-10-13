@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { FaTrash } from 'react-icons/fa';
+import { FaBook, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { createWorkout } from '~/store/features/workout-slice';
 
 import ExerciseLibrary from './exercise-library';
-import { Button } from './ui/button';
 
 const CreateWorkout = () => {
   const [days, setDays] = useState([{ dayName: 'Day 1', exercises: [] }]);
@@ -50,77 +49,89 @@ const CreateWorkout = () => {
   };
 
   const handleSubmitWorkout = () => {
-    const formData = new FormData();
+    const workoutData = {
+      title: `Workout Day ${selectedDay + 1}`,
+      image: '',
+      isPublic: true,
+      user: '68dd311a1f6ef82b1f430d0f',
+      exercises: days[selectedDay].exercises.map(exercise => ({
+        exercise: exercise.exercise._id,
+        sets: exercise.sets,
+        reps: exercise.reps
+      }))
+    };
 
-    formData.append('title', `Workout Day ${selectedDay + 1}`);
-    formData.append('image', '');
-    formData.append('isPublic', true);
-    formData.append('user', '68dd311a1f6ef82b1f430d0f');
+    console.log('Workout data:', workoutData);
 
-    days[selectedDay].exercises.forEach((exercise, index) => {
-      formData.append(`exercises[${index}][exercise]`, exercise.exercise._id);
-      formData.append(`exercises[${index}][sets]`, exercise.sets);
-      formData.append(`exercises[${index}][reps]`, exercise.reps);
-    });
-
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
-    dispatch(createWorkout(formData));
+    dispatch(createWorkout(workoutData));
   };
 
   return (
-    <div className='p-6 bg-white rounded-lg shadow-md'>
-      <h2 className='text-2xl font-semibold mb-4'>Create Workout</h2>
+    <div className='flex gap-8 p-6 bg-white rounded-lg shadow-md'>
+      <div className='w-2/3 p-4 bg-white rounded-lg'>
+        <h2 className='text-2xl font-semibold mb-4'>Create Workout</h2>
 
-      <div className='flex space-x-4 mb-4'>
-        {days.map((day, dayIndex) => (
-          <div
-            key={dayIndex}
-            className={`cursor-pointer p-4 rounded-full border-2 flex justify-center items-center ${
-              selectedDay === dayIndex
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200'
-            }`}
-            onClick={() => setSelectedDay(dayIndex)}
+        <div className='flex justify-between mb-4'>
+          <button
+            onClick={addDay}
+            className='bg-blue-600 text-white px-4 py-2 rounded-md'
           >
-            {day.dayName}
-          </div>
-        ))}
-        <button onClick={addDay} className='text-blue-500 hover:text-blue-700'>
-          + Add Day
-        </button>
-      </div>
+            + Add Day
+          </button>
 
-      <div className='flex space-x-8'>
-        <div className='w-4/5'>
-          {days[selectedDay]?.exercises?.length === 0 ? (
-            <p>
-              No exercises added for {days[selectedDay]?.dayName}. Add exercises
-              from the library.
-            </p>
-          ) : (
-            <div>
-              <h3 className='text-lg font-medium mb-3'>
-                Exercises for {days[selectedDay]?.dayName}
-              </h3>
-              <ul className='space-y-4'>
-                {days[selectedDay]?.exercises.map((exercise, exerciseIndex) => (
-                  <li
+          <button
+            onClick={handleSubmitWorkout}
+            className='bg-blue-600 text-white px-4 py-2 rounded-md flex items-center'
+            disabled={loading}
+          >
+            <FaBook className='mr-2' />
+            {loading ? 'Creating Workout...' : 'Create Workout'}
+          </button>
+        </div>
+
+        {days.map((day, dayIndex) => (
+          <div key={dayIndex} className='mt-4 border rounded-md p-4 mb-4'>
+            <div className='flex justify-between items-center mb-4'>
+              <div className='flex items-center'>
+                <span
+                  onClick={() => setSelectedDay(dayIndex)}
+                  className={`text-lg font-semibold cursor-pointer ${
+                    selectedDay === dayIndex ? 'text-blue-600' : 'text-gray-600'
+                  }`}
+                >
+                  {day.dayName}
+                </span>
+                <button
+                  onClick={() => handleRemoveExercise(dayIndex)}
+                  className='ml-4 text-red-500'
+                >
+                  <FaTrash />
+                </button>
+              </div>
+              <span className='text-sm text-gray-500'>
+                Est. 0 min | {day.exercises.length} exercises
+              </span>
+            </div>
+
+            {day.exercises.length === 0 ? (
+              <p>This day is empty. Add exercises from the library.</p>
+            ) : (
+              <div className='space-y-4'>
+                {day.exercises.map((exercise, exerciseIndex) => (
+                  <div
                     key={exerciseIndex}
-                    className='border bg-gray-100 rounded-md shadow-sm p-4 hover:shadow-lg'
+                    className='p-4 bg-gray-100 rounded-md'
                   >
-                    <div className='flex items-center mb-3'>
+                    <div className='flex items-center justify-between mb-3'>
                       <span>{exercise.exercise.title}</span>
                       <button
                         onClick={() => handleRemoveExercise(exerciseIndex)}
-                        className='ml-4 text-red-500'
+                        className='text-red-500'
                       >
                         <FaTrash />
                       </button>
                     </div>
-                    <div className='grid grid-cols-4 gap-4 mb-2'>
+                    <div className='flex space-x-4'>
                       <input
                         type='number'
                         value={exercise.sets}
@@ -148,27 +159,19 @@ const CreateWorkout = () => {
                         placeholder='Reps'
                       />
                     </div>
-                  </li>
+                  </div>
                 ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        <div className='w-1/2'>
-          <ExerciseLibrary handleAddExercise={handleAddExercise} />
-        </div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
-      <Button
-        onClick={handleSubmitWorkout}
-        className='mt-4 bg-blue-600 text-white px-4 py-2 rounded-md'
-        disabled={loading}
-      >
-        {loading ? 'Creating Workout...' : 'Create Workout'}
-      </Button>
+      <div className='w-1/3 border-l p-4 rounded-lg shadow-lg'>
+        <ExerciseLibrary handleAddExercise={handleAddExercise} />
+      </div>
 
-      {error && <p className='text-red-500 mt-2'>{error}</p>}
+      {error && <p className='text-red-500 mt-2 text-center'>{error}</p>}
     </div>
   );
 };
