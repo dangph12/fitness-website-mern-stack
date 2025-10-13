@@ -73,12 +73,11 @@ function Header() {
         transition={{ duration: 1 }}
       >
         <MenuItem
-          label='Workout'
+          label='Workouts'
           isDropdown={true}
           links={[
-            { label: 'Abs Training', href: '#abs' },
-            { label: 'Legs Training', href: '#legs' },
-            { label: 'Arms Training', href: '#arms' }
+            { label: 'Rountine Database', href: '/workout/routine-database' },
+            { label: 'Rountine Builder', href: '/workout/rountine-builder' }
           ]}
         />
         <MenuItem
