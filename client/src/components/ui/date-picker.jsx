@@ -76,8 +76,19 @@ export function DateOfBirthPicker({
   }, [value]);
 
   const handleSelect = selectedDate => {
-    setDate(selectedDate);
-    onChange?.(selectedDate);
+    if (selectedDate) {
+      // Create a new date at noon local time to avoid timezone issues
+      const localDate = new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+        12,
+        0,
+        0
+      );
+      setDate(localDate);
+      onChange?.(localDate);
+    }
   };
 
   const handleMonthChange = newMonth => {
