@@ -5,6 +5,27 @@ import ApiResponse from '~/types/api-response';
 import WorkoutService from './workout-service';
 
 const WorkoutController = {
+  find: async (req: Request, res: Response) => {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy,
+      sortOrder,
+      ...filterParams
+    } = req.query;
+
+    const workouts = await WorkoutService.find({
+      page: Number(page),
+      limit: Number(limit),
+      filterParams: filterParams,
+      sortBy: sortBy as string,
+      sortOrder: sortOrder as string
+    });
+    return res
+      .status(200)
+      .json(ApiResponse.success('Plans retrieved successfully', workouts));
+  },
+
   findAll: async (req: Request, res: Response) => {
     const workouts = await WorkoutService.findAll();
 

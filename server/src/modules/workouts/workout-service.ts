@@ -9,6 +9,40 @@ import WorkoutModel from './workout-model';
 import { IWorkout } from './workout-type';
 
 const WorkoutService = {
+  find: async ({
+    page = 1,
+    limit = 10,
+    filterParams = {},
+    sortBy = 'createdAt',
+    sortOrder = 'desc'
+  }) => {
+    const filterRecord: Record<string, any> = {};
+
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value && value !== '') {
+        // options for case-insensitive
+        filterRecord[key] = { $regex: value, $options: 'i' };
+      }
+    }
+
+    const skip = (page - 1) * limit;
+    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as any;
+
+    const totalWorkouts = await WorkoutModel.countDocuments(filterRecord);
+    const totalPages = Math.ceil(totalWorkouts / limit);
+
+    const workouts = await WorkoutModel.find(filterRecord)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
+
+    return {
+      workouts,
+      totalWorkouts,
+      totalPages
+    };
+  },
+
   findAll: async () => {
     const workouts = await WorkoutModel.find()
       .populate('user')

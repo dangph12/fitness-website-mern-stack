@@ -9,6 +9,8 @@ import WorkoutValidationSchema from './workout-validation';
 
 const router: Router = express.Router();
 
+router.get('/filter', asyncHandler(WorkoutController.find));
+
 router.get('/', asyncHandler(WorkoutController.findAll));
 
 router.get('/user/:userId', asyncHandler(WorkoutController.findByUser));
