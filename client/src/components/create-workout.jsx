@@ -8,6 +8,7 @@ import ExerciseLibrary from './exercise-library';
 
 const CreateWorkout = () => {
   const [days, setDays] = useState([{ dayName: 'Day 1', exercises: [] }]);
+  const userId = useSelector(state => state.auth.user.id);
   const [selectedDay, setSelectedDay] = useState(0);
 
   const dispatch = useDispatch();
@@ -53,7 +54,7 @@ const CreateWorkout = () => {
       title: `Workout Day ${selectedDay + 1}`,
       image: '',
       isPublic: true,
-      user: '68dd311a1f6ef82b1f430d0f',
+      user: userId,
       exercises: days[selectedDay].exercises.map(exercise => ({
         exercise: exercise.exercise._id,
         sets: exercise.sets,
