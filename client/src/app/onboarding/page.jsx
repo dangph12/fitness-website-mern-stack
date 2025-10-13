@@ -23,6 +23,7 @@ import {
   CardHeader,
   CardTitle
 } from '~/components/ui/card';
+import { DateOfBirthPicker, DatePicker } from '~/components/ui/date-picker';
 import {
   Form,
   FormControl,
@@ -217,11 +218,20 @@ const Onboarding = () => {
                           Date of Birth
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type='date'
+                          <DateOfBirthPicker
+                            value={field.value ? new Date(field.value) : null}
+                            onChange={date => {
+                              // Format date as YYYY-MM-DD for form
+                              if (date) {
+                                const formattedDate = date
+                                  .toISOString()
+                                  .split('T')[0];
+                                field.onChange(formattedDate);
+                              } else {
+                                field.onChange('');
+                              }
+                            }}
                             placeholder='Select your date of birth'
-                            {...field}
-                            max={new Date().toISOString().split('T')[0]}
                           />
                         </FormControl>
                         <FormMessage />
