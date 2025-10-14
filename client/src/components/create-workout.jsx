@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { FaBook, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 import { createWorkout } from '~/store/features/workout-slice';
 
@@ -9,6 +11,7 @@ import ExerciseLibrary from './exercise-library';
 const CreateWorkout = () => {
   const [exercises, setExercises] = useState([]);
   const userId = useSelector(state => state.auth.user.id);
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
   const { loading, error } = useSelector(state => state.workouts);
@@ -64,7 +67,16 @@ const CreateWorkout = () => {
     };
 
     console.log('Workout data:', workoutData);
-    dispatch(createWorkout(workoutData));
+    dispatch(createWorkout(workoutData))
+      .then(() => {
+        toast.success('workout created successfully!');
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
+      })
+      .catch(error => {
+        toast.error('Failed to create plan');
+      });
   };
 
   return (
