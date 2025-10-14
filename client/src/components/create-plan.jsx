@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { FaBook, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 import { createPlan } from '~/store/features/plan-slice';
 
@@ -10,6 +12,7 @@ const CreatePlan = () => {
   const [days, setDays] = useState([{ dayName: 'Day 1', workouts: [] }]);
   const userId = useSelector(state => state.auth.user.id);
   const [selectedDay, setSelectedDay] = useState(0);
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
   const { loading, error } = useSelector(state => state.plans);
@@ -111,7 +114,16 @@ const CreatePlan = () => {
       )
     };
 
-    dispatch(createPlan(planData));
+    dispatch(createPlan(planData))
+      .then(() => {
+        toast.success('Plan created successfully!');
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
+      })
+      .catch(error => {
+        toast.error('Failed to create plan');
+      });
   };
 
   return (
