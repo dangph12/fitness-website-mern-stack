@@ -344,7 +344,7 @@ export default function AddUserPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value='user'>User</SelectItem>
-                    <SelectItem value='instructor'>Instructor</SelectItem>
+                    {/* <SelectItem value='instructor'>Instructor</SelectItem> */}
                     <SelectItem value='admin'>Admin</SelectItem>
                   </SelectContent>
                 </Select>
@@ -363,7 +363,7 @@ export default function AddUserPage() {
                     <SelectItem value='unspecified'>Not specified</SelectItem>
                     <SelectItem value='male'>Male</SelectItem>
                     <SelectItem value='female'>Female</SelectItem>
-                    <SelectItem value='other'>Other</SelectItem>
+                    {/* <SelectItem value='other'>Other</SelectItem> */}
                   </SelectContent>
                 </Select>
               </div>
