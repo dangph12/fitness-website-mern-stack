@@ -3,19 +3,32 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axiosInstance from '~/lib/axios-instance';
 
 // Fetch workouts
+// export const fetchWorkouts = createAsyncThunk(
+//   'workouts/fetchWorkouts',
+//   async ({
+//     page = 1,
+//     limit = 10,
+//     sortBy = 'createdAt',
+//     sortOrder = 'desc',
+//     filterParams = {}
+//   }) => {
+//     try {
+//       const response = await axiosInstance.get('/api/workouts', {
+//         params: { page, limit, sortBy, sortOrder, ...filterParams }
+//       });
+//       return response.data.data;
+//     } catch (error) {
+//       console.error('Error fetching workouts:', error);
+//       throw error;
+//     }
+//   }
+// );
+
 export const fetchWorkouts = createAsyncThunk(
   'workouts/fetchWorkouts',
-  async ({
-    page = 1,
-    limit = 10,
-    sortBy = 'createdAt',
-    sortOrder = 'desc',
-    filterParams = {}
-  }) => {
+  async () => {
     try {
-      const response = await axiosInstance.get('/api/workouts', {
-        params: { page, limit, sortBy, sortOrder, ...filterParams }
-      });
+      const response = await axiosInstance.get('/api/workouts'); // Fetch all workouts without page or limit
       return response.data.data;
     } catch (error) {
       console.error('Error fetching workouts:', error);
@@ -114,14 +127,11 @@ export const workoutSlice = createSlice({
       })
       .addCase(fetchWorkouts.fulfilled, (state, action) => {
         state.loading = false;
-        const data = action.payload;
-        state.workouts = data?.workouts || [];
-        state.totalWorkouts = data?.totalWorkouts || 0;
-        state.totalPages = data?.totalPages || 1;
+        state.workouts = action.payload;
       })
       .addCase(fetchWorkouts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch workouts';
+        state.error = action.error.message;
       })
 
       // Fetch workout by ID
