@@ -6,6 +6,7 @@ export const fetchFoods = createAsyncThunk(
   'foods/fetchFoods',
   async ({ page, limit, sortBy, sortOrder, filterParams }) => {
     try {
+      console.log({ page, limit, sortBy, sortOrder, filterParams });
       const response = await axiosInstance.get('/api/foods', {
         params: { page, limit, sortBy, sortOrder, ...filterParams }
       });
@@ -94,7 +95,11 @@ export const foodSlice = createSlice({
       })
       .addCase(createFood.fulfilled, (state, action) => {
         state.loading = false;
-        state.foods.unshift(action.payload);
+        if (state.foods.items && Array.isArray(state.foods.items)) {
+          state.foods.items.unshift(action.payload);
+        } else {
+          state.foods.items = [action.payload];
+        }
       })
       .addCase(createFood.rejected, (state, action) => {
         state.loading = false;
@@ -102,11 +107,14 @@ export const foodSlice = createSlice({
       })
       // Update food
       .addCase(updateFood.fulfilled, (state, action) => {
-        const index = state.foods.findIndex(
-          food => food._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.foods[index] = action.payload;
+        state.loading = false;
+        if (state.foods.items && Array.isArray(state.foods.items)) {
+          const index = state.foods.items.findIndex(
+            food => food._id === action.payload._id
+          );
+          if (index !== -1) {
+            state.foods.items[index] = action.payload;
+          }
         }
         if (state.currentFood?._id === action.payload._id) {
           state.currentFood = action.payload;
