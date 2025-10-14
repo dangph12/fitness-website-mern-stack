@@ -7,6 +7,7 @@ import exercisesReducer from '~/store/features/exercise-slice';
 import foodReducer from '~/store/features/food-slice';
 import mealsReducer from '~/store/features/meal-slice';
 import musclesReducer from '~/store/features/muscles-slice';
+import plansReducer from '~/store/features/plan-slice';
 import usersReducer from '~/store/features/users-slice';
 import workoutsReducer from '~/store/features/workout-slice';
 
@@ -20,6 +21,7 @@ export default configureStore({
     muscles: musclesReducer,
     equipments: equipmentsReducer,
     exercises: exercisesReducer,
-    workouts: workoutsReducer
+    workouts: workoutsReducer,
+    plans: plansReducer
   }
 });
