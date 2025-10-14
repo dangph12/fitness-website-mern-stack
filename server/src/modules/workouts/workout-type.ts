@@ -8,8 +8,7 @@ export interface IWorkout {
   exercises: [
     {
       exercise: Types.ObjectId;
-      sets: number;
-      reps: number;
+      sets: number[];
     }
   ];
 }
