@@ -82,8 +82,23 @@ const WorkoutDetail = () => {
             >
               {exercise.exercise.tutorial && (
                 <img
-                  src={exercise.exercise.tutorial}
-                  alt={exercise.exercise.title}
+                  src={
+                    exercise.exercise.tutorial.endsWith('.gif')
+                      ? exercise.exercise.tutorial.replace(
+                          '/upload/',
+                          '/upload/f_jpg/so_0/'
+                        )
+                      : exercise.exercise.tutorial
+                  }
+                  onMouseEnter={e =>
+                    (e.currentTarget.src = exercise.exercise.tutorial)
+                  }
+                  onMouseLeave={e =>
+                    (e.currentTarget.src = exercise.exercise.tutorial.replace(
+                      '/upload/',
+                      '/upload/f_jpg/so_0/'
+                    ))
+                  }
                   className='w-full h-full object-cover'
                 />
               )}
