@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { fetchEquipments } from '~/store/features/equipment-slice';
@@ -13,6 +13,7 @@ const WorkoutList = () => {
   const { workouts, loading, error } = useSelector(state => state.workouts);
   const { muscles } = useSelector(state => state.muscles);
   const { equipments } = useSelector(state => state.equipments);
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchWorkouts());
@@ -49,6 +50,9 @@ const WorkoutList = () => {
       });
   };
 
+  const handleViewDetails = workoutId => {
+    navigate(`/workouts/workout-detail/${workoutId}`);
+  };
   return (
     <div className='p-8 bg-gray-100'>
       <h2 className='text-3xl font-semibold mb-6 text-center'>
@@ -78,6 +82,7 @@ const WorkoutList = () => {
               <tr
                 key={workout._id}
                 className='border-b hover:bg-gray-100 transition-colors'
+                onClick={() => handleViewDetails(workout._id)}
               >
                 <td className='px-6 py-4'>
                   <span className='inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full'>
