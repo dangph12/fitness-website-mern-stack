@@ -24,8 +24,7 @@ export interface ICreatePlan {
       exercises: [
         {
           exercise: Types.ObjectId;
-          sets: number;
-          reps: number;
+          sets: number[];
         }
       ];
     }
