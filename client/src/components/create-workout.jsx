@@ -71,7 +71,7 @@ const CreateWorkout = () => {
       .then(() => {
         toast.success('workout created successfully!');
         setTimeout(() => {
-          navigate('/');
+          navigate('/workouts');
         }, 3000);
       })
       .catch(error => {
