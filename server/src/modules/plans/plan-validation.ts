@@ -42,12 +42,14 @@ const createPlanValidation = {
       exercises: z.array(
         z.object({
           exercise: z.string(),
-          sets: z.preprocess(val => {
-            if (typeof val === 'string') return parseInt(val, 10);
-          }, z.number()),
-          reps: z.preprocess(val => {
-            if (typeof val === 'string') return parseInt(val, 10);
-          }, z.number())
+          sets: z
+            .array(
+              z
+                .union([z.number(), z.string()])
+                .transform(val => Number(val))
+                .pipe(z.number().positive('Sets must be positive numbers'))
+            )
+            .min(1, 'At least one set is required')
         })
       )
     })
