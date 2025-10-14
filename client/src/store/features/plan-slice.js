@@ -52,19 +52,6 @@ export const createPlan = createAsyncThunk(
   }
 );
 
-// export const createPlan = createAsyncThunk(
-//     'plans/createPlan',
-//     async (planData) => {
-//         try {
-//             const response = await axiosInstance.post('/api/plans', planData); // Gửi dữ liệu lên API
-//             return response.data.data; // Trả về dữ liệu sau khi tạo thành công
-//         } catch (error) {
-//             console.error('Error creating plan:', error);
-//             throw new Error(error.response?.data?.message || error.message); // Xử lý lỗi
-//         }
-//     }
-// );
-
 // Update plan
 export const updatePlan = createAsyncThunk(
   'plans/updatePlan',
