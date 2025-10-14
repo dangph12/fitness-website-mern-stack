@@ -55,7 +55,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'workouts',
-        Component: lazy(() => import('~/app/workouts/page'))
+        Component: lazy(() => import('~/app/workouts/workouts-list/page'))
+      },
+      {
+        path: 'workouts/create-workout',
+        Component: lazy(() => import('~/app/workouts/create-workout/page'))
       },
       {
         path: 'plans/rountine-builder',
