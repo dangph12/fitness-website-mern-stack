@@ -36,7 +36,12 @@ const AdminLayout = () => {
       'edit-user': 'Edit User',
       'manage-workouts': 'Workouts Management',
       'manage-exercises': 'Exercises Management',
+      'create-exercise': 'Create Exercise',
+      'update-exercise': 'Update Exercise',
       'manage-nutrition': 'Nutrition Management',
+      'manage-foods': 'Foods Management',
+      'create-food': 'Create Food',
+      'update-food': 'Update Food',
       analytics: 'Analytics',
       settings: 'Settings'
     };
