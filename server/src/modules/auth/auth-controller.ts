@@ -13,8 +13,7 @@ const AuthController = {
 
     const { user, accessToken, refreshToken } = await AuthService.login(
       email,
-      password,
-      'user'
+      password
     );
 
     res.cookie('refreshToken', refreshToken, {
