@@ -12,26 +12,18 @@ const workoutValidation = {
   }, z.boolean()),
   user: z.string(),
   exercises: z
-    .preprocess(
-      val => {
-        if (Array.isArray(val)) {
-          return val.map(exercise => {
-            return {
-              exercise: z.string().parse(exercise.exercise),
-              sets: z.number().parse(parseInt(exercise.sets, 10)),
-              reps: z.number().parse(parseInt(exercise.reps, 10))
-            };
-          });
-        }
-        return val;
-      },
-      z.array(
-        z.object({
-          exercise: z.string(),
-          sets: z.number().positive(),
-          reps: z.number().positive()
-        })
-      )
+    .array(
+      z.object({
+        exercise: z.string(),
+        sets: z
+          .array(
+            z
+              .union([z.number(), z.string()])
+              .transform(val => Number(val))
+              .pipe(z.number().positive('Sets must be positive numbers'))
+          )
+          .min(1, 'At least one set is required')
+      })
     )
     .optional()
 };

@@ -15,8 +15,7 @@ const WorkoutSchema = new Schema<IWorkout>(
           ref: 'Exercise',
           required: true
         },
-        sets: { type: Number, required: true },
-        reps: { type: Number, required: true }
+        sets: [{ type: Number, required: true }]
       }
     ]
   },
