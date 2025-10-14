@@ -14,13 +14,11 @@ const CreateWorkout = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector(state => state.workouts);
 
-  // Thêm một ngày mới
   const addDay = () => {
     const newDay = { dayName: `Day ${days.length + 1}`, exercises: [] };
     setDays([...days, newDay]);
   };
 
-  // Thêm bài tập vào ngày đã chọn
   const handleAddExercise = exercise => {
     const updatedDays = [...days];
 
@@ -31,51 +29,46 @@ const CreateWorkout = () => {
     if (!exerciseExists) {
       updatedDays[selectedDay].exercises.push({
         exercise: { _id: exercise._id, title: exercise.title },
-        sets: [1] // Mỗi set sẽ có 1 rep mặc định
+        sets: [1]
       });
 
       setDays(updatedDays);
     }
   };
 
-  // Xóa bài tập khỏi ngày đã chọn
   const handleRemoveExercise = exerciseIndex => {
     const updatedDays = [...days];
     updatedDays[selectedDay].exercises.splice(exerciseIndex, 1);
     setDays(updatedDays);
   };
 
-  // Xử lý thay đổi số reps
   const handleInputChange = (exerciseIndex, setIndex, value) => {
     const updatedDays = [...days];
     updatedDays[selectedDay].exercises[exerciseIndex].sets[setIndex] = value;
     setDays(updatedDays);
   };
 
-  // Thêm set mới cho bài tập
   const handleAddSet = exerciseIndex => {
     const updatedDays = [...days];
-    updatedDays[selectedDay].exercises[exerciseIndex].sets.push(1); // Mỗi set mới sẽ có 1 rep mặc định
+    updatedDays[selectedDay].exercises[exerciseIndex].sets.push(1);
     setDays(updatedDays);
   };
 
-  // Xóa set khỏi bài tập
   const handleRemoveSet = (exerciseIndex, setIndex) => {
     const updatedDays = [...days];
     updatedDays[selectedDay].exercises[exerciseIndex].sets.splice(setIndex, 1);
     setDays(updatedDays);
   };
 
-  // Xử lý khi submit workout
   const handleSubmitWorkout = () => {
     const workoutData = {
       title: `Workout Day ${selectedDay + 1}`,
-      image: '', // Xử lý phần image nếu cần
+      image: '',
       isPublic: true,
       user: userId,
       exercises: days[selectedDay].exercises.map(exercise => ({
         exercise: exercise.exercise._id,
-        sets: exercise.sets // Gửi mảng reps của các set
+        sets: exercise.sets
       }))
     };
 
@@ -86,7 +79,6 @@ const CreateWorkout = () => {
 
   return (
     <div className='flex gap-8 p-6 bg-white rounded-lg shadow-md'>
-      {/* Phần bên trái (Tạo Workout) */}
       <div className='w-2/3 p-4 bg-white rounded-lg'>
         <h2 className='text-2xl font-semibold mb-4'>Create Workout</h2>
 
@@ -132,7 +124,6 @@ const CreateWorkout = () => {
               </span>
             </div>
 
-            {/* Các bài tập cho ngày đã chọn */}
             {day.exercises.length === 0 ? (
               <p>This day is empty. Add exercises from the library.</p>
             ) : (
@@ -195,7 +186,6 @@ const CreateWorkout = () => {
         ))}
       </div>
 
-      {/* Phần bên phải (Exercise Library) */}
       <div className='w-1/3 border-l p-4 rounded-lg shadow-lg'>
         <ExerciseLibrary handleAddExercise={handleAddExercise} />
       </div>
