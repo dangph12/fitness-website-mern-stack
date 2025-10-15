@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaBook, FaTrash } from 'react-icons/fa';
+import { FaBook, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -25,7 +25,11 @@ const CreateWorkout = () => {
       setExercises([
         ...exercises,
         {
-          exercise: { _id: exercise._id, title: exercise.title },
+          exercise: {
+            _id: exercise._id,
+            title: exercise.title,
+            tutorial: exercise.tutorial
+          },
           sets: [1]
         }
       ]);
@@ -145,37 +149,80 @@ const CreateWorkout = () => {
               key={exerciseIndex}
               className='p-4 bg-gray-100 rounded-md mb-4'
             >
-              <div className='flex items-center justify-between mb-3'>
-                <span>{exercise.exercise.title}</span>
+              <div className='flex items-center mb-3'>
+                <img
+                  src={
+                    exercise.exercise.tutorial.endsWith('.gif')
+                      ? exercise.exercise.tutorial.replace(
+                          '/upload/',
+                          '/upload/f_jpg/so_0/'
+                        )
+                      : exercise.exercise.tutorial
+                  }
+                  onMouseEnter={e =>
+                    (e.currentTarget.src = exercise.exercise.tutorial)
+                  }
+                  onMouseLeave={e =>
+                    (e.currentTarget.src = exercise.exercise.tutorial.replace(
+                      '/upload/',
+                      '/upload/f_jpg/so_0/'
+                    ))
+                  }
+                  alt={exercise.exercise.title}
+                  className='w-16 h-16 object-cover rounded-md mr-2'
+                />
+                <span className='font-bold'>{exercise.exercise.title}</span>
                 <button
                   onClick={() => handleRemoveExercise(exerciseIndex)}
-                  className='text-red-500'
+                  className='text-red-500 ml-2'
                 >
                   <FaTrash />
                 </button>
               </div>
 
-              <div className='grid grid-cols-4 gap-4'>
-                <span className='font-semibold'>Set</span>
-                <span className='font-semibold'>Reps</span>
+              <div className='grid grid-cols-2 gap-50 mb-3'>
+                <span className='font-semibold text-center'>Set</span>
+                <span className='font-semibold text-center'>Reps</span>
               </div>
 
               {exercise.sets.map((set, setIndex) => (
-                <div key={setIndex} className='grid grid-cols-4 gap-4'>
-                  <span>{setIndex + 1}</span>
+                <div key={setIndex} className='flex items-center gap-2 mb-4'>
+                  <span className='p-2 border rounded-md w-md'>
+                    {setIndex + 1}
+                  </span>
                   <input
                     type='number'
                     value={set}
                     onChange={e =>
                       handleInputChange(exerciseIndex, setIndex, e.target.value)
                     }
-                    className='p-2 border rounded-md mt-3'
+                    className='p-2 border rounded-md w-md'
                     placeholder='Reps'
                     min={1}
                   />
                   <button
+                    onClick={() =>
+                      handleInputChange(
+                        exerciseIndex,
+                        setIndex,
+                        Math.max(set - 1, 1)
+                      )
+                    }
+                    className='bg-red-200 text-white p-2 rounded-md hover:bg-red-600'
+                  >
+                    <FaMinus />
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleInputChange(exerciseIndex, setIndex, set + 1)
+                    }
+                    className='bg-green-200 text-white p-2 rounded-md hover:bg-green-600'
+                  >
+                    <FaPlus />
+                  </button>
+                  <button
                     onClick={() => handleRemoveSet(exerciseIndex, setIndex)}
-                    className='text-red-500'
+                    className='text-red-500 ml-2'
                   >
                     <FaTrash />
                   </button>
