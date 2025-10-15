@@ -43,11 +43,11 @@ const EditMeal = () => {
       setImage(currentMeal.image || null);
       setSelectedFoods(
         currentMeal.foods.map(food => ({
-          foodId: food.foodId._id,
-          title: food.foodId.title,
-          image: food.foodId.image,
-          calories: food.foodId.calories,
-          fats: food.foodId.fats,
+          food: food.food._id,
+          title: food.food.title,
+          image: food.food.image,
+          calories: food.food.calories,
+          fats: food.food.fats,
           quantity: food.quantity
         }))
       );
@@ -69,11 +69,11 @@ const EditMeal = () => {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('mealType', mealType);
-    formData.append('userId', userId);
+    formData.append('user', userId);
     formData.append('image', image);
 
     selectedFoods.forEach((food, index) => {
-      formData.append(`foods[${index}][foodId]`, food.foodId);
+      formData.append(`foods[${index}][food]`, food.food);
       formData.append(`foods[${index}][quantity]`, food.quantity);
     });
 

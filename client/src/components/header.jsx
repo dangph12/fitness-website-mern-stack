@@ -72,13 +72,15 @@ function Header() {
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
+        <Link to='/workouts' className='hover:text-gray-300 text-lg'>
+          Workouts
+        </Link>
         <MenuItem
-          label='Workout'
+          label='Plans'
           isDropdown={true}
           links={[
-            { label: 'Abs Training', href: '#abs' },
-            { label: 'Legs Training', href: '#legs' },
-            { label: 'Arms Training', href: '#arms' }
+            { label: 'Rountine Database', href: '/plans/routine-database' },
+            { label: 'Rountine Builder', href: '/plans/rountine-builder' }
           ]}
         />
         <MenuItem

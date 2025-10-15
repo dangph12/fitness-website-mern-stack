@@ -22,11 +22,11 @@ const FoodList = ({ selectedFoods, setSelectedFoods }) => {
   }, [dispatch, foods]);
 
   const handleFoodSelect = (food, quantity) => {
-    const foodExists = selectedFoods.find(f => f.foodId === food._id);
+    const foodExists = selectedFoods.find(f => f.food === food._id);
     if (foodExists) return;
 
     const selectedFood = {
-      foodId: food._id,
+      food: food._id,
       title: food.title,
       image: food.image,
       quantity: quantity || 1
