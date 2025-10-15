@@ -117,7 +117,6 @@ export const exerciseSlice = createSlice({
       // FETCH BY ID
       // In exercise-slice.js, in the extraReducers:
       .addCase(fetchExerciseById.fulfilled, (state, action) => {
-        console.log('Fetched exercise:', action.payload); // Log the fetched exercise data
         // Add the exercise to the exercises array
         const existingExercise = state.exercises.find(
           ex => ex._id === action.payload._id
