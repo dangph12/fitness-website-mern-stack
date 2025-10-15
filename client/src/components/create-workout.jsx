@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaBook, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
@@ -17,6 +17,10 @@ const CreateWorkout = () => {
 
   const dispatch = useDispatch();
   const { loading, error } = useSelector(state => state.workouts);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleAddExercise = exercise => {
     const exerciseExists = exercises.some(e => e.exercise._id === exercise._id);
@@ -102,34 +106,49 @@ const CreateWorkout = () => {
 
   return (
     <div className='flex gap-8 p-6 bg-white rounded-lg shadow-md'>
-      <div className='w-2/3 p-4 bg-white rounded-lg'>
+      <div className='w-2/3 p-4 bg-white rounded-lg border border-gray-200 border-opacity-50'>
         <h2 className='text-2xl font-semibold mb-4'>Create Workout</h2>
 
-        <div className='mb-4'>
-          <label className='font-semibold'>Workout Title</label>
-          <input
-            type='text'
-            value={title}
-            onChange={handleTitleChange}
-            className='p-2 border rounded-md w-full'
-            placeholder='Enter workout title'
-          />
-        </div>
-
-        <div className='mb-4'>
-          <label className='font-semibold'>Workout Image</label>
-          <input
-            type='file'
-            onChange={handleImageChange}
-            className='p-2 border rounded-md w-full'
-          />
-          {image && (
-            <img
-              src={URL.createObjectURL(image)}
-              alt='Workout Preview'
-              className='mt-4 w-32 h-32 object-cover'
+        <div className='flex gap-8 mb-10'>
+          <div className='w-1/2'>
+            <div className='font-semibold mb-5'>Workout Title</div>
+            <input
+              type='text'
+              value={title}
+              onChange={handleTitleChange}
+              className='p-2 border rounded-md w-full'
+              placeholder='Enter workout title'
             />
-          )}
+          </div>
+
+          <div className='w-1/2'>
+            <div className='font-semibold mb-5'>Workout Image</div>
+            <div className='border-2 border-dashed p-6 text-center rounded-lg'>
+              <input
+                type='file'
+                onChange={handleImageChange}
+                className='hidden'
+                id='imageInput'
+              />
+              <label
+                htmlFor='imageInput'
+                className='cursor-pointer text-gray-500'
+              >
+                {image ? (
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt='Workout Preview'
+                    className='w-full h-full object-cover mx-auto'
+                  />
+                ) : (
+                  <div>
+                    <p>No Image Selected</p>
+                    <p className='text-sm'>Upload Image</p>
+                  </div>
+                )}
+              </label>
+            </div>
+          </div>
         </div>
 
         <div className='flex justify-between mb-4'>
@@ -147,8 +166,16 @@ const CreateWorkout = () => {
           exercises.map((exercise, exerciseIndex) => (
             <div
               key={exerciseIndex}
-              className='p-4 bg-gray-100 rounded-md mb-4'
+              className='relative p-4 bg-gray-100 rounded-md mb-4'
             >
+              <button
+                onClick={() => handleRemoveExercise(exerciseIndex)}
+                className='absolute top-3 right-3 bg-red-200 text-white font-medium px-3 py-2 rounded-md flex items-center justify-center hover:bg-red-700'
+              >
+                <FaTrash className='mr-2' />
+                Delete Exercise
+              </button>
+
               <div className='flex items-center mb-3'>
                 <img
                   src={
@@ -172,17 +199,11 @@ const CreateWorkout = () => {
                   className='w-16 h-16 object-cover rounded-md mr-2'
                 />
                 <span className='font-bold'>{exercise.exercise.title}</span>
-                <button
-                  onClick={() => handleRemoveExercise(exerciseIndex)}
-                  className='text-red-500 ml-2'
-                >
-                  <FaTrash />
-                </button>
               </div>
 
               <div className='grid grid-cols-2 gap-50 mb-3'>
                 <span className='font-semibold text-center'>Set</span>
-                <span className='font-semibold text-center'>Reps</span>
+                <span className='font-semibold text-left'>Reps</span>
               </div>
 
               {exercise.sets.map((set, setIndex) => (
