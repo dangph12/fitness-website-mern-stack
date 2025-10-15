@@ -48,7 +48,7 @@ const ExerciseLibrary = ({ handleAddExercise }) => {
         </div>
       </div>
 
-      <ScrollArea className='max-h-100 overflow-y-auto'>
+      <ScrollArea className='max-h-full overflow-y-auto'>
         <div className='space-y-4'>
           {exercises.map(exercise => (
             <div
