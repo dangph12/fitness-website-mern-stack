@@ -2,34 +2,21 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import axiosInstance from '~/lib/axios-instance';
 
-// Fetch workouts
-// export const fetchWorkouts = createAsyncThunk(
-//   'workouts/fetchWorkouts',
-//   async ({
-//     page = 1,
-//     limit = 10,
-//     sortBy = 'createdAt',
-//     sortOrder = 'desc',
-//     filterParams = {}
-//   }) => {
-//     try {
-//       const response = await axiosInstance.get('/api/workouts', {
-//         params: { page, limit, sortBy, sortOrder, ...filterParams }
-//       });
-//       return response.data.data;
-//     } catch (error) {
-//       console.error('Error fetching workouts:', error);
-//       throw error;
-//     }
-//   }
-// );
-
+// Fetch workouts with filters (page, limit, sortBy, sortOrder, title)
 export const fetchWorkouts = createAsyncThunk(
   'workouts/fetchWorkouts',
-  async () => {
+  async ({
+    page = 1,
+    limit = 10,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+    title = ''
+  }) => {
     try {
-      const response = await axiosInstance.get('/api/workouts'); // Fetch all workouts without page or limit
-      return response.data.data;
+      const response = await axiosInstance.get('/api/workouts/filter', {
+        params: { page, limit, sortBy, sortOrder, title } // Passing filter params to the backend
+      });
+      return response.data.data; // returning the workouts data
     } catch (error) {
       console.error('Error fetching workouts:', error);
       throw error;
@@ -56,20 +43,10 @@ export const createWorkout = createAsyncThunk(
   'workouts/createWorkout',
   async workoutData => {
     try {
-      console.log('Creating workout with data:', workoutData);
-
       const response = await axiosInstance.post('/api/workouts', workoutData);
       return response.data.data;
     } catch (error) {
       console.error('Error creating workout:', error);
-
-      if (error.response) {
-        console.error('Error response data:', error.response.data);
-      }
-      if (error.message) {
-        console.error('Error message:', error.message);
-      }
-
       throw new Error(error.response?.data?.message || error.message);
     }
   }
@@ -120,18 +97,21 @@ export const workoutSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-      // Fetch workouts
+      // Fetch workouts with filters
       .addCase(fetchWorkouts.pending, state => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchWorkouts.fulfilled, (state, action) => {
         state.loading = false;
-        state.workouts = action.payload;
+        const data = action.payload;
+        state.workouts = Array.isArray(data?.workouts) ? data.workouts : [];
+        state.totalWorkouts = data?.totalWorkouts || 0;
+        state.totalPages = data?.totalPages || 1;
       })
       .addCase(fetchWorkouts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.error.message || 'Failed to fetch workouts';
       })
 
       // Fetch workout by ID
