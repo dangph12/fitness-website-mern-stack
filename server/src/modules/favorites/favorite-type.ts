@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 
 export interface IFavorite {
-  userId: Types.ObjectId;
-  workoutId: Types.ObjectId;
+  user: Types.ObjectId;
+  workouts: Types.ObjectId[];
 }

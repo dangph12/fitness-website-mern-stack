@@ -6,6 +6,7 @@ import BodyClassificationRouter from '~/modules/body-classification/body-classif
 import BodyRecordRoute from '~/modules/body-records/body-record-route';
 import EquipmentRoute from '~/modules/equipments/equipment-route';
 import ExerciseRoute from '~/modules/exercises/exercise-route';
+import FavoriteRoute from '~/modules/favorites/favorite-route';
 import FoodRoute from '~/modules/foods/food-route';
 import GoalRoute from '~/modules/goals/goal-route';
 import MealRoute from '~/modules/meals/meal-route';
@@ -50,5 +51,8 @@ router.use('/workouts', WorkoutRoute);
 
 // Plan routes
 router.use('/plans', PlanRoute);
+
+// Favorite routes
+router.use('/favorites', FavoriteRoute);
 
 export default router;

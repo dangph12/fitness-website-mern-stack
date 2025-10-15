@@ -1,5 +1,6 @@
 import { Document, model, Schema } from 'mongoose';
 
+import FavoriteModel from '../favorites/favorite-model';
 import GoalModel from '../goals/goal-model';
 import { IUser } from './user-type';
 
@@ -30,6 +31,12 @@ UserSchema.post('save', async (doc: IUserDocument, next) => {
       await GoalModel.updateOne(
         { user: doc._id },
         { $setOnInsert: { user: doc._id, targetWeight: 0 } },
+        { upsert: true }
+      );
+
+      await FavoriteModel.updateOne(
+        { user: doc._id },
+        { $setOnInsert: { user: doc._id, workouts: [] } },
         { upsert: true }
       );
     }
