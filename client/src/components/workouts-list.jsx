@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { fetchExerciseById } from '~/store/features/exercise-slice';
-import { fetchWorkouts } from '~/store/features/workout-slice';
+import { deleteWorkout, fetchWorkouts } from '~/store/features/workout-slice';
 
 import logo from '../assets/logo.png';
 import {
@@ -29,6 +29,7 @@ const WorkoutList = () => {
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     dispatch(fetchWorkouts({ page: currentPage }));
@@ -85,13 +86,28 @@ const WorkoutList = () => {
     return { muscles: 'Loading...', equipment: 'Loading...' };
   };
 
+  const filteredWorkouts = workouts.filter(workout =>
+    workout.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className='p-8 bg-gray-100'>
-      <h2 className='text-3xl font-semibold mb-6 text-center'>
-        My Workout List
-      </h2>
+      <div className='mb-10'>
+        <h4 className='text-4xl font-extrabold text-black'>My Workout List</h4>
+        <p className='text-xl text-black mt-2'>
+          Filter and refine your search to find the perfect workout plan for
+          your fitness goals
+        </p>
+      </div>
 
-      <div className='mb-6 flex justify-end'>
+      <div className='mb-6 flex justify-between'>
+        <input
+          type='text'
+          placeholder='Search workouts'
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className='px-50 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-left'
+        />
         <button className='bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700'>
           <Link to={`/workouts/create-workout`}>+ Add Workout</Link>
         </button>
@@ -101,8 +117,8 @@ const WorkoutList = () => {
         <table className='min-w-full table-auto border-collapse'>
           <thead>
             <tr className='bg-gray-800 text-white'>
-              <th className='px-6 py-4 text-left'>Workout Name</th>
               <th className='px-6 py-4 text-left'>Image</th>
+              <th className='px-6 py-4 text-left'>Workout Name</th>
               <th className='px-6 py-4 text-left'>Exercises</th>
               <th className='px-6 py-4 text-left'>Muscles</th>
               <th className='px-6 py-4 text-left'>Equipment</th>
@@ -111,23 +127,24 @@ const WorkoutList = () => {
             </tr>
           </thead>
           <tbody>
-            {workouts?.map(workout => (
+            {filteredWorkouts?.map(workout => (
               <tr
                 key={workout._id}
                 className='border-b hover:bg-gray-100 transition-colors'
-                onClick={() => handleViewDetails(workout._id)}
               >
+                <div onClick={() => handleViewDetails(workout._id)}>
+                  <td className='px-6 py-4'>
+                    <img
+                      src={workout.image || logo}
+                      alt={workout.title}
+                      className='w-20 h-20 object-cover rounded-md'
+                    />
+                  </td>
+                </div>
                 <td className='px-6 py-4'>
                   <span className='inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full'>
                     {workout.title}
                   </span>
-                </td>
-                <td className='px-6 py-4'>
-                  <img
-                    src={workout.image || logo}
-                    alt={workout.title}
-                    className='w-20 h-20 object-cover rounded-md'
-                  />
                 </td>
                 <td className='px-6 py-4'>
                   <span className='inline-block bg-green-100 text-gray-800 px-4 py-2 rounded-full'>
