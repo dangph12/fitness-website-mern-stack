@@ -169,7 +169,7 @@ const CreateWorkout = () => {
                     onChange={e =>
                       handleInputChange(exerciseIndex, setIndex, e.target.value)
                     }
-                    className='p-2 border rounded-md mt-2'
+                    className='p-2 border rounded-md mt-3'
                     placeholder='Reps'
                     min={1}
                   />
