@@ -10,6 +10,8 @@ import ExerciseLibrary from './exercise-library';
 
 const CreateWorkout = () => {
   const [exercises, setExercises] = useState([]);
+  const [title, setTitle] = useState('My Workout');
+  const [image, setImage] = useState(null);
   const userId = useSelector(state => state.auth.user.id);
   const navigate = useNavigate();
 
@@ -54,28 +56,43 @@ const CreateWorkout = () => {
     setExercises(updatedExercises);
   };
 
+  const handleTitleChange = e => {
+    setTitle(e.target.value);
+  };
+
+  const handleImageChange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
   const handleSubmitWorkout = () => {
-    const workoutData = {
-      title: 'My Workout',
-      image: '',
-      isPublic: true,
-      user: userId,
-      exercises: exercises.map(exercise => ({
-        exercise: exercise.exercise._id,
-        sets: exercise.sets
-      }))
-    };
+    const workoutData = new FormData();
+    workoutData.append('title', title);
+    workoutData.append('image', image);
+    workoutData.append('isPublic', true);
+    workoutData.append('user', userId);
+
+    exercises.forEach((exercise, index) => {
+      workoutData.append(
+        `exercises[${index}][exercise]`,
+        exercise.exercise._id
+      );
+      exercise.sets.forEach((set, setIndex) => {
+        workoutData.append(`exercises[${index}][sets][${setIndex}]`, set);
+      });
+    });
 
     console.log('Workout data:', workoutData);
+
     dispatch(createWorkout(workoutData))
       .then(() => {
-        toast.success('workout created successfully!');
-        setTimeout(() => {
-          navigate('/workouts');
-        }, 3000);
+        toast.success('Workout created successfully!');
+        navigate('/workouts');
       })
       .catch(error => {
-        toast.error('Failed to create plan');
+        toast.error('Failed to create workout');
       });
   };
 
@@ -83,6 +100,33 @@ const CreateWorkout = () => {
     <div className='flex gap-8 p-6 bg-white rounded-lg shadow-md'>
       <div className='w-2/3 p-4 bg-white rounded-lg'>
         <h2 className='text-2xl font-semibold mb-4'>Create Workout</h2>
+
+        <div className='mb-4'>
+          <label className='font-semibold'>Workout Title</label>
+          <input
+            type='text'
+            value={title}
+            onChange={handleTitleChange}
+            className='p-2 border rounded-md w-full'
+            placeholder='Enter workout title'
+          />
+        </div>
+
+        <div className='mb-4'>
+          <label className='font-semibold'>Workout Image</label>
+          <input
+            type='file'
+            onChange={handleImageChange}
+            className='p-2 border rounded-md w-full'
+          />
+          {image && (
+            <img
+              src={URL.createObjectURL(image)}
+              alt='Workout Preview'
+              className='mt-4 w-32 h-32 object-cover'
+            />
+          )}
+        </div>
 
         <div className='flex justify-between mb-4'>
           <button
@@ -125,8 +169,9 @@ const CreateWorkout = () => {
                     onChange={e =>
                       handleInputChange(exerciseIndex, setIndex, e.target.value)
                     }
-                    className='p-2 border rounded-md'
+                    className='p-2 border rounded-md mt-2'
                     placeholder='Reps'
+                    min={1}
                   />
                   <button
                     onClick={() => handleRemoveSet(exerciseIndex, setIndex)}
