@@ -2,6 +2,7 @@ import { Document, model, Schema } from 'mongoose';
 
 import FavoriteModel from '../favorites/favorite-model';
 import GoalModel from '../goals/goal-model';
+import HistoryModel from '../histories/history-model';
 import { IUser } from './user-type';
 
 export interface IUserDocument extends IUser, Document {}
@@ -30,7 +31,14 @@ UserSchema.post('save', async (doc: IUserDocument, next) => {
     if (doc.role === 'user') {
       await GoalModel.updateOne(
         { user: doc._id },
-        { $setOnInsert: { user: doc._id, targetWeight: 0 } },
+        {
+          $setOnInsert: {
+            user: doc._id,
+            targetWeight: 0,
+            diet: '',
+            fitnessGoal: ''
+          }
+        },
         { upsert: true }
       );
 
