@@ -62,12 +62,16 @@ const router = createBrowserRouter([
         Component: lazy(() => import('~/app/workouts/create-workout/page'))
       },
       {
-        path: 'workouts/workout-detail/:workoutId', // Route path should match the link
+        path: 'workouts/workout-detail/:workoutId',
         Component: lazy(() => import('~/app/workouts/workout-detail/[id]/page'))
       },
       {
         path: 'plans/rountine-builder',
         Component: lazy(() => import('~/app/plans/rountine-builder/page'))
+      },
+      {
+        path: 'workout/edit-workout/:workoutId',
+        Component: lazy(() => import('~/app/workouts/edit-workout/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
