@@ -57,13 +57,8 @@ export const createPlan = createAsyncThunk(
 export const updatePlan = createAsyncThunk(
   'plans/updatePlan',
   async ({ id, updateData }) => {
-    try {
-      const response = await axiosInstance.put(`/api/plans/${id}`, updateData);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error updating plan:', error);
-      throw error;
-    }
+    const response = await axiosInstance.put(`/api/plans/${id}`, updateData);
+    return response.data.data;
   }
 );
 
