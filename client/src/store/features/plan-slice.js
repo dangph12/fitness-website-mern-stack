@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import axiosInstance from '~/lib/axios-instance';
 
-// Fetch plans
+// fetch plans
 export const fetchPlans = createAsyncThunk(
   'plans/fetchPlans',
   async ({
@@ -13,9 +13,10 @@ export const fetchPlans = createAsyncThunk(
     filterParams = {}
   }) => {
     try {
-      const response = await axiosInstance.get('/api/plans', {
+      const response = await axiosInstance.get('/api/plans/filter', {
         params: { page, limit, sortBy, sortOrder, ...filterParams }
       });
+
       return response.data.data;
     } catch (error) {
       console.error('Error fetching plans:', error);
@@ -91,21 +92,18 @@ export const planSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-      // Fetch plans
       .addCase(fetchPlans.pending, state => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(fetchPlans.fulfilled, (state, action) => {
         state.loading = false;
-        const data = action.payload;
-        state.plans = data?.plans || [];
-        state.totalPlans = data?.totalPlans || 0;
-        state.totalPages = data?.totalPages || 1;
+        state.plans = action.payload.plans || action.payload.items || [];
+        state.totalPages = action.payload.totalPages || 1;
+        state.totalPlans = action.payload.totalPlans || 0;
       })
       .addCase(fetchPlans.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to fetch plans';
+        state.error = action.error.message;
       })
 
       // Fetch plan by ID
