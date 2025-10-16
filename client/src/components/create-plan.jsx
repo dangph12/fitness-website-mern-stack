@@ -11,6 +11,10 @@ import ExerciseLibrary from './exercise-library';
 const CreatePlan = () => {
   const [days, setDays] = useState([{ dayName: 'Day 1', workouts: [] }]);
   const [selectedDay, setSelectedDay] = useState(0);
+  const [planImage, setPlanImage] = useState(null);
+  const [planTitle, setPlanTitle] = useState('');
+  const [planDescription, setPlanDescription] = useState('');
+
   const userId = useSelector(state => state.auth.user.id);
   const { loading } = useSelector(state => state.plans);
   const dispatch = useDispatch();
@@ -18,12 +22,14 @@ const CreatePlan = () => {
 
   const addDay = () =>
     setDays([...days, { dayName: `Day ${days.length + 1}`, workouts: [] }]);
+
   const removeDay = index => {
     const updated = [...days];
     updated.splice(index, 1);
     setDays(updated);
     if (selectedDay >= updated.length) setSelectedDay(updated.length - 1);
   };
+
   const handleDayTitleChange = (index, value) => {
     const updated = [...days];
     updated[index].dayName = value;
@@ -35,20 +41,28 @@ const CreatePlan = () => {
     updated[dayIndex].workouts.push({
       title: exercise.title,
       image: null,
-      exercises: [{ exercise: exercise._id, sets: [1] }]
+      exercises: [
+        {
+          exercise: exercise._id,
+          sets: [1]
+        }
+      ]
     });
     setDays(updated);
   };
+
   const handleRemoveExercise = (dayIndex, workoutIndex) => {
     const updated = [...days];
     updated[dayIndex].workouts.splice(workoutIndex, 1);
     setDays(updated);
   };
+
   const handleWorkoutTitleChange = (dayIndex, workoutIndex, value) => {
     const updated = [...days];
     updated[dayIndex].workouts[workoutIndex].title = value;
     setDays(updated);
   };
+
   const handleWorkoutImageChange = (dayIndex, workoutIndex, file) => {
     const updated = [...days];
     updated[dayIndex].workouts[workoutIndex].image = file;
@@ -63,68 +77,66 @@ const CreatePlan = () => {
     value
   ) => {
     const updated = [...days];
-    const exercise =
-      updated[dayIndex].workouts[workoutIndex].exercises[exIndex];
-    if (!exercise.sets) exercise.sets = [];
-    exercise.sets[setIndex] = Number(value);
+    updated[dayIndex].workouts[workoutIndex].exercises[exIndex].sets[setIndex] =
+      Number(value);
     setDays(updated);
   };
 
   const handleAddSet = (dayIndex, workoutIndex, exIndex) => {
     const updated = [...days];
-    const exercise =
-      updated[dayIndex].workouts[workoutIndex].exercises[exIndex];
-    if (!exercise.sets) exercise.sets = [];
-    exercise.sets.push(1);
+    updated[dayIndex].workouts[workoutIndex].exercises[exIndex].sets.push(1);
     setDays(updated);
   };
+
   const handleRemoveSet = (dayIndex, workoutIndex, exIndex, setIndex) => {
     const updated = [...days];
-    const exercise =
-      updated[dayIndex].workouts[workoutIndex].exercises[exIndex];
-    if (exercise.sets && exercise.sets[setIndex] !== undefined) {
-      exercise.sets.splice(setIndex, 1);
-      setDays(updated);
-    }
+    updated[dayIndex].workouts[workoutIndex].exercises[exIndex].sets.splice(
+      setIndex,
+      1
+    );
+    setDays(updated);
   };
 
   const handleSubmitPlan = () => {
     const formData = new FormData();
-    formData.append('title', `Plan ${Date.now()}`);
-    formData.append('description', `Description for Plan ${Date.now()}`);
+    formData.append('title', planTitle || `Plan ${Date.now()}`);
+    formData.append(
+      'description',
+      planDescription || `Description for Plan ${Date.now()}`
+    );
+    if (planImage) formData.append('image', planImage);
     formData.append('isPublic', 'true');
     formData.append('user', userId);
 
-    days.forEach(day =>
-      day.workouts.forEach((workout, i) => {
-        formData.append(`workouts[${i}][title]`, workout.title);
-        formData.append(
-          `workouts[${i}][isPublic]`,
-          String(workout.isPublic ?? false)
-        );
-        formData.append(`workouts[${i}][user]`, workout.user || userId);
+    let workoutIndex = 0;
+    days.forEach(day => {
+      day.workouts.forEach(workout => {
+        formData.append(`workouts[${workoutIndex}][title]`, workout.title);
+        formData.append(`workouts[${workoutIndex}][isPublic]`, 'false');
+        formData.append(`workouts[${workoutIndex}][user]`, userId);
         if (workout.image)
-          formData.append(`workouts[${i}][image]`, workout.image);
+          formData.append(`workouts[${workoutIndex}][image]`, workout.image);
 
-        workout.exercises.forEach((ex, j) => {
+        workout.exercises.forEach((ex, exIndex) => {
           formData.append(
-            `workouts[${i}][exercises][${j}][exercise]`,
+            `workouts[${workoutIndex}][exercises][${exIndex}][exercise]`,
             ex.exercise
           );
-          ex.sets.forEach((set, k) =>
+          ex.sets.forEach((set, setIndex) => {
             formData.append(
-              `workouts[${i}][exercises][${j}][sets][${k}]`,
+              `workouts[${workoutIndex}][exercises][${exIndex}][sets][${setIndex}]`,
               String(set)
-            )
-          );
+            );
+          });
         });
-      })
-    );
+        workoutIndex++;
+      });
+    });
 
     dispatch(createPlan(formData))
       .then(() => {
         toast.success('Plan created successfully!');
-        setTimeout(() => navigate('/'), 2000);
+        setTimeout(() => navigate('/'), 1500);
       })
       .catch(() => toast.error('Failed to create plan'));
   };
@@ -132,6 +144,97 @@ const CreatePlan = () => {
   return (
     <div className='flex gap-6 p-6 bg-gray-50 rounded-lg shadow-md'>
       <div className='w-2/3 p-4 bg-white rounded-lg border border-gray-200'>
+        <div className='mb-6 grid grid-cols-2 gap-6'>
+          <div>
+            <label className='block font-medium mb-1 text-gray-700'>
+              Plan Title
+            </label>
+            <input
+              type='text'
+              value={planTitle}
+              onChange={e => setPlanTitle(e.target.value)}
+              placeholder='Enter plan title...'
+              className='w-full border p-2 rounded-md mb-3'
+            />
+            <label className='block font-medium mb-1 text-gray-700'>
+              Description
+            </label>
+            <textarea
+              value={planDescription}
+              onChange={e => setPlanDescription(e.target.value)}
+              placeholder='Enter plan description...'
+              className='w-full border p-2 rounded-md'
+              rows='4'
+            />
+          </div>
+
+          <div className='w-full'>
+            <label className='block font-medium mb-2 text-gray-700'>
+              Plan Image
+            </label>
+
+            <div className='relative border-2 border-dashed border-gray-300 rounded-xl h-48 flex items-center justify-center cursor-pointer hover:border-blue-400 transition group overflow-hidden'>
+              <input
+                type='file'
+                accept='image/*'
+                id='planImage'
+                onChange={e => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+
+                  if (!file.type.startsWith('image/')) {
+                    alert('Please upload an image file!');
+                    return;
+                  }
+
+                  if (file.size > 5 * 1024 * 1024) {
+                    alert('Image must be smaller than 5MB.');
+                    return;
+                  }
+
+                  setPlanImage(file);
+                }}
+                className='absolute inset-0 opacity-0 cursor-pointer z-10'
+              />
+
+              {planImage ? (
+                <div className='relative w-full h-full'>
+                  <img
+                    src={
+                      typeof planImage === 'string'
+                        ? planImage
+                        : URL.createObjectURL(planImage)
+                    }
+                    alt='Plan'
+                    className='w-full h-full object-cover rounded-xl'
+                  />
+                  <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition'>
+                    <p className='text-white text-sm font-medium'>
+                      Replace Image
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className='text-center text-gray-500'>
+                  <p className='font-medium'>No Image Selected</p>
+                  <p className='text-sm text-blue-500'>Upload Image</p>
+                </div>
+              )}
+            </div>
+
+            {planImage && (
+              <div className='flex justify-center mt-3'>
+                <button
+                  onClick={() => setPlanImage(null)}
+                  className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition'
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className='flex justify-between mb-4'>
           <button
             onClick={addDay}
@@ -144,7 +247,7 @@ const CreatePlan = () => {
             disabled={loading}
             className='bg-green-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-green-700'
           >
-            <FaBook className='mr-2' />{' '}
+            <FaBook className='mr-2' />
             {loading ? 'Creating...' : 'Create Plan'}
           </button>
         </div>
@@ -167,8 +270,8 @@ const CreatePlan = () => {
                     ? 'border-blue-500 font-bold'
                     : 'border-gray-300'
                 }`}
+                readOnly
               />
-
               <button
                 onClick={() => removeDay(dayIndex)}
                 className='bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 flex items-center'
@@ -204,36 +307,6 @@ const CreatePlan = () => {
                         readOnly
                         className='flex-1 p-2 border rounded-md bg-gray-200 text-gray-700 cursor-not-allowed'
                       />
-                      <div>
-                        <input
-                          type='file'
-                          id={`workoutImage-${dayIndex}-${workoutIndex}`}
-                          onChange={e =>
-                            handleWorkoutImageChange(
-                              dayIndex,
-                              workoutIndex,
-                              e.target.files[0]
-                            )
-                          }
-                          className='hidden'
-                        />
-                        <label
-                          htmlFor={`workoutImage-${dayIndex}-${workoutIndex}`}
-                          className='w-20 h-20 bg-gray-200 flex items-center justify-center rounded-md cursor-pointer overflow-hidden'
-                        >
-                          {workout.image ? (
-                            <img
-                              src={URL.createObjectURL(workout.image)}
-                              alt='Workout'
-                              className='w-full h-full object-cover'
-                            />
-                          ) : (
-                            <span className='text-gray-500 text-sm'>
-                              Add Image
-                            </span>
-                          )}
-                        </label>
-                      </div>
                     </div>
 
                     {workout.exercises.map((exercise, exIndex) => (
@@ -242,13 +315,12 @@ const CreatePlan = () => {
                         className='border p-3 rounded-md flex flex-col gap-2 bg-white'
                       >
                         <div className='grid grid-cols-2 gap-20 mb-3'>
-                          <span className='font-semibold text-center mr-25'>
+                          <span className='font-semibold text-center mr-30'>
                             Set
                           </span>
-                          <span className='font-semibold text-center mr-500'>
-                            Reps
-                          </span>
+                          <span className='font-semibold text-left'>Reps</span>
                         </div>
+
                         {exercise.sets.map((set, setIndex) => (
                           <div
                             key={setIndex}
@@ -272,34 +344,6 @@ const CreatePlan = () => {
                               className='p-2 border rounded-md w-100 text-center'
                               min={1}
                             />
-                            <button
-                              onClick={() =>
-                                handleRepsChange(
-                                  dayIndex,
-                                  workoutIndex,
-                                  exIndex,
-                                  setIndex,
-                                  Math.max(set - 1, 1)
-                                )
-                              }
-                              className='bg-red-200 text-white p-2 rounded-md hover:bg-red-600'
-                            >
-                              -
-                            </button>
-                            <button
-                              onClick={() =>
-                                handleRepsChange(
-                                  dayIndex,
-                                  workoutIndex,
-                                  exIndex,
-                                  setIndex,
-                                  Number(set) + 1
-                                )
-                              }
-                              className='bg-green-200 text-white p-2 rounded-md hover:bg-green-600'
-                            >
-                              +
-                            </button>
                             <button
                               onClick={() =>
                                 handleRemoveSet(
