@@ -104,6 +104,10 @@ const PlanList = () => {
     return pages;
   };
 
+  const handleViewDetails = planId => {
+    navigate(`/plans/plan-detail/${planId}`);
+  };
+
   return (
     <div className='p-6 space-y-6'>
       <div className='flex justify-between items-center'>
@@ -145,7 +149,10 @@ const PlanList = () => {
                 <tr key={plan._id} className='hover:bg-gray-50'>
                   <td className='p-3 text-gray-500'>{index + 1}</td>
 
-                  <td className='p-3'>
+                  <td
+                    className='p-3'
+                    onClick={() => handleViewDetails(plan._id)}
+                  >
                     <img
                       src={plan.image || logo}
                       alt={plan.title}
