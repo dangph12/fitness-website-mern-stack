@@ -196,20 +196,22 @@ const PlanList = () => {
                                     >
                                       <img
                                         src={
-                                          ex.exercise?.tutorial.endsWith('.gif')
-                                            ? ex.exercise?.tutorial.replace(
+                                          ex?.exercise?.tutorial?.endsWith(
+                                            '.gif'
+                                          )
+                                            ? ex?.exercise?.tutorial.replace(
                                                 '/upload/',
                                                 '/upload/f_jpg/so_0/'
                                               )
-                                            : ex.exercise?.tutorial
+                                            : ex?.exercise?.tutorial
                                         }
                                         onMouseEnter={e =>
                                           (e.currentTarget.src =
-                                            ex.exercise?.tutorial)
+                                            ex?.exercise?.tutorial)
                                         }
                                         onMouseLeave={e =>
                                           (e.currentTarget.src =
-                                            ex.exercise?.tutorial.replace(
+                                            ex?.exercise?.tutorial.replace(
                                               '/upload/',
                                               '/upload/f_jpg/so_0/'
                                             )) || logo
