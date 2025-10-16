@@ -136,7 +136,7 @@ const CreatePlan = () => {
     dispatch(createPlan(formData))
       .then(() => {
         toast.success('Plan created successfully!');
-        setTimeout(() => navigate('/'), 1500);
+        navigate('/plans/plan-list');
       })
       .catch(() => toast.error('Failed to create plan'));
   };
