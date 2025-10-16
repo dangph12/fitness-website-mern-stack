@@ -55,10 +55,10 @@ export const createWorkout = createAsyncThunk(
 // Update workout
 export const updateWorkout = createAsyncThunk(
   'workouts/updateWorkout',
-  async ({ id, updateData }) => {
+  async ({ workoutId, updateData }) => {
     try {
       const response = await axiosInstance.put(
-        `/api/workouts/${id}`,
+        `/api/workouts/${workoutId}`,
         updateData
       );
       return response.data.data;
