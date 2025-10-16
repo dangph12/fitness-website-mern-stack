@@ -76,6 +76,14 @@ const router = createBrowserRouter([
       {
         path: 'workout/edit-workout/:workoutId',
         Component: lazy(() => import('~/app/workouts/edit-workout/page'))
+      },
+      {
+        path: 'plans/plan-detail/:planId',
+        Component: lazy(() => import('~/app/plans/plan-detail/[planId]/page'))
+      },
+      {
+        path: 'plans/edit-plan/:planId',
+        Component: lazy(() => import('~/app/plans/plan-edit/[planId]/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
