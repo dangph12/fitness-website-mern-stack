@@ -4,8 +4,10 @@ import { IHistory } from './history-type';
 
 const HistorySchema = new Schema<IHistory>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    workoutId: { type: Schema.Types.ObjectId, ref: 'Workout', required: true }
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    workout: { type: Schema.Types.ObjectId, ref: 'Workout', required: true },
+    plan: { type: Schema.Types.ObjectId, ref: 'Plan', default: null },
+    time: { type: Number, required: true }
   },
   { timestamps: true }
 );
