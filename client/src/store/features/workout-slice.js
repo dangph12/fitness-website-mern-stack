@@ -14,9 +14,9 @@ export const fetchWorkouts = createAsyncThunk(
   }) => {
     try {
       const response = await axiosInstance.get('/api/workouts/filter', {
-        params: { page, limit, sortBy, sortOrder, title } // Passing filter params to the backend
+        params: { page, limit, sortBy, sortOrder, title }
       });
-      return response.data.data; // returning the workouts data
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching workouts:', error);
       throw error;
@@ -114,9 +114,14 @@ export const workoutSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch workouts';
       })
 
-      // Fetch workout by ID
+      //fetch workout by id
       .addCase(fetchWorkoutById.fulfilled, (state, action) => {
-        state.currentWorkout = action.payload;
+        const workout = action.payload;
+        const exists = state.workouts.some(w => w._id === workout._id);
+        if (!exists) {
+          state.workouts.push(workout);
+        }
+        state.currentWorkout = workout;
       })
 
       // Create workout
