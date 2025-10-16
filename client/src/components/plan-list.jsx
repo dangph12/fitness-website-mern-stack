@@ -188,7 +188,25 @@ const PlanList = () => {
                                       className='flex flex-col items-center text-center w-20 flex-shrink-0'
                                     >
                                       <img
-                                        src={ex.exercise?.tutorial || logo}
+                                        src={
+                                          ex.exercise?.tutorial.endsWith('.gif')
+                                            ? ex.exercise?.tutorial.replace(
+                                                '/upload/',
+                                                '/upload/f_jpg/so_0/'
+                                              )
+                                            : ex.exercise?.tutorial
+                                        }
+                                        onMouseEnter={e =>
+                                          (e.currentTarget.src =
+                                            ex.exercise?.tutorial)
+                                        }
+                                        onMouseLeave={e =>
+                                          (e.currentTarget.src =
+                                            ex.exercise?.tutorial.replace(
+                                              '/upload/',
+                                              '/upload/f_jpg/so_0/'
+                                            )) || logo
+                                        }
                                         alt={ex.exercise?.title}
                                         className='w-14 h-14 object-cover rounded-lg'
                                       />
