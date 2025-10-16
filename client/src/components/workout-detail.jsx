@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { FaCheckCircle, FaDumbbell, FaEdit } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
@@ -27,6 +27,13 @@ const WorkoutDetail = () => {
   const { currentWorkout, loading, error } = useSelector(
     state => state.workouts
   );
+
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, []);
 
   useEffect(() => {
     dispatch(fetchWorkoutById(workoutId));
