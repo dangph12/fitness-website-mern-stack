@@ -180,13 +180,16 @@ const WorkoutList = () => {
                   })}
                 </td>
                 <td className='px-6 py-4'>{formatDate(workout.createdAt)}</td>
-                <td className='px-6 py-4'>
-                  <button className='text-yellow-500'>
-                    <FaEdit />
-                  </button>
+                <td className='px-6 py-4 flex items-center'>
+                  <Link to={`/workout/edit-workout/${workout._id}`}>
+                    <button className='flex items-center justify-center w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200 hover:text-yellow-700 transition duration-200'>
+                      <FaEdit />
+                    </button>
+                  </Link>
+
                   <button
                     onClick={() => handleDelete(workout._id)}
-                    className='ml-4 text-red-500'
+                    className='ml-4 flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700 transition duration-200'
                   >
                     <FaTrash />
                   </button>
