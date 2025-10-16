@@ -77,7 +77,21 @@ const WorkoutDetail = () => {
           <div className='w-16 h-16 rounded-md overflow-hidden bg-gray-200'>
             {exercise.tutorial ? (
               <img
-                src={exercise.tutorial}
+                src={
+                  exercise.tutorial.endsWith('.gif')
+                    ? exercise.tutorial.replace(
+                        '/upload/',
+                        '/upload/f_jpg/so_0/'
+                      )
+                    : exercise.tutorial
+                }
+                onMouseEnter={e => (e.currentTarget.src = exercise.tutorial)}
+                onMouseLeave={e =>
+                  (e.currentTarget.src = exercise.tutorial.replace(
+                    '/upload/',
+                    '/upload/f_jpg/so_0/'
+                  ))
+                }
                 alt={exercise.title}
                 className='w-full h-full object-cover'
               />
