@@ -241,15 +241,20 @@ const CreatePlan = () => {
                         key={exIndex}
                         className='border p-3 rounded-md flex flex-col gap-2 bg-white'
                       >
-                        <span className='font-semibold'>
-                          {exercise.title || 'Exercise'}
-                        </span>
+                        <div className='grid grid-cols-2 gap-20 mb-3'>
+                          <span className='font-semibold text-center mr-25'>
+                            Set
+                          </span>
+                          <span className='font-semibold text-center mr-500'>
+                            Reps
+                          </span>
+                        </div>
                         {exercise.sets.map((set, setIndex) => (
                           <div
                             key={setIndex}
                             className='flex items-center gap-2'
                           >
-                            <span className='p-2 border rounded-md w-8 text-center'>
+                            <span className='p-2 border rounded-md w-100 text-center'>
                               {setIndex + 1}
                             </span>
                             <input
@@ -264,7 +269,7 @@ const CreatePlan = () => {
                                   e.target.value
                                 )
                               }
-                              className='p-2 border rounded-md w-20'
+                              className='p-2 border rounded-md w-100 text-center'
                               min={1}
                             />
                             <button
@@ -314,7 +319,7 @@ const CreatePlan = () => {
                           onClick={() =>
                             handleAddSet(dayIndex, workoutIndex, exIndex)
                           }
-                          className='text-blue-600 mt-1'
+                          className='text-blue-600 mt-1 text-left'
                         >
                           + Add Set
                         </button>
