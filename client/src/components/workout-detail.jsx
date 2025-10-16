@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect } from 'react';
 import { FaCheckCircle, FaDumbbell, FaEdit } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import { fetchWorkoutById } from '~/store/features/workout-slice';
 
@@ -153,10 +153,13 @@ const WorkoutDetail = () => {
             </div>
 
             <div className='flex justify-center sm:justify-end'>
-              <button className='flex items-center bg-transparent border border-gray-400 hover:border-blue-500 hover:text-blue-600 text-gray-800 px-6 py-2 rounded-lg font-medium transition duration-200 mb-20'>
+              <Link
+                to={`/workout/edit-workout/${workoutId}`}
+                className='flex items-center bg-gray-600 text-white hover:bg-blue-700 border border-blue-600 px-6 py-2 rounded-lg font-medium transition duration-200 mb-20'
+              >
                 <FaEdit className='mr-2' />
                 Edit Routine
-              </button>
+              </Link>
             </div>
           </div>
         </div>
