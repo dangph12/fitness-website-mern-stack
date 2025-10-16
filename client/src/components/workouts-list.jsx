@@ -39,7 +39,7 @@ const WorkoutList = () => {
     workouts.forEach(workout => {
       workout.exercises.forEach(exercise => {
         if (!exercises.some(ex => ex._id === exercise.exercise)) {
-          dispatch(fetchExerciseById(exercise.exercise));
+          dispatch(fetchExerciseById(exercise?.exercise));
         }
       });
     });
