@@ -132,15 +132,16 @@ const WorkoutList = () => {
                 key={workout._id}
                 className='border-b hover:bg-gray-100 transition-colors'
               >
-                <div onClick={() => handleViewDetails(workout._id)}>
-                  <td className='px-6 py-4'>
-                    <img
-                      src={workout.image || logo}
-                      alt={workout.title}
-                      className='w-20 h-20 object-cover rounded-md'
-                    />
-                  </td>
-                </div>
+                <td
+                  className='px-6 py-4'
+                  onClick={() => handleViewDetails(workout._id)}
+                >
+                  <img
+                    src={workout.image || logo}
+                    alt={workout.title}
+                    className='w-20 h-20 object-cover rounded-md'
+                  />
+                </td>
                 <td className='px-6 py-4'>
                   <span className='inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full'>
                     {workout.title}
