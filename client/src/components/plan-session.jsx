@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { FaCheckCircle, FaDumbbell } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
@@ -23,29 +23,35 @@ const PlanSession = () => {
   const userId = useSelector(state => state.auth.user.id);
 
   const [completedSets, setCompletedSets] = useState({});
+  const [detailedExercises, setDetailedExercises] = useState([]);
 
   const { seconds, minutes, hours } = useStopwatch({ autoStart: true });
 
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
+
   useEffect(() => {
-    if (planId) {
-      dispatch(fetchPlanById(planId));
-    }
+    if (planId) dispatch(fetchPlanById(planId));
   }, [dispatch, planId]);
 
   useEffect(() => {
     if (!currentPlan?.workouts) return;
-    currentPlan.workouts.forEach(workout => {
-      workout.exercises.forEach(exItem => {
-        const id = getExerciseId(exItem.exercise);
-        if (id && !exercises[id]) {
-          dispatch(fetchExerciseById(id));
+    currentPlan?.workouts?.forEach(workout => {
+      workout?.exercises?.forEach(ex => {
+        if (!detailedExercises[ex?.exercise]) {
+          dispatch(fetchExerciseById(ex?.exercise)).then(res => {
+            setDetailedExercises(prev => ({
+              ...prev,
+              [ex?.exercise]: res?.payload
+            }));
+          });
         }
       });
     });
-  }, [currentPlan, dispatch, exercises]);
+  }, [currentPlan, dispatch, detailedExercises]);
 
   const handleLogNextSet = (exerciseId, setIndex) => {
-    if (!exerciseId) return;
     setCompletedSets(prev => ({
       ...prev,
       [exerciseId]: { ...(prev[exerciseId] || {}), [setIndex]: true }
@@ -68,17 +74,16 @@ const PlanSession = () => {
       .toString()
       .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-  if (loading || !currentPlan) {
+  if (loading || !currentPlan)
     return (
       <div className='flex justify-center items-center h-screen text-gray-500'>
         Loading Plan...
       </div>
     );
-  }
 
   return (
     <div className='min-h-screen bg-gray-50 flex flex-col justify-between'>
-      <header className='flex justify-between items-center px-6 py-4 border-b sticky top-0 z-10 bg-white'>
+      <header className='flex justify-between items-center px-6 py-4 border-b sticky top-0 z-20 bg-white'>
         <div>
           <h2 className='text-2xl text-gray-600'>
             {currentPlan.title || 'Plan Session'}
@@ -98,16 +103,16 @@ const PlanSession = () => {
         <img
           src={currentPlan.image || logo}
           alt='Plan'
-          className='w-full h-100 object-cover rounded-lg shadow-lg max-w-3xl'
+          className='w-full h-100 object-cover rounded-lg shadow-lg'
         />
       </div>
 
-      <main className='flex-1 overflow-y-auto px-4 pb-28'>
+      <main className='flex-1 overflow-y-auto px-4 pb-28 space-y-6'>
         <div className='mb-6 flex justify-between items-center'>
           <p className='text-sm text-gray-600'>
             Created by:{' '}
             <span className='font-semibold text-black'>
-              {currentPlan.user?.name || 'Unknown'}
+              {currentPlan.user.name}
             </span>
           </p>
           <p className='text-sm text-gray-500'>
@@ -117,22 +122,19 @@ const PlanSession = () => {
             </span>
           </p>
         </div>
-
         {currentPlan.workouts.map((workout, dayIndex) => (
           <div
             key={workout._id}
-            className='mb-6 bg-white rounded-xl p-4 border border-gray-300 shadow-sm max-w-4xl mx-auto'
+            className='bg-white rounded-xl p-4 border border-gray-300 shadow-sm max-w-4xl mx-auto'
           >
-            <div className='flex justify-between items-center mb-3'>
-              <h3 className='font-semibold text-black'>
-                Day {dayIndex + 1}: {workout.title}
-              </h3>
-            </div>
+            <h3 className='font-semibold text-black mb-3'>
+              Day {dayIndex + 1}: {workout.title}
+            </h3>
 
-            {workout.exercises.map(exerciseItem => {
-              const exerciseId = getExerciseId(exerciseItem.exercise);
-              const detail = exercises[exerciseId];
-              const sets = exerciseItem.sets || [];
+            {workout.exercises.map(exItem => {
+              const exerciseId = getExerciseId(exItem.exercise);
+              const detail = detailedExercises[exItem.exercise];
+              const sets = exItem.sets || [];
 
               const doneCount = Object.values(
                 completedSets[exerciseId] || {}
@@ -140,7 +142,7 @@ const PlanSession = () => {
 
               return (
                 <div
-                  key={exerciseId || exerciseItem._id}
+                  key={exerciseId || exItem._id}
                   className='mb-4 rounded-lg bg-gray-50 border border-gray-300 shadow-sm p-4'
                 >
                   <div className='flex items-start gap-4 mb-3'>
@@ -155,31 +157,53 @@ const PlanSession = () => {
                         <FaDumbbell className='text-gray-500 text-xl m-4' />
                       )}
                     </div>
-                    <div>
+                    <div className='flex-1'>
                       <h3 className='text-lg font-semibold text-black'>
-                        {detail?.title || 'Exercise'}
+                        {detail?.title || 'Loading...'}
                       </h3>
-                      <p className='text-sm text-gray-600'>
-                        {doneCount}/{sets.length} Done
-                      </p>
+                      {detail && (
+                        <>
+                          <p className='text-sm text-gray-600'>
+                            Difficulty: {detail.difficulty} | Type:{' '}
+                            {detail.type}
+                          </p>
+                          <p className='text-sm text-gray-500 mt-1'>
+                            Sets: {sets.length} | Done: {doneCount}
+                          </p>
+                          <div className='flex mt-1 space-x-1'>
+                            {detail.muscles?.map(m => (
+                              <img
+                                key={m._id}
+                                src={m.image}
+                                alt={m.title}
+                                title={m.title}
+                                className='w-5 h-5 rounded-full border'
+                              />
+                            ))}
+                            {detail.equipments?.map(eq => (
+                              <img
+                                key={eq._id}
+                                src={eq.image}
+                                alt={eq.title}
+                                title={eq.title}
+                                className='w-5 h-5 rounded border'
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 
                   <div className='space-y-2'>
-                    {sets.map((set, setIndex) => {
-                      const isDone =
-                        completedSets[exerciseId]?.[setIndex] || false;
-
+                    {sets.map((set, idx) => {
+                      const isDone = completedSets[exerciseId]?.[idx] || false;
                       const reps =
-                        typeof set === 'object' && set !== null
-                          ? (set.reps ?? set.count ?? 8)
-                          : typeof set === 'number'
-                            ? set
-                            : 8;
+                        typeof set === 'number' ? set : (set.reps ?? 8);
 
                       return (
                         <div
-                          key={setIndex}
+                          key={idx}
                           className={`flex justify-between items-center px-4 py-3 rounded-xl transition-all ${
                             isDone
                               ? 'bg-green-500 text-white'
@@ -192,16 +216,11 @@ const PlanSession = () => {
                             ) : (
                               <div className='w-4 h-4 border-2 border-gray-400 rounded-full' />
                             )}
-                            <span className='font-semibold'>
-                              Set {setIndex + 1}
-                            </span>
+                            <span className='font-semibold'>Set {idx + 1}</span>
                           </div>
-
-                          <div className='flex items-center gap-6 text-sm font-medium'>
-                            <span>
-                              {reps} <span className='text-xs'>REPS</span>
-                            </span>
-                          </div>
+                          <span className='text-sm font-medium'>
+                            {reps} REPS
+                          </span>
                         </div>
                       );
                     })}
