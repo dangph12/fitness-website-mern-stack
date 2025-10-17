@@ -182,12 +182,24 @@ const WorkoutDetail = () => {
           </div>
 
           <div className='space-y-4'>
-            {exercises.map(exerciseItem => (
-              <ExerciseRow
-                key={exerciseItem.exercise._id}
-                exerciseItem={exerciseItem}
-              />
-            ))}
+            {Array.isArray(exercises) &&
+              exercises.map((exerciseItem, index) => {
+                const exerciseData = exerciseItem?.exercise;
+                if (!exerciseData) return null;
+
+                return (
+                  <ExerciseRow
+                    key={exerciseData?._id || exerciseData || index}
+                    exerciseItem={{
+                      ...exerciseItem,
+                      exercise:
+                        typeof exerciseData === 'object'
+                          ? exerciseData
+                          : { _id: exerciseData, title: 'Unnamed Exercise' }
+                    }}
+                  />
+                );
+              })}
           </div>
         </div>
       </main>
