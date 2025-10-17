@@ -14,9 +14,16 @@ export const fetchHistoryByUser = createAsyncThunk(
 // Add history record
 export const addHistory = createAsyncThunk(
   'history/addHistory',
-  async historyData => {
-    const response = await axiosInstance.post('/api/history', historyData);
-    return response.data.data;
+  async (historyData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/api/histories', historyData);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error add history:', error);
+      return rejectWithValue(
+        error.response?.data || error.message || 'Something went wrong'
+      );
+    }
   }
 );
 
