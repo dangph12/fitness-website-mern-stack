@@ -36,14 +36,24 @@ const WorkoutList = () => {
   }, [dispatch, currentPage]);
 
   useEffect(() => {
+    if (!workouts || workouts.length === 0) return;
+
+    const existingIds = new Set(exercises?.map(ex => ex?._id?.toString()));
+    const idsToFetch = new Set();
+
     workouts.forEach(workout => {
-      workout.exercises.forEach(exercise => {
-        if (!exercises.some(ex => ex._id === exercise.exercise)) {
-          dispatch(fetchExerciseById(exercise?.exercise));
+      workout?.exercises?.forEach(ex => {
+        const id = ex?.exercise?.toString();
+        if (id && !existingIds.has(id)) {
+          idsToFetch.add(id);
         }
       });
     });
-  }, [dispatch, workouts, exercises]);
+
+    idsToFetch.forEach(id => {
+      dispatch(fetchExerciseById(id));
+    });
+  }, [dispatch, workouts]);
 
   const handleDelete = workoutId => {
     dispatch(deleteWorkout(workoutId))
@@ -71,7 +81,7 @@ const WorkoutList = () => {
   };
 
   const getMusclesAndEquipment = exerciseId => {
-    const exercise = exercises.find(ex => ex._id === exerciseId);
+    const exercise = exercises?.find(ex => ex?._id == exerciseId);
 
     if (exercise) {
       const muscles =
