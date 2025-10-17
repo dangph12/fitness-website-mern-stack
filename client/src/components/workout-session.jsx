@@ -51,7 +51,7 @@ const WorkoutSession = () => {
 
   return (
     <div className='min-h-screen bg-gray-50 flex flex-col justify-between'>
-      <header className='flex justify-between items-center px-6 py-4 border-b sticky top-0 bg-white z-10'>
+      <header className='flex justify-between items-center px-6 py-4 border-b sticky top-0 z-10'>
         <div>
           <h2 className='text-2xl text-gray-600'>
             {currentWorkout.title || 'Workout Session'}
