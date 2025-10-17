@@ -166,9 +166,20 @@ const WorkoutDetail = () => {
       </header>
 
       <main className='max-w-6xl mx-auto px-6 py-10'>
-        <h2 className='text-2xl font-semibold text-gray-900 mb-6 p-4 border-b border-gray-300'>
-          Routine detail
-        </h2>
+        <div className='flex justify-between items-center mb-6 p-4 border-b border-gray-300'>
+          <h2 className='text-2xl font-semibold text-gray-900'>
+            Workout Detail
+          </h2>
+
+          <button
+            onClick={() =>
+              navigate(`/workouts/workout-session/${currentWorkout._id}`)
+            }
+            className='px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition'
+          >
+            Start Workout
+          </button>
+        </div>
 
         <div className='bg-gray-50 p-6 rounded-xl border border-gray-300 shadow-md'>
           <div className='flex justify-between items-center pb-4 border-b border-gray-300 mb-4'>
