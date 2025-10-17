@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { useStopwatch } from 'react-timer-hook';
 
+import { addHistory } from '~/store/features/history-slice';
 import { fetchWorkoutById } from '~/store/features/workout-slice';
 
 import logo from '../assets/logo.png';
@@ -13,6 +14,7 @@ const WorkoutSession = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentWorkout, loading } = useSelector(state => state.workouts);
+  const userId = useSelector(state => state.auth.user.id);
 
   const [completedSets, setCompletedSets] = useState({});
 
@@ -33,6 +35,19 @@ const WorkoutSession = () => {
       ...prev,
       [exerciseId]: { ...(prev[exerciseId] || {}), [setIndex]: true }
     }));
+  };
+
+  const handleFinishWorkout = () => {
+    const historyData = {
+      user: userId,
+      workout: currentWorkout._id,
+      plan: '',
+      time: hours * 60 * 60 + minutes * 60 + seconds
+    };
+
+    dispatch(addHistory(historyData));
+
+    navigate('/');
   };
 
   if (loading || !currentWorkout) {
@@ -60,7 +75,7 @@ const WorkoutSession = () => {
         </div>
 
         <button
-          onClick={() => navigate(-1)}
+          onClick={handleFinishWorkout}
           className='bg-black text-white px-5 py-2 rounded-full text-xl font-semibold'
         >
           FINISH
