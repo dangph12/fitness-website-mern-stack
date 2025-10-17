@@ -46,7 +46,9 @@ const HistoryService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const history = await HistoryModel.find({ user: userId });
+    const history = await HistoryModel.find({ user: userId })
+      .populate('workout')
+      .populate('plan');
 
     if (!history) {
       throw createHttpError(404, 'History not found');
