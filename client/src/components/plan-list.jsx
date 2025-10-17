@@ -44,7 +44,7 @@ const PlanList = () => {
   };
 
   const handleCreatePlan = () => navigate('/plans/rountine-builder');
-  const handleEditPlan = planId => navigate(`/edit-plan/${planId}`);
+  const handleEditPlan = planId => navigate(`/plans/edit-plan/${planId}`);
 
   const handleDeletePlan = planId => {
     if (window.confirm('Are you sure you want to delete this plan?')) {
