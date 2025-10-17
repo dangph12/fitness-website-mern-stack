@@ -1,21 +1,24 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { FaDumbbell, FaEdit, FaPlay } from 'react-icons/fa';
+import { FaCheckCircle, FaDumbbell, FaEdit, FaPlay } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
 import { fetchExerciseById } from '~/store/features/exercise-slice';
+import { fetchHistoryByUser } from '~/store/features/history-slice';
 import { fetchPlanById } from '~/store/features/plan-slice';
 
 import logo from '../assets/logo.png';
 
 const calculateTotalReps = sets => (sets ? sets.reduce((a, b) => a + b, 0) : 0);
-const calculateTotalSets = sets => (sets ? sets.length : 0);
 
 const PlanDetail = () => {
   const { planId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const { currentPlan, loading, error } = useSelector(state => state.plans);
+  const { history } = useSelector(state => state.histories);
+  const userId = useSelector(state => state.auth.user?.id);
 
   const [detailedExercises, setDetailedExercises] = useState([]);
 
@@ -28,20 +31,26 @@ const PlanDetail = () => {
   }, [dispatch, planId]);
 
   useEffect(() => {
+    if (userId) dispatch(fetchHistoryByUser(userId));
+  }, [dispatch, userId]);
+
+  useEffect(() => {
     if (!currentPlan?.workouts) return;
-    currentPlan?.workouts?.forEach(workout => {
-      workout?.exercises?.forEach(ex => {
-        if (!detailedExercises[ex?.exercise]) {
-          dispatch(fetchExerciseById(ex?.exercise)).then(res => {
+    currentPlan.workouts.forEach(workout => {
+      workout.exercises.forEach(ex => {
+        if (!detailedExercises[ex.exercise]) {
+          dispatch(fetchExerciseById(ex.exercise)).then(res => {
             setDetailedExercises(prev => ({
               ...prev,
-              [ex?.exercise]: res?.payload
+              [ex.exercise]: res?.payload
             }));
           });
         }
       });
     });
   }, [currentPlan, dispatch, detailedExercises]);
+
+  const isPlanCompleted = history.some(h => h.plan && h.plan._id === planId);
 
   const handleTutorialClick = exerciseId => {
     navigate(`/exercise/${exerciseId}`);
@@ -84,26 +93,13 @@ const PlanDetail = () => {
         </div>
 
         <div className='relative max-w-6xl mx-auto px-6 z-20 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
-          <div>
+          <div className='flex items-center gap-2'>
             <h1 className='text-5xl font-extrabold text-gray-900 mb-2'>
               {currentPlan.title}
             </h1>
-            <p className='text-gray-700 mb-4'>
-              Description:{' '}
-              <span className='font-medium'>{currentPlan.description}</span>
-            </p>
-            <div className='flex items-center space-x-4 text-sm text-gray-600'>
-              <p>
-                Owner:{' '}
-                <span className='font-medium'>{currentPlan.user?.name}</span>
-              </p>
-              <p>
-                Last updated:{' '}
-                <span className='font-medium'>
-                  {new Date(currentPlan.updatedAt).toLocaleDateString()}
-                </span>
-              </p>
-            </div>
+            {isPlanCompleted && (
+              <FaCheckCircle className='text-green-500 text-3xl' />
+            )}
           </div>
 
           <button
@@ -123,6 +119,7 @@ const PlanDetail = () => {
           <FaPlay className='mr-4 text-sm' />
           Start Plan
         </button>
+
         {currentPlan.workouts.map((workout, dayIndex) => (
           <div key={workout._id}>
             <h2 className='text-2xl font-semibold text-gray-900 mb-4 border-b border-gray-300 pb-2'>
@@ -130,7 +127,7 @@ const PlanDetail = () => {
             </h2>
 
             <div className='space-y-4'>
-              {workout?.exercises?.map(ex => {
+              {workout.exercises.map(ex => {
                 const detail = detailedExercises[ex.exercise];
                 return (
                   <div
@@ -138,7 +135,7 @@ const PlanDetail = () => {
                     className='flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-300 shadow-sm'
                   >
                     <div
-                      className='w-24 h-24 rounded-md overflow-hidden bg-gray-200 flex items-center justify-center'
+                      className='w-24 h-24 rounded-md overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer'
                       onClick={() => handleTutorialClick(ex._id)}
                     >
                       {detail?.tutorial ? (
