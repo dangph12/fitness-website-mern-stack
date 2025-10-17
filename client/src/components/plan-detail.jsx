@@ -43,6 +43,10 @@ const PlanDetail = () => {
     });
   }, [currentPlan, dispatch, detailedExercises]);
 
+  const handleTutorialClick = exerciseId => {
+    navigate(`/exercise/${exerciseId}`);
+  };
+
   if (loading)
     return (
       <div className='flex justify-center items-center h-screen text-gray-500'>
@@ -119,7 +123,10 @@ const PlanDetail = () => {
                     key={ex._id}
                     className='flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-300 shadow-sm'
                   >
-                    <div className='w-24 h-24 rounded-md overflow-hidden bg-gray-200 flex items-center justify-center'>
+                    <div
+                      className='w-24 h-24 rounded-md overflow-hidden bg-gray-200 flex items-center justify-center'
+                      onClick={() => handleTutorialClick(ex._id)}
+                    >
                       {detail?.tutorial ? (
                         <img
                           src={
