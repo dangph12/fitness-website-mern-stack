@@ -38,16 +38,27 @@ const CreatePlan = () => {
 
   const handleAddExercise = (dayIndex, exercise) => {
     const updated = [...days];
-    updated[dayIndex].workouts.push({
-      title: exercise.title,
-      image: null,
-      exercises: [
-        {
-          exercise: exercise._id,
-          sets: [1]
-        }
-      ]
-    });
+    const selectedDay = updated[dayIndex];
+
+    if (selectedDay.workouts.length === 0) {
+      selectedDay.workouts.push({
+        title: `Workout ${dayIndex + 1}`,
+        image: null,
+        exercises: []
+      });
+    }
+
+    const workout = selectedDay.workouts[0];
+
+    const exists = workout.exercises.some(ex => ex.exercise === exercise._id);
+
+    if (!exists) {
+      workout.exercises.push({
+        exercise: exercise._id,
+        sets: [1]
+      });
+    }
+
     setDays(updated);
   };
 
