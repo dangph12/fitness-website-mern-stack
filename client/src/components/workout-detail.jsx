@@ -48,10 +48,10 @@ const WorkoutDetail = () => {
   useEffect(() => {
     if (history?.length > 0) {
       const completed = {};
-      history.forEach(entry => {
-        if (entry.workout._id === workoutId) {
-          entry.workout.exercises.forEach(ex => {
-            completed[ex.exercise] = ex.sets;
+      history?.forEach(entry => {
+        if (entry?.workout?._id === workoutId) {
+          entry?.workout?.exercises?.forEach(ex => {
+            completed[ex?.exercise] = ex?.sets;
           });
         }
       });
