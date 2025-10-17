@@ -83,15 +83,6 @@ function Header() {
             { label: 'Rountine Builder', href: '/plans/plan-list' }
           ]}
         />
-        <MenuItem
-          label='Courses'
-          isDropdown={true}
-          links={[
-            { label: 'Beginner', href: '#beginner' },
-            { label: 'Intermediate', href: '#intermediate' },
-            { label: 'Advanced', href: '#advanced' }
-          ]}
-        />
         <Link to='/nutrition' className='hover:text-gray-300 text-lg'>
           Nutrition
         </Link>
@@ -100,6 +91,9 @@ function Header() {
         </Link>
         <Link to='/exercise' className='hover:text-gray-300 text-lg'>
           Exercise
+        </Link>
+        <Link to='/history' className='hover:text-gray-300 text-lg'>
+          History
         </Link>
         <Link to='/about' className='hover:text-gray-300 text-lg'>
           About
