@@ -31,7 +31,7 @@ export const addHistory = createAsyncThunk(
 export const removeHistory = createAsyncThunk(
   'history/removeHistory',
   async historyId => {
-    await axiosInstance.delete(`/api/history/${historyId}`);
+    await axiosInstance.delete(`/api/histories/${historyId}`);
     return historyId;
   }
 );
