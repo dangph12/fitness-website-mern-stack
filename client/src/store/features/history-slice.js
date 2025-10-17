@@ -6,7 +6,7 @@ import axiosInstance from '~/lib/axios-instance';
 export const fetchHistoryByUser = createAsyncThunk(
   'history/fetchHistoryByUser',
   async userId => {
-    const response = await axiosInstance.get(`/api/history/user/${userId}`);
+    const response = await axiosInstance.get(`/api/histories/user/${userId}`);
     return response.data.data;
   }
 );
