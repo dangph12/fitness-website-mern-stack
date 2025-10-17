@@ -169,10 +169,10 @@ const PlanList = () => {
                     {new Date(plan.createdAt).toLocaleString('en-GB')}
                   </td>
 
-                  <td>
+                  <td className='flex-1'>
                     <button
                       onClick={() => handleEditPlan(plan._id)}
-                      className='bg-blue-100 text-blue-600 hover:bg-blue-200 p-3 rounded-full'
+                      className='bg-blue-100 text-blue-600 hover:bg-blue-200 p-3 rounded-full mr-3'
                       title='Edit Plan'
                     >
                       <Edit size={20} />
