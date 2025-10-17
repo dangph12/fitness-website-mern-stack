@@ -109,6 +109,28 @@ const CreatePlan = () => {
   };
 
   const handleSubmitPlan = () => {
+    if (!planTitle.trim() || !planDescription.trim()) {
+      toast.error('Please fill in both title and description !');
+      return;
+    }
+    const hasWorkout = days.some(
+      d => Array.isArray(d.workouts) && d.workouts.length > 0
+    );
+    if (!hasWorkout) {
+      toast.error('Please add at least one workout!');
+      return;
+    }
+
+    const hasExercise = days.some(d =>
+      d.workouts?.some(
+        w => Array.isArray(w.exercises) && w.exercises.length > 0
+      )
+    );
+    if (!hasExercise) {
+      toast.error('Please add at least one exercise!');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('title', planTitle || `Plan ${Date.now()}`);
     formData.append(
