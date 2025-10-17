@@ -1,24 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaBook, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 
-import { createPlan } from '~/store/features/plan-slice';
+import { fetchPlanById, updatePlan } from '~/store/features/plan-slice';
 
 import ExerciseLibrary from './exercise-library';
 
-const CreatePlan = () => {
-  const [days, setDays] = useState([{ dayName: 'Day 1', workouts: [] }]);
+const EditPlan = () => {
+  const { planId } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { currentPlan, loading } = useSelector(state => state.plans);
+  const userId = useSelector(state => state.auth.user.id);
+
+  const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState(0);
   const [planImage, setPlanImage] = useState(null);
   const [planTitle, setPlanTitle] = useState('');
   const [planDescription, setPlanDescription] = useState('');
 
-  const userId = useSelector(state => state.auth.user.id);
-  const { loading } = useSelector(state => state.plans);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  useEffect(() => {
+    if (planId) dispatch(fetchPlanById(planId));
+  }, [dispatch, planId]);
+
+  useEffect(() => {
+    if (currentPlan) {
+      setPlanTitle(currentPlan.title || '');
+      setPlanDescription(currentPlan.description || '');
+      setPlanImage(currentPlan.image || null);
+
+      const mappedDays = currentPlan.workouts.map(workout => ({
+        dayName: workout.title,
+        workouts: [
+          {
+            ...workout,
+            exercises: workout.exercises.map(ex => ({
+              ...ex,
+              sets: [...ex.sets]
+            }))
+          }
+        ]
+      }));
+
+      setDays(
+        mappedDays.length ? mappedDays : [{ dayName: 'Day 1', workouts: [] }]
+      );
+    }
+  }, [currentPlan]);
 
   const addDay = () =>
     setDays([...days, { dayName: `Day ${days.length + 1}`, workouts: [] }]);
@@ -41,6 +71,7 @@ const CreatePlan = () => {
     updated[dayIndex].workouts.push({
       title: exercise.title,
       image: null,
+      user: userId,
       exercises: [
         {
           exercise: exercise._id,
@@ -54,18 +85,6 @@ const CreatePlan = () => {
   const handleRemoveExercise = (dayIndex, workoutIndex) => {
     const updated = [...days];
     updated[dayIndex].workouts.splice(workoutIndex, 1);
-    setDays(updated);
-  };
-
-  const handleWorkoutTitleChange = (dayIndex, workoutIndex, value) => {
-    const updated = [...days];
-    updated[dayIndex].workouts[workoutIndex].title = value;
-    setDays(updated);
-  };
-
-  const handleWorkoutImageChange = (dayIndex, workoutIndex, file) => {
-    const updated = [...days];
-    updated[dayIndex].workouts[workoutIndex].image = file;
     setDays(updated);
   };
 
@@ -97,13 +116,15 @@ const CreatePlan = () => {
     setDays(updated);
   };
 
-  const handleSubmitPlan = () => {
+  const handleSubmit = () => {
+    if (!planTitle.trim()) {
+      toast.error('Plan title is required');
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('title', planTitle || `Plan ${Date.now()}`);
-    formData.append(
-      'description',
-      planDescription || `Description for Plan ${Date.now()}`
-    );
+    formData.append('title', planTitle);
+    formData.append('description', planDescription);
     if (planImage) formData.append('image', planImage);
     formData.append('isPublic', 'true');
     formData.append('user', userId);
@@ -113,7 +134,10 @@ const CreatePlan = () => {
       day.workouts.forEach(workout => {
         formData.append(`workouts[${workoutIndex}][title]`, workout.title);
         formData.append(`workouts[${workoutIndex}][isPublic]`, 'false');
-        formData.append(`workouts[${workoutIndex}][user]`, userId);
+        formData.append(
+          `workouts[${workoutIndex}][user]`,
+          workout.user || userId
+        );
         if (workout.image)
           formData.append(`workouts[${workoutIndex}][image]`, workout.image);
 
@@ -129,17 +153,21 @@ const CreatePlan = () => {
             );
           });
         });
+
         workoutIndex++;
       });
     });
 
-    dispatch(createPlan(formData))
+    dispatch(updatePlan({ id: planId, updateData: formData }))
       .then(() => {
-        toast.success('Plan created successfully!');
+        toast.success('Plan updated successfully!');
         navigate('/plans/plan-list');
       })
-      .catch(() => toast.error('Failed to create plan'));
+      .catch(() => toast.error('Failed to update plan'));
   };
+
+  if (!currentPlan)
+    return <p className='text-center text-gray-500'>Loading plan...</p>;
 
   return (
     <div className='flex gap-6 p-6 bg-gray-50 rounded-lg shadow-md'>
@@ -168,69 +196,38 @@ const CreatePlan = () => {
             />
           </div>
 
-          <div className='w-full'>
+          <div>
             <label className='block font-medium mb-2 text-gray-700'>
               Plan Image
             </label>
-
             <div className='relative border-2 border-dashed border-gray-300 rounded-xl h-48 flex items-center justify-center cursor-pointer hover:border-blue-400 transition group overflow-hidden'>
               <input
                 type='file'
                 accept='image/*'
-                id='planImage'
-                onChange={e => {
-                  const file = e.target.files[0];
-                  if (!file) return;
-
-                  if (!file.type.startsWith('image/')) {
-                    alert('Please upload an image file!');
-                    return;
-                  }
-
-                  if (file.size > 5 * 1024 * 1024) {
-                    alert('Image must be smaller than 5MB.');
-                    return;
-                  }
-
-                  setPlanImage(file);
-                }}
+                onChange={e => setPlanImage(e.target.files[0])}
                 className='absolute inset-0 opacity-0 cursor-pointer z-10'
               />
-
               {planImage ? (
-                <div className='relative w-full h-full'>
-                  <img
-                    src={
-                      typeof planImage === 'string'
-                        ? planImage
-                        : URL.createObjectURL(planImage)
-                    }
-                    alt='Plan'
-                    className='w-full h-full object-cover rounded-xl'
-                  />
-                  <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition'>
-                    <p className='text-white text-sm font-medium'>
-                      Replace Image
-                    </p>
-                  </div>
-                </div>
+                <img
+                  src={
+                    typeof planImage === 'string'
+                      ? planImage
+                      : URL.createObjectURL(planImage)
+                  }
+                  alt='Plan'
+                  className='w-full h-full object-cover rounded-xl'
+                />
               ) : (
-                <div className='text-center text-gray-500'>
-                  <p className='font-medium'>No Image Selected</p>
-                  <p className='text-sm text-blue-500'>Upload Image</p>
-                </div>
+                <p className='text-gray-500'>No Image Selected</p>
               )}
             </div>
-
             {planImage && (
-              <div className='flex justify-center mt-3'>
-                <button
-                  onClick={() => setPlanImage(null)}
-                  className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition'
-                >
-                  Remove
-                </button>
-              </div>
+              <button
+                onClick={() => setPlanImage(null)}
+                className='mt-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'
+              >
+                Remove
+              </button>
             )}
           </div>
         </div>
@@ -243,12 +240,12 @@ const CreatePlan = () => {
             + Add Day
           </button>
           <button
-            onClick={handleSubmitPlan}
+            onClick={handleSubmit}
             disabled={loading}
             className='bg-green-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-green-700'
           >
-            <FaBook className='mr-2' />
-            {loading ? 'Creating...' : 'Create Plan'}
+            <FaBook className='mr-2' />{' '}
+            {loading ? 'Updating...' : 'Update Plan'}
           </button>
         </div>
 
@@ -270,7 +267,6 @@ const CreatePlan = () => {
                     ? 'border-blue-500 font-bold'
                     : 'border-gray-300'
                 }`}
-                readOnly
               />
               <button
                 onClick={() => removeDay(dayIndex)}
@@ -300,14 +296,12 @@ const CreatePlan = () => {
                       <FaTrash />
                     </button>
 
-                    <div className='flex items-center gap-4'>
-                      <input
-                        type='text'
-                        value={workout.title}
-                        readOnly
-                        className='flex-1 p-2 border rounded-md bg-gray-200 text-gray-700 cursor-not-allowed'
-                      />
-                    </div>
+                    <input
+                      type='text'
+                      value={workout.title}
+                      readOnly
+                      className='flex-1 p-2 border rounded-md bg-gray-200 text-gray-700 cursor-not-allowed'
+                    />
 
                     {workout.exercises.map((exercise, exIndex) => (
                       <div
@@ -388,4 +382,4 @@ const CreatePlan = () => {
   );
 };
 
-export default CreatePlan;
+export default EditPlan;

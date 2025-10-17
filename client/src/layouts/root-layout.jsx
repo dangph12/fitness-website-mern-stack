@@ -23,15 +23,8 @@ const RootLayout = () => {
   useEffect(() => {
     if (!user) {
       if (location.pathname === '/onboarding') {
-        navigate('/login', { replace: true });
+        navigate('/auth/login', { replace: true });
         return;
-      }
-      if (
-        location.pathname !== '/login' &&
-        location.pathname !== '/register' &&
-        location.pathname !== '/'
-      ) {
-        navigate('/', { replace: true });
       }
       return;
     }
