@@ -2,6 +2,7 @@ import { Trash2 } from 'lucide-react';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 import {
   fetchHistoryByUser,
@@ -26,6 +27,7 @@ const HistoryPage = () => {
     if (
       window.confirm('Are you sure you want to remove this history record?')
     ) {
+      toast.success('Delete history successful !');
       dispatch(removeHistory(historyId));
     }
   };
