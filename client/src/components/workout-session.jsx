@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { FaCheckCircle } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
@@ -19,6 +19,10 @@ const WorkoutSession = () => {
   const { seconds, minutes, hours, start, pause, reset } = useStopwatch({
     autoStart: true
   });
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   useEffect(() => {
     if (workoutId) dispatch(fetchWorkoutById(workoutId));
@@ -49,7 +53,7 @@ const WorkoutSession = () => {
     <div className='min-h-screen bg-gray-50 flex flex-col justify-between'>
       <header className='flex justify-between items-center px-6 py-4 border-b sticky top-0 bg-white z-10'>
         <div>
-          <h2 className='text-sm text-gray-600'>
+          <h2 className='text-2xl text-gray-600'>
             {currentWorkout.title || 'Workout Session'}
           </h2>
           <p className='text-5xl font-bold text-black mt-1'>{formatTime()}</p>
@@ -57,7 +61,7 @@ const WorkoutSession = () => {
 
         <button
           onClick={() => navigate(-1)}
-          className='bg-black text-white px-4 py-2 rounded-full text-sm font-semibold'
+          className='bg-black text-white px-5 py-2 rounded-full text-xl font-semibold'
         >
           FINISH
         </button>
@@ -67,7 +71,7 @@ const WorkoutSession = () => {
         <img
           src={currentWorkout.image || logo}
           alt='Workout'
-          className='w-full h-48 object-cover rounded-lg shadow-lg'
+          className='w-full h-100 object-cover rounded-lg shadow-lg'
         />
       </div>
 
@@ -117,7 +121,7 @@ const WorkoutSession = () => {
                         ))
                       }
                       alt={ex.title}
-                      className='w-14 h-14 rounded-lg object-cover border'
+                      className='w-20 h-20 rounded-lg object-cover border'
                     />
                   ) : (
                     <div className='w-14 h-14 bg-gray-200 rounded-md' />
