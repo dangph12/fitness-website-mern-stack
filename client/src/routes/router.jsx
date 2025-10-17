@@ -90,6 +90,10 @@ const router = createBrowserRouter([
       {
         path: 'plans/edit-plan/:planId',
         Component: lazy(() => import('~/app/plans/plan-edit/[planId]/page'))
+      },
+      {
+        path: 'plans/plan-session/:planId',
+        Component: lazy(() => import('~/app/plans/plan-session/[planId]/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
