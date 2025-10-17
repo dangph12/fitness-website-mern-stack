@@ -78,7 +78,7 @@ const WorkoutSession = () => {
           onClick={handleFinishWorkout}
           className='bg-black text-white px-5 py-2 rounded-full text-xl font-semibold'
         >
-          FINISH
+          FINISH WORKOUT
         </button>
       </header>
 
