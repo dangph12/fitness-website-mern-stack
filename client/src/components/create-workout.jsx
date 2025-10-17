@@ -11,6 +11,7 @@ import ExerciseLibrary from './exercise-library';
 const CreateWorkout = () => {
   const [exercises, setExercises] = useState([]);
   const [title, setTitle] = useState('My Workout');
+  const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
   const userId = useSelector(state => state.auth.user.id);
   const navigate = useNavigate();
@@ -68,6 +69,10 @@ const CreateWorkout = () => {
     setTitle(e.target.value);
   };
 
+  const handleDescriptionChange = e => {
+    setDescription(e.target.value);
+  };
+
   const handleImageChange = e => {
     const file = e.target.files[0];
     if (file) {
@@ -76,8 +81,19 @@ const CreateWorkout = () => {
   };
 
   const handleSubmitWorkout = () => {
+    if (!title.trim() || !description.trim()) {
+      toast.error('Please fill in both title and description!');
+      return;
+    }
+
+    if (exercises.length === 0) {
+      toast.error('Please add at least one exercise!');
+      return;
+    }
+
     const workoutData = new FormData();
     workoutData.append('title', title);
+    workoutData.append('description', description);
     workoutData.append('image', image);
     workoutData.append('isPublic', true);
     workoutData.append('user', userId);
@@ -91,8 +107,6 @@ const CreateWorkout = () => {
         workoutData.append(`exercises[${index}][sets][${setIndex}]`, set);
       });
     });
-
-    console.log('Workout data:', workoutData);
 
     dispatch(createWorkout(workoutData))
       .then(() => {
@@ -116,8 +130,16 @@ const CreateWorkout = () => {
               type='text'
               value={title}
               onChange={handleTitleChange}
-              className='p-2 border rounded-md w-full'
+              className='p-2 border rounded-md w-full mb-4'
               placeholder='Enter workout title'
+            />
+
+            <div className='font-semibold mb-2'>Description</div>
+            <textarea
+              value={description}
+              onChange={handleDescriptionChange}
+              className='p-2 border rounded-md w-full h-24'
+              placeholder='Describe your workout goal, focus or purpose...'
             />
           </div>
 
