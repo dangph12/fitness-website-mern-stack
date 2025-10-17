@@ -29,7 +29,7 @@ const HistoryService = {
     }
 
     const history = await HistoryModel.create({
-      user: new Types.ObjectId(historyData.user),
+      user: historyData.user,
       workout: historyData.workout,
       plan: historyData.plan ? historyData.plan : null,
       time: historyData.time
