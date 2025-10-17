@@ -115,16 +115,17 @@ export const exerciseSlice = createSlice({
       })
 
       // FETCH BY ID
-      // In exercise-slice.js, in the extraReducers:
       .addCase(fetchExerciseById.fulfilled, (state, action) => {
-        // Add the exercise to the exercises array
+        const exercise = action.payload;
+        if (!exercise) return;
+
         const existingExercise = state.exercises.find(
-          ex => ex._id === action.payload._id
+          ex => ex._id === exercise._id
         );
         if (!existingExercise) {
-          state.exercises.push(action.payload); // Ensure we add the exercise if it's not already there
+          state.exercises.push(exercise);
         }
-        state.currentExercise = action.payload;
+        state.currentExercise = exercise;
       })
 
       // CREATE
