@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { FaDumbbell, FaEdit } from 'react-icons/fa';
+import { FaDumbbell, FaEdit, FaPlay } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
@@ -47,6 +47,10 @@ const PlanDetail = () => {
     navigate(`/exercise/${exerciseId}`);
   };
 
+  const handleStartPlan = () => {
+    navigate(`/plans/plan-session/${planId}`);
+  };
+
   if (loading)
     return (
       <div className='flex justify-center items-center h-screen text-gray-500'>
@@ -84,7 +88,10 @@ const PlanDetail = () => {
             <h1 className='text-5xl font-extrabold text-gray-900 mb-2'>
               {currentPlan.title}
             </h1>
-            <p className='text-gray-700 mb-4'>{currentPlan.description}</p>
+            <p className='text-gray-700 mb-4'>
+              Description:{' '}
+              <span className='font-medium'>{currentPlan.description}</span>
+            </p>
             <div className='flex items-center space-x-4 text-sm text-gray-600'>
               <p>
                 Owner:{' '}
@@ -109,6 +116,13 @@ const PlanDetail = () => {
       </header>
 
       <main className='max-w-6xl mx-auto px-6 py-10 space-y-10'>
+        <button
+          onClick={handleStartPlan}
+          className='flex items-center bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-green-700 transition-all duration-300 ease-in-out'
+        >
+          <FaPlay className='mr-4 text-sm' />
+          Start Plan
+        </button>
         {currentPlan.workouts.map((workout, dayIndex) => (
           <div key={workout._id}>
             <h2 className='text-2xl font-semibold text-gray-900 mb-4 border-b border-gray-300 pb-2'>
