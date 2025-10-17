@@ -1,8 +1,9 @@
-import React, { useEffect, useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { FaCheckCircle, FaDumbbell, FaEdit } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 
+import { fetchHistoryByUser } from '~/store/features/history-slice';
 import { fetchWorkoutById } from '~/store/features/workout-slice';
 
 import logo from '../assets/logo.png';
@@ -22,11 +23,15 @@ const calculateTotalReps = sets => {
 
 const WorkoutDetail = () => {
   const { workoutId } = useParams();
+  const userId = useSelector(state => state.auth.user.id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentWorkout, loading, error } = useSelector(
     state => state.workouts
   );
+  const { history } = useSelector(state => state.histories);
+
+  const [completedExercises, setCompletedExercises] = useState({});
 
   useLayoutEffect(() => {
     window.scrollTo({
@@ -37,7 +42,22 @@ const WorkoutDetail = () => {
 
   useEffect(() => {
     dispatch(fetchWorkoutById(workoutId));
+    dispatch(fetchHistoryByUser(userId));
   }, [dispatch, workoutId]);
+
+  useEffect(() => {
+    if (history?.length > 0) {
+      const completed = {};
+      history.forEach(entry => {
+        if (entry.workout._id === workoutId) {
+          entry.workout.exercises.forEach(ex => {
+            completed[ex.exercise] = ex.sets;
+          });
+        }
+      });
+      setCompletedExercises(completed);
+    }
+  }, [history, workoutId]);
 
   if (loading)
     return (
@@ -68,6 +88,8 @@ const WorkoutDetail = () => {
 
   const ExerciseRow = ({ exerciseItem }) => {
     const { exercise, sets } = exerciseItem;
+    const isCompleted = completedExercises[exercise._id];
+
     return (
       <div
         className='flex items-center justify-between p-4 rounded-lg bg-white hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer border border-gray-300 shadow-sm'
@@ -111,7 +133,7 @@ const WorkoutDetail = () => {
         </div>
 
         <div className='flex items-center space-x-2 text-sm text-gray-700'>
-          <FaCheckCircle className='text-green-500' />
+          {isCompleted && <FaCheckCircle className='text-green-500' />}
           <p>
             {sets.length} Sets — Total Reps: {calculateTotalReps(sets)}
           </p>
