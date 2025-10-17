@@ -29,13 +29,13 @@ const PlanDetail = () => {
 
   useEffect(() => {
     if (!currentPlan?.workouts) return;
-    currentPlan.workouts.forEach(workout => {
-      workout.exercises.forEach(ex => {
-        if (!detailedExercises[ex.exercise]) {
-          dispatch(fetchExerciseById(ex.exercise)).then(res => {
+    currentPlan?.workouts?.forEach(workout => {
+      workout?.exercises?.forEach(ex => {
+        if (!detailedExercises[ex?.exercise]) {
+          dispatch(fetchExerciseById(ex?.exercise)).then(res => {
             setDetailedExercises(prev => ({
               ...prev,
-              [ex.exercise]: res.payload
+              [ex?.exercise]: res?.payload
             }));
           });
         }

@@ -198,7 +198,7 @@ const EditWorkout = () => {
             >
               <button
                 onClick={() => handleRemoveExercise(exerciseIndex)}
-                className='absolute top-3 right-3 bg-red-200 text-white font-medium px-3 py-2 rounded-md flex items-center justify-center hover:bg-red-700'
+                className='absolute top-3 right-3 bg-red-400 text-white font-medium px-3 py-2 rounded-md flex items-center justify-center hover:bg-red-700'
               >
                 <FaTrash className='mr-2' />
                 Delete Exercise
@@ -261,7 +261,7 @@ const EditWorkout = () => {
                         Math.max(set - 1, 1)
                       )
                     }
-                    className='bg-red-200 text-white p-2 rounded-md hover:bg-red-600'
+                    className='bg-red-500 text-white p-2 rounded-md hover:bg-red-600'
                   >
                     <FaMinus />
                   </button>
@@ -269,7 +269,7 @@ const EditWorkout = () => {
                     onClick={() =>
                       handleInputChange(exerciseIndex, setIndex, set + 1)
                     }
-                    className='bg-green-200 text-white p-2 rounded-md hover:bg-green-600'
+                    className='bg-green-500 text-white p-2 rounded-md hover:bg-green-600'
                   >
                     <FaPlus />
                   </button>
