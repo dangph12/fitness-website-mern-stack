@@ -149,7 +149,23 @@ const PlanSession = () => {
                     <div className='w-20 h-20 rounded-md overflow-hidden bg-gray-200'>
                       {detail?.tutorial ? (
                         <img
-                          src={detail.tutorial}
+                          src={
+                            detail.tutorial.endsWith('.gif')
+                              ? detail.tutorial.replace(
+                                  '/upload/',
+                                  '/upload/f_jpg/so_0/'
+                                )
+                              : detail.tutorial
+                          }
+                          onMouseEnter={e =>
+                            (e.currentTarget.src = detail.tutorial)
+                          }
+                          onMouseLeave={e =>
+                            (e.currentTarget.src = detail.tutorial.replace(
+                              '/upload/',
+                              '/upload/f_jpg/so_0/'
+                            ))
+                          }
                           alt={detail.title}
                           className='w-full h-full object-cover'
                         />
