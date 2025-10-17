@@ -92,14 +92,44 @@ const PlanDetail = () => {
           />
         </div>
 
-        <div className='relative max-w-6xl mx-auto px-6 z-20 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
-          <div className='flex items-center gap-2'>
-            <h1 className='text-5xl font-extrabold text-gray-900 mb-2'>
-              {currentPlan.title}
-            </h1>
-            {isPlanCompleted && (
-              <FaCheckCircle className='text-green-500 text-3xl' />
-            )}
+        <div className='relative max-w-6xl mx-auto px-6 z-20 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4'>
+          <div className='flex flex-col gap-2'>
+            <div className='flex items-center gap-2'>
+              <h1 className='text-5xl font-extrabold text-gray-900 mb-2'>
+                {currentPlan.title}
+              </h1>
+              {isPlanCompleted && (
+                <FaCheckCircle className='text-green-500 text-3xl' />
+              )}
+            </div>
+            <p className='text-gray-700 mb-2 mt-2'>
+              Description:{' '}
+              <span className='font-medium'>{currentPlan.description}</span>
+            </p>
+            <div className='flex items-center space-x-4 text-sm text-gray-600'>
+              <p>
+                Owner:{' '}
+                <span className='font-medium'>{currentPlan.user?.name}</span>
+              </p>
+              <p>
+                Created At:{' '}
+                <span className='font-medium'>
+                  {new Date(currentPlan.createdAt).toLocaleDateString()}
+                </span>
+              </p>
+              <p>
+                Last Updated:{' '}
+                <span className='font-medium'>
+                  {new Date(currentPlan.updatedAt).toLocaleDateString()}
+                </span>
+              </p>
+              {currentPlan.reviewedBy && (
+                <p>
+                  Reviewed By:{' '}
+                  <span className='font-medium'>{currentPlan.reviewedBy}</span>
+                </p>
+              )}
+            </div>
           </div>
 
           <button
