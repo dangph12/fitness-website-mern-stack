@@ -101,7 +101,21 @@ const WorkoutSession = () => {
                 <div className='flex items-center gap-3'>
                   {ex.tutorial ? (
                     <img
-                      src={ex.tutorial}
+                      src={
+                        ex.tutorial.endsWith('.gif')
+                          ? ex.tutorial.replace(
+                              '/upload/',
+                              '/upload/f_jpg/so_0/'
+                            )
+                          : ex.tutorial
+                      }
+                      onMouseEnter={e => (e.currentTarget.src = ex.tutorial)}
+                      onMouseLeave={e =>
+                        (e.currentTarget.src = ex.tutorial.replace(
+                          '/upload/',
+                          '/upload/f_jpg/so_0/'
+                        ))
+                      }
                       alt={ex.title}
                       className='w-14 h-14 rounded-lg object-cover border'
                     />
