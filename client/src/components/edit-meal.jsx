@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import {
   FaClipboardList,
   FaDrumstickBite,
@@ -31,6 +31,10 @@ const EditMeal = () => {
   const [image, setImage] = useState(null);
   const [selectedFoods, setSelectedFoods] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   useEffect(() => {
     dispatch(fetchMealById(id));
