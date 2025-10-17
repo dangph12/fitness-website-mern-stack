@@ -47,13 +47,12 @@ const WorkoutSession = () => {
 
   return (
     <div className='min-h-screen bg-gray-50 flex flex-col justify-between'>
-      {/* Header */}
       <header className='flex justify-between items-center px-6 py-4 border-b sticky top-0 bg-white z-10'>
         <div>
           <h2 className='text-sm text-gray-600'>
             {currentWorkout.title || 'Workout Session'}
           </h2>
-          <p className='text-4xl font-bold text-black mt-1'>{formatTime()}</p>
+          <p className='text-5xl font-bold text-black mt-1'>{formatTime()}</p>
         </div>
 
         <button
@@ -64,18 +63,15 @@ const WorkoutSession = () => {
         </button>
       </header>
 
-      {/* Workout Image */}
       <div className='flex justify-center mb-6'>
         <img
           src={currentWorkout.image || logo}
           alt='Workout'
-          className='w-full h-100 object-cover rounded-lg shadow-lg'
+          className='w-full h-48 object-cover rounded-lg shadow-lg'
         />
       </div>
 
-      {/* Workout Details */}
       <main className='flex-1 overflow-y-auto px-4 pb-28'>
-        {/* Workout Creator and Date */}
         <div className='mb-6 flex justify-between items-center'>
           <p className='text-sm text-gray-600'>
             Created by:{' '}
@@ -91,7 +87,6 @@ const WorkoutSession = () => {
           </p>
         </div>
 
-        {/* Exercises */}
         {currentWorkout.exercises.map((exItem, idx) => {
           const ex = exItem.exercise;
           const sets = exItem.sets || [];
@@ -102,7 +97,6 @@ const WorkoutSession = () => {
               key={ex._id || idx}
               className='mb-6 bg-white rounded-xl p-4 border border-gray-300 shadow-sm max-w-4xl mx-auto'
             >
-              {/* Exercise Header */}
               <div className='flex justify-between items-center mb-3'>
                 <div className='flex items-center gap-3'>
                   {ex.tutorial ? (
@@ -125,7 +119,6 @@ const WorkoutSession = () => {
                 </div>
               </div>
 
-              {/* Sets */}
               <div className='space-y-2'>
                 {sets.map((set, setIndex) => {
                   const isDone = completedSets[ex._id]?.[setIndex];
@@ -150,10 +143,7 @@ const WorkoutSession = () => {
                       </div>
                       <div className='flex items-center gap-6 text-sm font-medium'>
                         <span>
-                          {set.weight || 11} <span className='text-xs'>KG</span>
-                        </span>
-                        <span>
-                          {set.reps || 8} <span className='text-xs'>REPS</span>
+                          {set || 8} <span className='text-xs'>REPS</span>
                         </span>
                       </div>
                     </div>
@@ -161,7 +151,6 @@ const WorkoutSession = () => {
                 })}
               </div>
 
-              {/* Add set */}
               <div className='text-center mt-2 text-gray-500 text-sm hover:text-gray-700 cursor-pointer'>
                 + Add a set
               </div>
@@ -170,11 +159,9 @@ const WorkoutSession = () => {
         })}
       </main>
 
-      {/* Footer */}
       <footer className='fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-4 shadow-lg'>
         <button
           onClick={() => {
-            // Find next unfinished set
             const next = currentWorkout.exercises.find(ex =>
               ex.sets.some((_, i) => !completedSets[ex.exercise._id]?.[i])
             );
