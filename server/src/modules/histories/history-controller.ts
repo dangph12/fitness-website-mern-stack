@@ -6,9 +6,8 @@ import HistoryService from './history-service';
 
 const HistoryController = {
   addToHistory: async (req: Request, res: Response) => {
-    const userId = req.params.userId;
     const historyData = req.body;
-    const history = await HistoryService.addToHistory(userId, historyData);
+    const history = await HistoryService.addToHistory(historyData);
     return res
       .status(201)
       .json(ApiResponse.success('History added successfully', history));

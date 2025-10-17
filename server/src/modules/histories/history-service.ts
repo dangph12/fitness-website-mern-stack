@@ -5,11 +5,11 @@ import HistoryModel from './history-model';
 import { IHistory } from './history-type';
 
 const HistoryService = {
-  addToHistory: async (userId: string, historyData: Partial<IHistory>) => {
-    if (!userId) {
+  addToHistory: async (historyData: IHistory) => {
+    if (!historyData.user) {
       throw createHttpError(400, 'userId is required');
     }
-    if (!Types.ObjectId.isValid(userId)) {
+    if (!Types.ObjectId.isValid(historyData.user)) {
       throw createHttpError(400, 'Invalid userId');
     }
 
@@ -29,7 +29,7 @@ const HistoryService = {
     }
 
     const history = await HistoryModel.create({
-      user: new Types.ObjectId(userId),
+      user: new Types.ObjectId(historyData.user),
       workout: historyData.workout,
       plan: historyData.plan ? historyData.plan : null,
       time: historyData.time

@@ -11,7 +11,7 @@ const router: Router = express.Router();
 router.get('/user/:userId', asyncHandler(HistoryController.listByUser));
 
 router.post(
-  '/user/:userId',
+  '/',
   validate(HistoryValidationSchema.shape),
   asyncHandler(HistoryController.addToHistory)
 );
