@@ -11,7 +11,6 @@ import ExerciseLibrary from './exercise-library';
 const CreateWorkout = () => {
   const [exercises, setExercises] = useState([]);
   const [title, setTitle] = useState('My Workout');
-  const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
   const userId = useSelector(state => state.auth.user.id);
   const navigate = useNavigate();
@@ -69,10 +68,6 @@ const CreateWorkout = () => {
     setTitle(e.target.value);
   };
 
-  const handleDescriptionChange = e => {
-    setDescription(e.target.value);
-  };
-
   const handleImageChange = e => {
     const file = e.target.files[0];
     if (file) {
@@ -81,8 +76,8 @@ const CreateWorkout = () => {
   };
 
   const handleSubmitWorkout = () => {
-    if (!title.trim() || !description.trim()) {
-      toast.error('Please fill in both title and description!');
+    if (!title.trim()) {
+      toast.error('Please fill in title!');
       return;
     }
 
@@ -93,7 +88,6 @@ const CreateWorkout = () => {
 
     const workoutData = new FormData();
     workoutData.append('title', title);
-    workoutData.append('description', description);
     workoutData.append('image', image);
     workoutData.append('isPublic', true);
     workoutData.append('user', userId);
@@ -132,14 +126,6 @@ const CreateWorkout = () => {
               onChange={handleTitleChange}
               className='p-2 border rounded-md w-full mb-4'
               placeholder='Enter workout title'
-            />
-
-            <div className='font-semibold mb-2'>Description</div>
-            <textarea
-              value={description}
-              onChange={handleDescriptionChange}
-              className='p-2 border rounded-md w-full h-24'
-              placeholder='Describe your workout goal, focus or purpose...'
             />
           </div>
 
