@@ -28,7 +28,6 @@ const PlanList = () => {
     loading,
     error
   } = useSelector(state => state.plans);
-  const { workouts } = useSelector(state => state.workouts);
 
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -36,17 +35,6 @@ const PlanList = () => {
   useEffect(() => {
     dispatch(fetchPlans({ page, limit }));
   }, [dispatch, page]);
-
-  useEffect(() => {
-    plans.forEach(plan => {
-      plan.workouts?.forEach(workoutRef => {
-        const workoutId = workoutRef._id || workoutRef;
-        if (!workouts.some(w => w._id === workoutId)) {
-          dispatch(fetchWorkoutById(workoutId));
-        }
-      });
-    });
-  }, [dispatch, plans, workouts]);
 
   const handlePageChange = newPage => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -137,7 +125,6 @@ const PlanList = () => {
                 <th className='p-3 text-left'>Image</th>
                 <th className='p-3 text-left'>Title</th>
                 <th className='p-3 text-left'>Description</th>
-                <th className='p-3 text-left'>Workouts</th>
                 <th className='p-3 text-left'>Is Public</th>
                 <th className='p-3 text-left'>Created At</th>
                 <th className='p-3 text-left'>Actions</th>
@@ -165,81 +152,6 @@ const PlanList = () => {
                   </td>
 
                   <td className='p-3 text-gray-600'>{plan.description}</td>
-
-                  <td className='p-3'>
-                    <div className='flex flex-col gap-3'>
-                      {plan.workouts?.length > 0 ? (
-                        plan.workouts.map(workoutRef => {
-                          const workoutId = workoutRef._id || workoutRef;
-                          const workout = workouts.find(
-                            w => w._id === workoutId
-                          );
-
-                          if (!workout)
-                            return (
-                              <div
-                                key={workoutId}
-                                className='text-gray-400 italic text-sm'
-                              >
-                                Loading workout...
-                              </div>
-                            );
-
-                          return (
-                            <div key={workoutId} className=''>
-                              <div className='flex items-center gap-4 overflow-x-auto scrollbar-hide'>
-                                {workout.exercises?.length > 0 ? (
-                                  workout.exercises.map(ex => (
-                                    <div
-                                      key={ex._id}
-                                      className='flex flex-col items-center text-center w-20 flex-shrink-0'
-                                    >
-                                      <img
-                                        src={
-                                          ex?.exercise?.tutorial?.endsWith(
-                                            '.gif'
-                                          )
-                                            ? ex?.exercise?.tutorial.replace(
-                                                '/upload/',
-                                                '/upload/f_jpg/so_0/'
-                                              )
-                                            : ex?.exercise?.tutorial
-                                        }
-                                        onMouseEnter={e =>
-                                          (e.currentTarget.src =
-                                            ex?.exercise?.tutorial)
-                                        }
-                                        onMouseLeave={e =>
-                                          (e.currentTarget.src =
-                                            ex?.exercise?.tutorial.replace(
-                                              '/upload/',
-                                              '/upload/f_jpg/so_0/'
-                                            )) || logo
-                                        }
-                                        alt={ex.exercise?.title}
-                                        className='w-14 h-14 object-cover rounded-lg'
-                                      />
-                                      <p className='text-[11px] font-medium text-gray-700 mt-1 truncate w-full'>
-                                        {ex.exercise?.title}
-                                      </p>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <p className='text-xs text-gray-400 italic'>
-                                    No exercises
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <span className='text-gray-400 italic'>
-                          No workouts
-                        </span>
-                      )}
-                    </div>
-                  </td>
 
                   <td className='p-3'>
                     {plan.isPublic ? (
