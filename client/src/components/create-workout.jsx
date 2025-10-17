@@ -102,8 +102,6 @@ const CreateWorkout = () => {
       });
     });
 
-    console.log('Workout data:', workoutData);
-
     dispatch(createWorkout(workoutData))
       .then(() => {
         toast.success('Workout created successfully!');
