@@ -77,7 +77,7 @@ const CreateWorkout = () => {
 
   const handleSubmitWorkout = () => {
     if (!title.trim()) {
-      toast.error('Please fill in title!');
+      toast.error('Please fill in title !');
       return;
     }
 
@@ -102,6 +102,8 @@ const CreateWorkout = () => {
       });
     });
 
+    console.log('Workout data:', workoutData);
+
     dispatch(createWorkout(workoutData))
       .then(() => {
         toast.success('Workout created successfully!');
@@ -124,7 +126,7 @@ const CreateWorkout = () => {
               type='text'
               value={title}
               onChange={handleTitleChange}
-              className='p-2 border rounded-md w-full mb-4'
+              className='p-2 border rounded-md w-full'
               placeholder='Enter workout title'
             />
           </div>
