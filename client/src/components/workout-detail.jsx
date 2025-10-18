@@ -50,7 +50,7 @@ const calculateTotalReps = sets =>
 
 const WorkoutDetail = () => {
   const { workoutId } = useParams();
-  const userId = useSelector(state => state.auth.user.id);
+  const userId = useSelector(state => state?.auth?.user?.id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
