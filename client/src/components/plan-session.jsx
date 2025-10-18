@@ -165,7 +165,6 @@ const PlanSession = () => {
     toast.success('All sets completed in this plan. Nice work!');
   };
 
-  // ✅ NEW: Memo hóa map số set đã hoàn thành cho mọi key "dayIndex-exerciseId"
   const doneCountMap = useMemo(() => {
     const m = {};
     for (const key of Object.keys(completedSets)) {
