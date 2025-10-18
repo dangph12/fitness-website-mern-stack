@@ -1,8 +1,20 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { FaCheckCircle, FaDumbbell, FaEdit } from 'react-icons/fa';
+import {
+  FaCheckCircle,
+  FaDumbbell,
+  FaEdit,
+  FaHeart,
+  FaRegHeart
+} from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
+import { toast } from 'sonner';
 
+import {
+  addFavoriteItems,
+  fetchFavorites,
+  removeFavoriteItems
+} from '~/store/features/favourite-slice';
 import { fetchHistoryByUser } from '~/store/features/history-slice';
 import { fetchWorkoutById } from '~/store/features/workout-slice';
 
@@ -47,6 +59,10 @@ const WorkoutDetail = () => {
   );
   const { history = [] } = useSelector(state => state.histories);
 
+  const { favorite, loading: favLoading } = useSelector(
+    state => state.favorites || {}
+  );
+
   const [completedExerciseIds, setCompletedExerciseIds] = useState(new Set());
 
   useLayoutEffect(() => {
@@ -57,6 +73,10 @@ const WorkoutDetail = () => {
     if (workoutId) dispatch(fetchWorkoutById(workoutId));
     if (userId) dispatch(fetchHistoryByUser(userId));
   }, [dispatch, workoutId, userId]);
+
+  useEffect(() => {
+    if (userId) dispatch(fetchFavorites(userId));
+  }, [dispatch, userId]);
 
   const latestHistoryForWorkout = useMemo(() => {
     const records = history.filter(h => h?.workout?._id === workoutId);
@@ -84,6 +104,14 @@ const WorkoutDetail = () => {
     setCompletedExerciseIds(ids);
   }, [latestHistoryForWorkout]);
 
+  const isFav = useMemo(() => {
+    const list = favorite?.workouts || [];
+    return list.some(w => {
+      const id = typeof w === 'string' ? w : w?._id;
+      return id?.toString?.() === workoutId?.toString?.();
+    });
+  }, [favorite?.workouts, workoutId]);
+
   if (loading)
     return (
       <div className='flex justify-center items-center h-screen bg-gray-100 text-gray-500'>
@@ -107,6 +135,31 @@ const WorkoutDetail = () => {
 
   const handleTutorialClick = exerciseId => {
     navigate(`/exercise/${exerciseId}`);
+  };
+
+  const toggleFavorite = () => {
+    if (!userId || !workoutId) return;
+    if (isFav) {
+      const p = dispatch(
+        removeFavoriteItems({ userId, workouts: [workoutId] })
+      );
+      (p.unwrap ? p.unwrap() : p)
+        .then(() => {
+          toast.success('Removed from Favorites');
+        })
+        .catch(() => {
+          toast.error('Failed to remove from Favorites');
+        });
+    } else {
+      const p = dispatch(addFavoriteItems({ userId, workouts: [workoutId] }));
+      (p.unwrap ? p.unwrap() : p)
+        .then(() => {
+          toast.success('Added to Favorites');
+        })
+        .catch(() => {
+          toast.error('Failed to add to Favorites');
+        });
+    }
   };
 
   const exercises = currentWorkout?.exercises || [];
@@ -220,7 +273,30 @@ const WorkoutDetail = () => {
               </p>
             </div>
 
-            <div className='flex justify-center sm:justify-end'>
+            <div className='flex justify-center sm:justify-end items-center gap-3'>
+              <button
+                onClick={toggleFavorite}
+                disabled={favLoading}
+                title={isFav ? 'Remove from Favorites' : 'Add to Favorites'}
+                className={`inline-flex items-center justify-center rounded-full border px-3 py-2 text-sm font-medium transition
+                  ${
+                    isFav
+                      ? 'bg-rose-600 text-white border-rose-600 hover:bg-rose-700'
+                      : 'bg-white text-rose-600 border-rose-300 hover:bg-rose-50'
+                  }`}
+                aria-pressed={isFav}
+                aria-label={
+                  isFav ? 'Remove from favorites' : 'Add to favorites'
+                }
+              >
+                {isFav ? (
+                  <FaHeart className='mr-2' />
+                ) : (
+                  <FaRegHeart className='mr-2' />
+                )}
+                {isFav ? 'Favorited' : 'Add to Favorites'}
+              </button>
+
               <Link
                 to={`/workout/edit-workout/${workoutId}`}
                 className='flex items-center bg-gray-700 text-white hover:bg-gray-800 px-6 py-2 rounded-lg font-medium transition'
