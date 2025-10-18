@@ -36,13 +36,13 @@ const PlanDetail = () => {
 
   useEffect(() => {
     if (!currentPlan?.workouts) return;
-    currentPlan.workouts.forEach(workout => {
-      workout.exercises.forEach(ex => {
-        if (!detailedExercises[ex.exercise]) {
-          dispatch(fetchExerciseById(ex.exercise)).then(res => {
+    currentPlan?.workouts?.forEach(workout => {
+      workout?.exercises?.forEach(ex => {
+        if (!detailedExercises[ex?.exercise]) {
+          dispatch(fetchExerciseById(ex?.exercise)).then(res => {
             setDetailedExercises(prev => ({
               ...prev,
-              [ex.exercise]: res?.payload
+              [ex?.exercise]: res?.payload
             }));
           });
         }
@@ -157,16 +157,16 @@ const PlanDetail = () => {
             </h2>
 
             <div className='space-y-4'>
-              {workout.exercises.map(ex => {
-                const detail = detailedExercises[ex.exercise];
+              {workout?.exercises?.map(ex => {
+                const detail = detailedExercises[ex?.exercise];
                 return (
                   <div
-                    key={ex._id}
+                    key={ex?._id}
                     className='flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-300 shadow-sm'
                   >
                     <div
                       className='w-24 h-24 rounded-md overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer'
-                      onClick={() => handleTutorialClick(ex._id)}
+                      onClick={() => handleTutorialClick(ex?._id)}
                     >
                       {detail?.tutorial ? (
                         <img
