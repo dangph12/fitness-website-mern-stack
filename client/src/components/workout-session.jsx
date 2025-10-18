@@ -44,7 +44,7 @@ const WorkoutSession = () => {
       time: hours * 3600 + minutes * 60 + seconds
     };
     dispatch(addHistory(historyData));
-    navigate('/');
+    navigate('/history');
   };
 
   const formatTime = () =>
