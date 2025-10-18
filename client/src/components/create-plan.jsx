@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { FaBook, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
@@ -20,8 +20,23 @@ const CreatePlan = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const dayStats = useMemo(
+    () =>
+      days.map(d => {
+        const w = d.workouts?.length || 0;
+        const e =
+          d.workouts?.reduce((acc, w) => acc + (w.exercises?.length || 0), 0) ||
+          0;
+        return { workouts: w, exercises: e };
+      }),
+    [days]
+  );
+
   const addDay = () =>
-    setDays([...days, { dayName: `Day ${days.length + 1}`, workouts: [] }]);
+    setDays(prev => [
+      ...prev,
+      { dayName: `Day ${prev.length + 1}`, workouts: [] }
+    ]);
 
   const removeDay = index => {
     const updated = [...days];
@@ -71,7 +86,7 @@ const CreatePlan = () => {
     setDays(updated);
   };
 
-  const handleRemoveExercise = (dayIndex, workoutIndex) => {
+  const handleRemoveWorkout = (dayIndex, workoutIndex) => {
     const updated = [...days];
     updated[dayIndex].workouts.splice(workoutIndex, 1);
     setDays(updated);
@@ -185,264 +200,368 @@ const CreatePlan = () => {
   };
 
   return (
-    <div className='flex gap-6 p-6 bg-gray-50 rounded-lg shadow-md'>
-      <div className='w-2/3 p-4 bg-white rounded-lg border border-gray-200'>
-        <div className='mb-6 grid grid-cols-2 gap-6'>
-          <div>
-            <label className='block font-medium mb-1 text-gray-700'>
-              Plan Title
-            </label>
-            <input
-              type='text'
-              value={planTitle}
-              onChange={e => setPlanTitle(e.target.value)}
-              placeholder='Enter plan title...'
-              className='w-full border p-2 rounded-md mb-3'
-            />
-            <label className='block font-medium mb-1 text-gray-700'>
-              Description
-            </label>
-            <textarea
-              value={planDescription}
-              onChange={e => setPlanDescription(e.target.value)}
-              placeholder='Enter plan description...'
-              className='w-full border p-2 rounded-md'
-              rows='4'
-            />
+    <div className='grid grid-cols-1 xl:grid-cols-[1fr_450px] gap-6 p-6'>
+      <div className='space-y-6'>
+        <div className='rounded-2xl border border-slate-200 bg-white shadow-sm'>
+          <div className='flex items-center justify-between border-b border-slate-200 px-6 py-4'>
+            <div>
+              <h2 className='text-xl font-semibold tracking-tight'>
+                Create Plan
+              </h2>
+              <p className='text-xs text-slate-500'>
+                Name it, describe it, then add workouts.
+              </p>
+            </div>
+            <span className='rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700'>
+              {days.length} day{days.length > 1 ? 's' : ''}
+            </span>
           </div>
 
-          <div className='w-full'>
-            <label className='block font-medium mb-2 text-gray-700'>
-              Plan Image
-            </label>
-            <div className='relative border-2 border-dashed border-gray-300 rounded-xl h-48 flex items-center justify-center cursor-pointer hover:border-blue-400 transition group overflow-hidden'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6 p-6'>
+            <div>
+              <label className='mb-1 block text-sm font-medium text-slate-700'>
+                Plan Title
+              </label>
               <input
-                type='file'
-                accept='image/*'
-                id='planImage'
-                onChange={e => {
-                  const file = e.target.files[0];
-                  if (!file) return;
-                  if (!file.type.startsWith('image/'))
-                    return alert('Please upload an image file!');
-                  if (file.size > 5 * 1024 * 1024)
-                    return alert('Image must be smaller than 5MB.');
-                  setPlanImage(file);
-                }}
-                className='absolute inset-0 opacity-0 cursor-pointer z-10'
+                type='text'
+                value={planTitle}
+                onChange={e => setPlanTitle(e.target.value)}
+                placeholder='e.g. Push/Pull/Legs – 6 Weeks'
+                className='w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
               />
-              {planImage ? (
-                <div className='relative w-full h-full'>
-                  <img
-                    src={
-                      typeof planImage === 'string'
-                        ? planImage
-                        : URL.createObjectURL(planImage)
-                    }
-                    alt='Plan'
-                    className='w-full h-full object-cover rounded-xl'
-                  />
-                  <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition'>
-                    <p className='text-white text-sm font-medium'>
-                      Replace Image
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className='text-center text-gray-500'>
-                  <p className='font-medium'>No Image Selected</p>
-                  <p className='text-sm text-blue-500'>Upload Image</p>
-                </div>
-              )}
+
+              <label className='mb-1 mt-4 block text-sm font-medium text-slate-700'>
+                Description
+              </label>
+              <textarea
+                value={planDescription}
+                onChange={e => setPlanDescription(e.target.value)}
+                placeholder='Short blurb about goals, split, gear, etc.'
+                rows={5}
+                className='w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+              />
             </div>
-            {planImage && (
-              <div className='flex justify-center mt-3'>
+
+            <div>
+              <label className='mb-2 block text-sm font-medium text-slate-700'>
+                Plan Image
+              </label>
+              <div className='relative h-48 overflow-hidden rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 group'>
+                <input
+                  type='file'
+                  accept='image/*'
+                  className='absolute inset-0 z-10 cursor-pointer opacity-0'
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (!file.type.startsWith('image/')) {
+                      toast.error('Please upload an image file!');
+                      return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                      toast.error('Image must be smaller than 5MB.');
+                      return;
+                    }
+                    setPlanImage(file);
+                  }}
+                />
+                {planImage ? (
+                  <>
+                    <img
+                      src={
+                        typeof planImage === 'string'
+                          ? planImage
+                          : URL.createObjectURL(planImage)
+                      }
+                      alt='Plan'
+                      className='absolute inset-0 h-full w-full object-cover'
+                    />
+                    <div className='absolute inset-0 hidden items-center justify-center bg-black/40 text-white backdrop-blur-[1px] group-hover:flex'>
+                      Replace Image
+                    </div>
+                  </>
+                ) : (
+                  <div className='grid h-full place-items-center text-center text-slate-500'>
+                    <div>
+                      <p className='font-medium'>Drop or click to upload</p>
+                      <p className='text-xs'>PNG, JPG (max 5MB)</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {planImage && (
                 <button
                   onClick={() => setPlanImage(null)}
-                  className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition'
+                  className='mt-3 rounded-md bg-red-500 px-3 py-1.5 text-white hover:bg-red-600'
                 >
                   Remove
                 </button>
-              </div>
-            )}
+              )}
+            </div>
+          </div>
+
+          <div className='sticky bottom-0 flex flex-col gap-3 items-center justify-between border-t border-slate-200 bg-white/80 px-6 py-4 backdrop-blur sm:flex-row'>
+            <div className='flex items-center gap-2 text-xs text-slate-500'>
+              <span className='rounded-full bg-slate-100 px-2 py-1'>
+                Total workouts: {dayStats.reduce((a, b) => a + b.workouts, 0)}
+              </span>
+              <span className='rounded-full bg-slate-100 px-2 py-1'>
+                Total exercises: {dayStats.reduce((a, b) => a + b.exercises, 0)}
+              </span>
+            </div>
+
+            <div className='flex gap-2'>
+              <button
+                onClick={addDay}
+                className='rounded-lg bg-blue-600 px-4 py-2 text-white shadow-sm transition hover:bg-blue-700'
+              >
+                + Add Day
+              </button>
+              <button
+                onClick={handleSubmitPlan}
+                disabled={loading}
+                className={`rounded-lg px-4 py-2 text-white shadow-sm transition ${
+                  loading
+                    ? 'cursor-not-allowed bg-slate-400'
+                    : 'bg-emerald-600 hover:bg-emerald-700'
+                } flex items-center gap-2`}
+              >
+                <FaBook />
+                {loading ? 'Creating...' : 'Create Plan'}
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className='flex justify-between mb-4'>
-          <button
-            onClick={addDay}
-            className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700'
-          >
-            + Add Day
-          </button>
-          <button
-            onClick={handleSubmitPlan}
-            disabled={loading}
-            className='bg-green-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-green-700'
-          >
-            <FaBook className='mr-2' />
-            {loading ? 'Creating...' : 'Create Plan'}
-          </button>
-        </div>
-
-        {days.map((day, dayIndex) => (
-          <div
-            key={dayIndex}
-            className={`mb-6 p-4 rounded-lg shadow-sm border ${selectedDay === dayIndex ? 'border-blue-500' : 'border-gray-300'}`}
-          >
-            <div className='flex justify-between items-center mb-3'>
-              <input
-                type='text'
-                value={day.dayName}
-                onChange={e => handleDayTitleChange(dayIndex, e.target.value)}
-                onClick={() => setSelectedDay(dayIndex)}
-                className={`text-lg font-semibold border rounded-md p-2 focus:outline-none ${
-                  selectedDay === dayIndex
-                    ? 'border-blue-500 font-bold'
-                    : 'border-gray-300'
-                }`}
-                readOnly
-              />
-              <button
-                onClick={() => removeDay(dayIndex)}
-                className='bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 flex items-center'
-              >
-                <FaTrash className='mr-1' /> Delete Day
-              </button>
-            </div>
-
-            {day.workouts.length === 0 ? (
-              <p className='text-gray-400'>
-                No workouts yet. Add exercises from library.
-              </p>
-            ) : (
-              <div className='grid gap-4'>
-                {day.workouts.map((workout, workoutIndex) => (
-                  <div
-                    key={workoutIndex}
-                    className='bg-gray-100 p-4 rounded-lg relative flex flex-col gap-3'
+        <div className='rounded-2xl border border-slate-200 bg-white shadow-sm'>
+          <div className='flex w-full gap-2 overflow-x-auto border-b border-slate-200 p-3'>
+            {days.map((day, i) => {
+              const isActive = i === selectedDay;
+              const stats = dayStats[i];
+              return (
+                <button
+                  key={i}
+                  onClick={() => setSelectedDay(i)}
+                  className={`group inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm transition ${
+                    isActive
+                      ? 'bg-blue-600 text-white shadow'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  <span className='font-medium'>Day {i + 1}</span>
+                  <span
+                    className={`rounded-full border px-2 py-0.5 text-xs ${
+                      isActive
+                        ? 'border-white/30 bg-white/20 text-white'
+                        : 'border-slate-300 bg-white text-slate-600'
+                    }`}
+                    title={`${stats.workouts} workout(s), ${stats.exercises} exercise(s)`}
                   >
-                    <button
-                      onClick={() =>
-                        handleRemoveExercise(dayIndex, workoutIndex)
+                    {stats.exercises}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className='p-6'>
+            {days.map((day, dayIndex) => {
+              if (selectedDay !== dayIndex) return null;
+
+              return (
+                <div key={dayIndex} className='space-y-5'>
+                  <div className='flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center'>
+                    <input
+                      type='text'
+                      value={day.dayName}
+                      onChange={e =>
+                        handleDayTitleChange(dayIndex, e.target.value)
                       }
-                      className='absolute top-2 right-2 bg-red-400 text-white px-2 py-1 rounded-md hover:bg-red-600'
+                      className='w-full max-w-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg font-semibold outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+                    />
+                    <button
+                      onClick={() => removeDay(dayIndex)}
+                      className='inline-flex items-center gap-2 rounded-md bg-red-500 px-3 py-2 text-white transition hover:bg-red-600'
                     >
-                      <FaTrash />
+                      <FaTrash /> Delete Day
                     </button>
+                  </div>
 
-                    <div className='flex items-center gap-4'>
-                      <input
-                        type='text'
-                        value={workout.title}
-                        readOnly
-                        className='flex-1 p-2 border rounded-md bg-gray-200 text-gray-700 cursor-not-allowed'
-                      />
+                  {day.workouts.length === 0 ? (
+                    <div className='rounded-xl border border-dashed border-slate-300 p-10 text-center text-slate-500'>
+                      No workouts yet. Use the library on the right to add an
+                      exercise.
                     </div>
-
-                    {workout.exercises.map((exercise, exIndex) => (
-                      <div
-                        key={exIndex}
-                        className='border p-3 rounded-md flex flex-col gap-2 bg-white'
-                      >
-                        <div className='flex items-center gap-3 mb-2'>
-                          <div className='relative h-12 w-12 overflow-hidden rounded-md ring-1 ring-slate-200'>
-                            <img
-                              src={
-                                exercise.exercise?.tutorial?.endsWith?.('.gif')
-                                  ? exercise.exercise.tutorial.replace(
-                                      '/upload/',
-                                      '/upload/f_jpg/so_0/'
-                                    )
-                                  : exercise.exercise?.tutorial
-                              }
-                              alt={exercise.exercise?.title || 'Exercise'}
-                              className='absolute inset-0 h-full w-full object-cover'
-                              onMouseEnter={e => {
-                                const t = exercise.exercise?.tutorial;
-                                if (t && t.endsWith('.gif'))
-                                  e.currentTarget.src = t;
-                              }}
-                              onMouseLeave={e => {
-                                const t = exercise.exercise?.tutorial;
-                                if (t && t.endsWith('.gif'))
-                                  e.currentTarget.src = t.replace(
-                                    '/upload/',
-                                    '/upload/f_jpg/so_0/'
-                                  );
-                              }}
-                            />
-                          </div>
-                          <span className='font-semibold'>
-                            {exercise.exercise?.title || 'Exercise'}
-                          </span>
-                        </div>
-
-                        <div className='grid grid-cols-2 gap-20 mb-3'>
-                          <span className='font-semibold text-center mr-30'>
-                            Set
-                          </span>
-                          <span className='font-semibold text-left'>Reps</span>
-                        </div>
-
-                        {exercise.sets.map((set, setIndex) => (
-                          <div
-                            key={setIndex}
-                            className='flex items-center gap-2'
+                  ) : (
+                    <div className='grid gap-4'>
+                      {day.workouts.map((workout, workoutIndex) => (
+                        <div
+                          key={workoutIndex}
+                          className='relative rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm'
+                        >
+                          <button
+                            onClick={() =>
+                              handleRemoveWorkout(dayIndex, workoutIndex)
+                            }
+                            className='absolute right-3 top-3 rounded-md bg-red-500 p-2 text-white hover:bg-red-600'
+                            title='Remove workout'
                           >
-                            <span className='p-2 border rounded-md w-95 text-center'>
-                              {setIndex + 1}
-                            </span>
+                            <FaTrash />
+                          </button>
+
+                          <div className='mb-3 flex flex-col gap-3 sm:flex-row sm:items-center'>
                             <input
-                              type='number'
-                              value={set}
+                              type='text'
+                              value={workout.title}
                               onChange={e =>
-                                handleRepsChange(
+                                handleWorkoutTitleChange(
                                   dayIndex,
                                   workoutIndex,
-                                  exIndex,
-                                  setIndex,
                                   e.target.value
                                 )
                               }
-                              className='p-2 border rounded-md w-110 text-center'
-                              min={1}
+                              className='flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 font-medium outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
                             />
-                            <button
-                              onClick={() =>
-                                handleRemoveSet(
-                                  dayIndex,
-                                  workoutIndex,
-                                  exIndex,
-                                  setIndex
-                                )
-                              }
-                              className='text-red-500 ml-2'
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        ))}
 
-                        <button
-                          onClick={() =>
-                            handleAddSet(dayIndex, workoutIndex, exIndex)
-                          }
-                          className='text-blue-600 mt-1 text-left'
-                        >
-                          + Add Set
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            )}
+                            <label className='inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50'>
+                              <input
+                                type='file'
+                                accept='image/*'
+                                className='hidden'
+                                onChange={e =>
+                                  handleWorkoutImageChange(
+                                    dayIndex,
+                                    workoutIndex,
+                                    e.target.files?.[0] || null
+                                  )
+                                }
+                              />
+                              Upload Image
+                            </label>
+                          </div>
+
+                          <div className='space-y-3'>
+                            {workout.exercises.map((exercise, exIndex) => (
+                              <div
+                                key={exIndex}
+                                className='rounded-xl border border-slate-200 bg-white p-3'
+                              >
+                                <div className='mb-2 flex items-center gap-3'>
+                                  <div className='relative h-12 w-12 overflow-hidden rounded-md ring-1 ring-slate-200'>
+                                    <img
+                                      src={
+                                        exercise.exercise?.tutorial?.endsWith?.(
+                                          '.gif'
+                                        )
+                                          ? exercise.exercise.tutorial.replace(
+                                              '/upload/',
+                                              '/upload/f_jpg/so_0/'
+                                            )
+                                          : exercise.exercise?.tutorial
+                                      }
+                                      alt={
+                                        exercise.exercise?.title || 'Exercise'
+                                      }
+                                      className='absolute inset-0 h-full w-full object-cover'
+                                      onMouseEnter={e => {
+                                        const t = exercise.exercise?.tutorial;
+                                        if (t && t.endsWith('.gif'))
+                                          e.currentTarget.src = t;
+                                      }}
+                                      onMouseLeave={e => {
+                                        const t = exercise.exercise?.tutorial;
+                                        if (t && t.endsWith('.gif'))
+                                          e.currentTarget.src = t.replace(
+                                            '/upload/',
+                                            '/upload/f_jpg/so_0/'
+                                          );
+                                      }}
+                                    />
+                                  </div>
+                                  <div className='min-w-0'>
+                                    <p className='truncate font-semibold'>
+                                      {exercise.exercise?.title || 'Exercise'}
+                                    </p>
+                                    <p className='text-xs text-slate-500'>
+                                      {exercise.sets.length} set(s)
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className='mb-2 grid grid-cols-[80px_1fr_42px] items-center gap-2 px-1 text-sm font-medium text-slate-600'>
+                                  <span className='text-center'>Set</span>
+                                  <span>Reps</span>
+                                  <span />
+                                </div>
+
+                                {exercise.sets.map((set, setIndex) => (
+                                  <div
+                                    key={setIndex}
+                                    className='mb-2 grid grid-cols-[80px_1fr_42px] items-center gap-2'
+                                  >
+                                    <span className='rounded-md border border-slate-300 bg-white py-2 text-center'>
+                                      {setIndex + 1}
+                                    </span>
+                                    <input
+                                      type='number'
+                                      min={1}
+                                      value={set}
+                                      onChange={e =>
+                                        handleRepsChange(
+                                          dayIndex,
+                                          workoutIndex,
+                                          exIndex,
+                                          setIndex,
+                                          e.target.value
+                                        )
+                                      }
+                                      className='rounded-md border border-slate-300 bg-white px-3 py-2 text-center outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+                                    />
+                                    <button
+                                      onClick={() =>
+                                        handleRemoveSet(
+                                          dayIndex,
+                                          workoutIndex,
+                                          exIndex,
+                                          setIndex
+                                        )
+                                      }
+                                      className='rounded-md p-2 text-red-500 hover:bg-red-50'
+                                      title='Remove set'
+                                    >
+                                      <FaTrash />
+                                    </button>
+                                  </div>
+                                ))}
+
+                                <button
+                                  onClick={() =>
+                                    handleAddSet(
+                                      dayIndex,
+                                      workoutIndex,
+                                      exIndex
+                                    )
+                                  }
+                                  className='mt-1 text-left text-blue-600 hover:underline'
+                                >
+                                  + Add Set
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        ))}
+        </div>
       </div>
 
-      <div className='w-1/3 border-l p-4 rounded-lg shadow-lg'>
+      <div className='h-[78vh]'>
         <ExerciseLibrary
           handleAddExercise={exercise =>
             handleAddExercise(selectedDay, exercise)
