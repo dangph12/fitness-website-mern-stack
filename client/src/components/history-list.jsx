@@ -146,7 +146,7 @@ const HistoryPage = () => {
 
                   <div className='mt-3 flex flex-wrap items-center gap-2'>
                     <span className='inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-700'>
-                      <Clock className='size-3.5' /> {h.time} min
+                      <Clock className='size-3.5' /> {h.time} seconds
                     </span>
                     <span className='inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700'>
                       <Activity className='size-3.5' />{' '}
@@ -228,7 +228,7 @@ const HistoryPage = () => {
                       <Clock className='size-3.5' /> {fmtDateTime(h.createdAt)}
                     </span>
                     <span className='inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700'>
-                      Duration: {h.time} min
+                      Duration: {h.time} seconds
                     </span>
                   </div>
 
