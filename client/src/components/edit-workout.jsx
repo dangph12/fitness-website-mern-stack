@@ -64,9 +64,14 @@ const EditWorkout = () => {
   };
 
   const handleInputChange = (exerciseIndex, setIndex, value) => {
-    const updated = [...exercises];
-    updated[exerciseIndex].sets[setIndex] = Number(value);
-    setExercises(updated);
+    setExercises(prev =>
+      prev.map((ex, i) => {
+        if (i !== exerciseIndex) return ex;
+        const next = [...ex.sets];
+        next[setIndex] = Math.max(1, Number(value) || 1);
+        return { ...ex, sets: next };
+      })
+    );
   };
 
   const handleAddSet = exerciseIndex => {
