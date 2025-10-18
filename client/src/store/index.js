@@ -4,6 +4,7 @@ import authReducer from '~/store/features/auth-slice';
 import avatarReducer from '~/store/features/avatar-slice';
 import equipmentsReducer from '~/store/features/equipment-slice';
 import exercisesReducer from '~/store/features/exercise-slice';
+import favouritesReducer from '~/store/features/favourite-slice';
 import foodReducer from '~/store/features/food-slice';
 import historiesReducer from '~/store/features/history-slice';
 import mealsReducer from '~/store/features/meal-slice';
@@ -24,6 +25,7 @@ export default configureStore({
     exercises: exercisesReducer,
     workouts: workoutsReducer,
     plans: plansReducer,
-    histories: historiesReducer
+    histories: historiesReducer,
+    favourites: favouritesReducer
   }
 });
