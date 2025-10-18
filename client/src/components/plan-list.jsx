@@ -1,4 +1,4 @@
-import { Edit, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Edit, Loader2, Plus, Search, Trash2, X } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
@@ -15,7 +15,6 @@ import {
   PaginationPrevious
 } from '~/components/ui/pagination';
 import { deletePlan, fetchPlans } from '~/store/features/plan-slice';
-import { fetchWorkoutById } from '~/store/features/workout-slice';
 
 const PlanList = () => {
   const dispatch = useDispatch();
@@ -31,6 +30,8 @@ const PlanList = () => {
 
   const [page, setPage] = useState(1);
   const limit = 10;
+
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     dispatch(fetchPlans({ page, limit }));
@@ -98,10 +99,16 @@ const PlanList = () => {
 
   const startIndex = useMemo(() => (page - 1) * limit, [page, limit]);
 
+  const filteredPlans = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return plans;
+    return plans.filter(p => p.title?.toLowerCase().includes(q));
+  }, [plans, searchQuery]);
+
   return (
     <div className='min-h-screen w-full bg-gradient-to-b from-slate-50 via-white to-slate-50 py-8'>
       <div className='mx-auto w-full max-w-7xl px-4 lg:px-6 space-y-6'>
-        <div className='flex items-center justify-between'>
+        <div className='flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between'>
           <div>
             <h1 className='text-3xl font-extrabold tracking-tight text-slate-900'>
               Plan List
@@ -110,12 +117,37 @@ const PlanList = () => {
               Manage, review and refine your workout plans.
             </p>
           </div>
-          <button
-            onClick={handleCreatePlan}
-            className='inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500'
-          >
-            <Plus size={18} /> Create Plan
-          </button>
+
+          <div className='flex w-full items-center gap-3 sm:w-auto'>
+            <div className='relative w-full sm:w-80'>
+              <span className='pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400'>
+                <Search size={18} />
+              </span>
+              <input
+                type='text'
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder='Search plans by title...'
+                className='w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-10 text-sm text-slate-900 shadow-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className='absolute inset-y-0 right-2 grid place-items-center rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+                  title='Clear'
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={handleCreatePlan}
+              className='inline-flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500'
+            >
+              <Plus size={18} /> Create Plan
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -126,7 +158,7 @@ const PlanList = () => {
 
         {loading ? (
           <LoadingTableSkeleton />
-        ) : plans.length === 0 ? (
+        ) : filteredPlans.length === 0 ? (
           <EmptyState onCreate={handleCreatePlan} />
         ) : (
           <div className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg'>
@@ -145,10 +177,10 @@ const PlanList = () => {
                 </thead>
 
                 <tbody className='divide-y divide-slate-100'>
-                  {plans.map((plan, idx) => (
+                  {filteredPlans.map((plan, idx) => (
                     <tr
                       key={plan._id}
-                      className='group hover:bg-slate-50 transition-colors'
+                      className='group transition-colors hover:bg-slate-50'
                     >
                       <Td className='text-slate-500'>{startIndex + idx + 1}</Td>
 
@@ -165,17 +197,17 @@ const PlanList = () => {
                         </div>
                       </Td>
 
-                      <Td className='font-medium'>
+                      <Td className='font-medium max-w-[18rem] md:max-w-[16rem] lg:max-w-[20rem]'>
                         <button
                           onClick={() => handleViewDetails(plan._id)}
-                          className='text-blue-700 hover:underline underline-offset-4'
-                          title='View details'
+                          className='inline-flex max-w-full items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 ring-1 ring-inset ring-blue-200 hover:underline underline-offset-4'
+                          title={plan.title}
                         >
-                          {plan.title}
+                          <span className='truncate'>{plan.title}</span>
                         </button>
                       </Td>
 
-                      <Td className='text-slate-600 max-w-[28rem]'>
+                      <Td className='max-w-[28rem] text-slate-600'>
                         <span className='line-clamp-2'>{plan.description}</span>
                       </Td>
 
@@ -221,7 +253,7 @@ const PlanList = () => {
           </div>
         )}
 
-        {totalPages > 1 && (
+        {!searchQuery && totalPages > 1 && (
           <Pagination className='mt-2'>
             <PaginationContent>
               <PaginationItem>
@@ -238,7 +270,13 @@ const PlanList = () => {
         )}
 
         <div className='text-center text-sm text-slate-500'>
-          Page {page} of {totalPages} • Total {totalPlans} plans
+          {searchQuery ? (
+            <>Filtered: {filteredPlans.length} result(s)</>
+          ) : (
+            <>
+              Page {page} of {totalPages} • Total {totalPlans} plans
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -329,7 +367,7 @@ function Skel({ className = '' }) {
 function EmptyState({ onCreate }) {
   return (
     <div className='flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center'>
-      <div className='mx-auto mb-3 size-14 rounded-full bg-slate-100 grid place-items-center'>
+      <div className='mx-auto mb-3 size-14 grid place-items-center rounded-full bg-slate-100'>
         <Loader2 className='h-6 w-6 text-slate-400' />
       </div>
       <h3 className='text-lg font-semibold text-slate-900'>No plans found</h3>
