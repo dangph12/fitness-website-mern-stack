@@ -60,17 +60,50 @@ const MealsList = () => {
 
   if (!userId) {
     return (
-      <div className='flex justify-center items-center py-16'>
-        <div className='text-center'>
-          <p className='text-xl text-red-500 font-semibold mb-4'>
-            Bạn chưa đăng nhập!
+      <div className='flex justify-center px-6 py-16'>
+        <div className='w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm'>
+          <div className='mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-rose-50 text-rose-600'>
+            <svg
+              viewBox='0 0 24 24'
+              className='h-6 w-6'
+              fill='currentColor'
+              aria-hidden='true'
+            >
+              <path d='M12 2a10 10 0 1 0 10 10A10.012 10.012 0 0 0 12 2Zm1 14h-2v-2h2Zm0-4h-2V6h2Z' />
+            </svg>
+          </div>
+          <h3 className='text-2xl font-bold text-slate-900'>
+            Bạn chưa đăng nhập
+          </h3>
+          <p className='mt-2 text-slate-600'>
+            Vui lòng đăng nhập để xem và quản lý{' '}
+            <span className='font-semibold'>Meals</span> của bạn.
           </p>
-          <button
-            onClick={() => navigate('/auth/login')}
-            className='bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition mb-4'
-          >
-            Đăng nhập để xem Meals
-          </button>
+
+          <div className='mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row'>
+            <button
+              onClick={() => navigate('/auth/login')}
+              className='inline-flex items-center justify-center rounded-xl bg-[#3067B6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#275397]'
+            >
+              Đăng nhập để xem Meals
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className='inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
+            >
+              Quay về trang chủ
+            </button>
+          </div>
+
+          <p className='mt-4 text-sm text-slate-500'>
+            Chưa có tài khoản?{' '}
+            <button
+              onClick={() => navigate('/auth/sign-up')}
+              className='font-semibold text-[#3067B6] hover:underline'
+            >
+              Đăng ký ngay
+            </button>
+          </p>
         </div>
       </div>
     );
