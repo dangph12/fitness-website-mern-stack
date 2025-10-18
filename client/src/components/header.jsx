@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link, NavLink } from 'react-router';
 
 import logo from '../assets/logo.png';
@@ -7,12 +8,36 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [openPlans, setOpenPlans] = useState(false);
 
+  const user = useSelector(state => state.auth?.user);
+  const avatarUrl = useSelector(state => state.avatar?.url);
+
   const navLinkClass = ({ isActive }) =>
     `px-3 py-2 rounded-lg text-lg font-semibold transition-colors ${
       isActive
         ? 'text-[#3067B6] bg-[#E6EEF9]'
         : 'text-[#3067B6] hover:text-slate-700'
     }`;
+
+  const Avatar = () => {
+    const letter = (user?.name || user?.email || 'U').charAt(0).toUpperCase();
+    return (
+      <Link
+        to='/profile'
+        className='inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full ring-2 ring-[#3067B6]/20 bg-white'
+        title='Profile'
+      >
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt='avatar'
+            className='h-full w-full object-cover'
+          />
+        ) : (
+          <span className='text-sm font-bold text-[#3067B6]'>{letter}</span>
+        )}
+      </Link>
+    );
+  };
 
   return (
     <header className='sticky top-0 z-50 border-b border-slate-200 bg-[#F5F2EC]'>
@@ -70,7 +95,7 @@ export default function Header() {
             <div
               className='
                 pointer-events-none absolute left-0 mt-2 origin-top
-                scale-y-95 transform opacity-0 translate-y-1
+                translate-y-1 scale-y-95 transform opacity-0
                 rounded-xl border border-slate-200 bg-white p-2 shadow-xl
                 transition-all duration-200 ease-out
                 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-y-100 group-hover:opacity-100
@@ -114,23 +139,29 @@ export default function Header() {
         </nav>
 
         <div className='hidden items-center gap-3 lg:flex'>
-          <Link
-            to='/auth/login'
-            className='rounded-full bg-yellow-400 px-5 py-2.5 text-base font-semibold text-black hover:bg-yellow-500'
-          >
-            Login
-          </Link>
-          <Link
-            to='/auth/sign-up'
-            className='rounded-full bg-[#3067B6] px-5 py-2.5 text-base font-semibold text-white hover:bg-[#275397]'
-          >
-            Sign Up
-          </Link>
+          {user ? (
+            <Avatar />
+          ) : (
+            <>
+              <Link
+                to='/auth/login'
+                className='rounded-full bg-yellow-400 px-5 py-2.5 text-base font-semibold text-black hover:bg-yellow-500'
+              >
+                Login
+              </Link>
+              <Link
+                to='/auth/sign-up'
+                className='rounded-full bg-[#3067B6] px-5 py-2.5 text-base font-semibold text-white hover:bg-[#275397]'
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
       {open && (
-        <div className='bg-white border-t border-slate-200 lg:hidden'>
+        <div className='border-t border-slate-200 bg-white lg:hidden'>
           <nav className='mx-auto max-w-7xl px-4 py-4'>
             <ul className='space-y-2'>
               <li>
@@ -157,9 +188,7 @@ export default function Header() {
                 >
                   Plans
                   <span
-                    className={`transition-transform ${
-                      openPlans ? 'rotate-180' : ''
-                    }`}
+                    className={`transition-transform ${openPlans ? 'rotate-180' : ''}`}
                   >
                     ▾
                   </span>
@@ -203,21 +232,27 @@ export default function Header() {
               ))}
             </ul>
 
-            <div className='mt-4 flex gap-3'>
-              <Link
-                to='/auth/login'
-                className='flex-1 rounded-full bg-yellow-400 px-4 py-2.5 text-center text-base font-semibold text-black hover:bg-yellow-500'
-                onClick={() => setOpen(false)}
-              >
-                Login
-              </Link>
-              <Link
-                to='/auth/sign-up'
-                className='flex-1 rounded-full bg-[#3067B6] px-4 py-2.5 text-center text-base font-semibold text-white hover:bg-[#275397]'
-                onClick={() => setOpen(false)}
-              >
-                Sign Up
-              </Link>
+            <div className='mt-4 flex items-center gap-3'>
+              {user ? (
+                <Avatar />
+              ) : (
+                <>
+                  <Link
+                    to='/auth/login'
+                    className='flex-1 rounded-full bg-yellow-400 px-4 py-2.5 text-center text-base font-semibold text-black hover:bg-yellow-500'
+                    onClick={() => setOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to='/auth/sign-up'
+                    className='flex-1 rounded-full bg-[#3067B6] px-4 py-2.5 text-center text-base font-semibold text-white hover:bg-[#275397]'
+                    onClick={() => setOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>
