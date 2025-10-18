@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FaBook, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
@@ -10,6 +10,8 @@ import {
 } from '~/store/features/workout-slice';
 
 import ExerciseLibrary from './exercise-library';
+
+const asObjId = ex => (typeof ex === 'object' && ex?._id ? ex._id : ex);
 
 const EditWorkout = () => {
   const { workoutId } = useParams();
@@ -24,43 +26,70 @@ const EditWorkout = () => {
   const [exercises, setExercises] = useState([]);
   const [title, setTitle] = useState('');
   const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
   useEffect(() => {
-    dispatch(fetchWorkoutById(workoutId));
+    if (workoutId) dispatch(fetchWorkoutById(workoutId));
   }, [dispatch, workoutId]);
 
   useEffect(() => {
-    if (currentWorkout) {
-      setTitle(currentWorkout.title || '');
-      setExercises(currentWorkout.exercises || []);
-    }
+    if (!currentWorkout) return;
+
+    setTitle(currentWorkout.title || '');
+    setImage(null);
+    setImageUrl(currentWorkout.image || '');
+
+    const mapped =
+      (currentWorkout.exercises || []).map(it => ({
+        exercise:
+          typeof it.exercise === 'object'
+            ? {
+                _id: it.exercise._id,
+                title: it.exercise.title,
+                tutorial: it.exercise.tutorial
+              }
+            : { _id: it.exercise, title: 'Exercise', tutorial: '' },
+        sets: Array.isArray(it.sets) ? it.sets.map(n => Number(n) || 1) : [1]
+      })) || [];
+
+    setExercises(mapped);
   }, [currentWorkout]);
 
-  const handleAddExercise = exercise => {
-    const exists = exercises.some(e => e.exercise._id === exercise._id);
-    if (!exists) {
-      setExercises([
-        ...exercises,
-        {
-          exercise: {
-            _id: exercise._id,
-            title: exercise.title,
-            tutorial: exercise.tutorial
-          },
-          sets: [1]
-        }
-      ]);
+  const totalSets = useMemo(
+    () => exercises.reduce((acc, ex) => acc + (ex.sets?.length || 0), 0),
+    [exercises]
+  );
+  const totalReps = useMemo(
+    () =>
+      exercises.reduce(
+        (acc, ex) =>
+          acc + (ex.sets || []).reduce((a, b) => a + (Number(b) || 0), 0),
+        0
+      ),
+    [exercises]
+  );
+
+  const handleAddExercise = ex => {
+    const exists = exercises.some(e => asObjId(e.exercise) === ex._id);
+    if (exists) {
+      toast.info('Exercise already in workout');
+      return;
     }
+    setExercises(prev => [
+      ...prev,
+      {
+        exercise: { _id: ex._id, title: ex.title, tutorial: ex.tutorial },
+        sets: [1]
+      }
+    ]);
   };
 
-  const handleRemoveExercise = index => {
-    const updated = [...exercises];
-    updated.splice(index, 1);
-    setExercises(updated);
+  const handleRemoveExercise = idx => {
+    setExercises(prev => prev.filter((_, i) => i !== idx));
   };
 
   const handleInputChange = (exerciseIndex, setIndex, value) => {
@@ -68,7 +97,8 @@ const EditWorkout = () => {
       prev.map((ex, i) => {
         if (i !== exerciseIndex) return ex;
         const next = [...ex.sets];
-        next[setIndex] = Math.max(1, Number(value) || 1);
+        const v = Math.max(1, Number(value) || 1);
+        next[setIndex] = v;
         return { ...ex, sets: next };
       })
     );
@@ -81,227 +111,339 @@ const EditWorkout = () => {
       )
     );
   };
-
   const handleRemoveSet = (exerciseIndex, setIndex) => {
-    const updated = [...exercises];
-    updated[exerciseIndex].sets.splice(setIndex, 1);
-    setExercises(updated);
+    setExercises(prev =>
+      prev.map((ex, i) => {
+        if (i !== exerciseIndex) return ex;
+        if (ex.sets.length <= 1) return ex;
+        const next = [...ex.sets];
+        next.splice(setIndex, 1);
+        return { ...ex, sets: next };
+      })
+    );
   };
 
-  const handleTitleChange = e => setTitle(e.target.value);
-
   const handleImageChange = e => {
-    const file = e.target.files[0];
-    if (file) setImage(file);
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please choose an image file');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be <= 5MB');
+      return;
+    }
+    setImage(file);
+    setImageUrl(URL.createObjectURL(file));
   };
 
   const handleUpdateWorkout = () => {
+    if (!title.trim()) {
+      toast.error('Workout title is required');
+      return;
+    }
+    if (!exercises.length) {
+      toast.error('Please add at least one exercise');
+      return;
+    }
+
     const updateData = new FormData();
     updateData.append('title', title);
-    updateData.append('image', image);
-    updateData.append('user', userId);
-    updateData.append('isPublic', true);
 
-    exercises.forEach((exercise, index) => {
-      updateData.append(`exercises[${index}][exercise]`, exercise.exercise._id);
-      exercise.sets.forEach((set, setIndex) => {
-        updateData.append(`exercises[${index}][sets][${setIndex}]`, set);
+    if (image) updateData.append('image', image);
+    updateData.append('user', userId);
+    updateData.append('isPublic', 'true');
+
+    exercises.forEach((item, index) => {
+      updateData.append(
+        `exercises[${index}][exercise]`,
+        asObjId(item.exercise)
+      );
+      item.sets.forEach((set, setIndex) => {
+        updateData.append(
+          `exercises[${index}][sets][${setIndex}]`,
+          String(Number(set) || 1)
+        );
       });
     });
 
     dispatch(updateWorkout({ workoutId, updateData }))
+      .unwrap?.()
       .then(() => {
         toast.success('Workout updated successfully!');
-        navigate(`/workouts`);
+        navigate('/workouts');
       })
       .catch(() => toast.error('Failed to update workout.'));
   };
 
-  if (loading && !currentWorkout)
+  if (loading && !currentWorkout) {
     return (
-      <div className='flex justify-center items-center h-screen text-gray-500'>
+      <div className='flex h-screen items-center justify-center text-gray-500'>
         Loading workout...
       </div>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
-      <div className='flex justify-center items-center h-screen text-red-600'>
+      <div className='flex h-screen items-center justify-center text-red-600'>
         Error: {error}
       </div>
     );
+  }
 
   return (
-    <div className='flex gap-8 p-6 bg-white rounded-lg shadow-md'>
-      <div className='w-2/3 p-4 bg-white rounded-lg border border-gray-200 border-opacity-50'>
-        <h2 className='text-2xl font-semibold mb-4'>Edit Workout</h2>
-
-        <div className='flex gap-8 mb-10'>
-          <div className='w-1/2'>
-            <div className='font-semibold mb-5'>Workout Title</div>
-            <input
-              type='text'
-              value={title}
-              onChange={handleTitleChange}
-              className='p-2 border rounded-md w-full'
-              placeholder='Enter workout title'
-            />
-          </div>
-
-          <div className='w-1/2'>
-            <div className='font-semibold mb-5'>Workout Image</div>
-            <div className='border-2 border-dashed p-6 text-center rounded-lg'>
-              <input
-                type='file'
-                onChange={handleImageChange}
-                className='hidden'
-                id='imageInput'
-              />
-              <label
-                htmlFor='imageInput'
-                className='cursor-pointer text-gray-500'
-              >
-                {image ? (
-                  <img
-                    src={URL.createObjectURL(image)}
-                    alt='Workout Preview'
-                    className='w-full h-full object-cover mx-auto'
-                  />
-                ) : currentWorkout?.image ? (
-                  <img
-                    src={currentWorkout.image}
-                    alt='Workout Preview'
-                    className='w-full h-full object-cover mx-auto'
-                  />
-                ) : (
-                  <div>
-                    <p>No Image Selected</p>
-                    <p className='text-sm'>Upload Image</p>
-                  </div>
-                )}
-              </label>
+    <div className='grid grid-cols-1 xl:grid-cols-[13fr_7fr] gap-6 p-6'>
+      <div className='space-y-6'>
+        <div className='rounded-2xl border border-slate-200 bg-white shadow-sm'>
+          <div className='flex items-center justify-between border-b border-slate-200 px-6 py-4'>
+            <div>
+              <h2 className='text-xl font-semibold tracking-tight'>
+                Edit Workout
+              </h2>
+              <p className='text-xs text-slate-500'>
+                Update title, image and exercise sets/reps.
+              </p>
+            </div>
+            <div className='flex items-center gap-2 text-xs text-slate-600'>
+              <span className='rounded-full bg-slate-100 px-2 py-1'>
+                {exercises.length} exercises
+              </span>
+              <span className='rounded-full bg-slate-100 px-2 py-1'>
+                {totalSets} sets
+              </span>
+              <span className='rounded-full bg-slate-100 px-2 py-1'>
+                {totalReps} reps
+              </span>
             </div>
           </div>
-        </div>
 
-        <div className='flex justify-between mb-4'>
-          <button
-            onClick={handleUpdateWorkout}
-            className='bg-blue-600 text-white px-4 py-2 rounded-md flex items-center'
-            disabled={loading}
-          >
-            <FaBook className='mr-2' />
-            {loading ? 'Updating...' : 'Update Workout'}
-          </button>
-        </div>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6 p-6'>
+            <div>
+              <label className='mb-1 block text-sm font-medium text-slate-700'>
+                Workout Title
+              </label>
+              <input
+                type='text'
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                placeholder='e.g. Upper Body Strength'
+                className='w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+              />
+            </div>
 
-        {exercises.length > 0 ? (
-          exercises.map((exercise, exerciseIndex) => (
-            <div
-              key={exerciseIndex}
-              className='relative p-4 bg-gray-100 rounded-md mb-4'
-            >
-              <button
-                onClick={() => handleRemoveExercise(exerciseIndex)}
-                className='absolute top-3 right-3 bg-red-400 text-white font-medium px-3 py-2 rounded-md flex items-center justify-center hover:bg-red-700'
-              >
-                <FaTrash className='mr-2' />
-                Delete Exercise
-              </button>
-
-              <div className='flex items-center mb-3'>
-                <img
-                  src={
-                    exercise.exercise.tutorial.endsWith('.gif')
-                      ? exercise.exercise.tutorial.replace(
-                          '/upload/',
-                          '/upload/f_jpg/so_0/'
-                        )
-                      : exercise.exercise.tutorial
-                  }
-                  onMouseEnter={e =>
-                    (e.currentTarget.src = exercise.exercise.tutorial)
-                  }
-                  onMouseLeave={e =>
-                    (e.currentTarget.src = exercise.exercise.tutorial.replace(
-                      '/upload/',
-                      '/upload/f_jpg/so_0/'
-                    ))
-                  }
-                  alt={exercise.exercise.title}
-                  className='w-16 h-16 object-cover rounded-md mr-2'
+            <div>
+              <label className='mb-2 block text-sm font-medium text-slate-700'>
+                Workout Image
+              </label>
+              <div className='relative h-44 overflow-hidden rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 group'>
+                <input
+                  type='file'
+                  accept='image/*'
+                  className='absolute inset-0 z-10 cursor-pointer opacity-0'
+                  onChange={handleImageChange}
                 />
-                <span className='font-bold'>{exercise.exercise.title}</span>
+                {imageUrl ? (
+                  <>
+                    <img
+                      src={imageUrl}
+                      alt='Workout'
+                      className='absolute inset-0 h-full w-full object-cover'
+                    />
+                    <div className='absolute inset-0 hidden items-center justify-center bg-black/40 text-white backdrop-blur-[1px] group-hover:flex'>
+                      Replace Image
+                    </div>
+                  </>
+                ) : (
+                  <div className='grid h-full place-items-center text-center text-slate-500'>
+                    <div>
+                      <p className='font-medium'>Drop or click to upload</p>
+                      <p className='text-xs'>PNG, JPG (max 5MB)</p>
+                    </div>
+                  </div>
+                )}
               </div>
+            </div>
+          </div>
 
-              <div className='grid grid-cols-2 gap-50 mb-3'>
-                <span className='font-semibold text-center'>Set</span>
-                <span className='font-semibold text-left'>Reps</span>
-              </div>
+          <div className='sticky bottom-0 flex flex-col items-center justify-between gap-3 border-t border-slate-200 bg-white/80 px-6 py-4 backdrop-blur sm:flex-row'>
+            <div className='text-xs text-slate-500'>
+              Make sure every exercise has at least one set.
+            </div>
+            <button
+              onClick={handleUpdateWorkout}
+              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-white shadow-sm transition ${
+                loading
+                  ? 'cursor-not-allowed bg-slate-400'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+              disabled={loading}
+            >
+              <FaBook />
+              {loading ? 'Updating...' : 'Update Workout'}
+            </button>
+          </div>
+        </div>
 
-              {exercise.sets.map((set, setIndex) => (
-                <div key={setIndex} className='flex items-center gap-2 mb-4'>
-                  <span className='p-2 border rounded-md w-md'>
-                    {setIndex + 1}
-                  </span>
-                  <input
-                    type='number'
-                    value={set}
-                    onChange={e =>
-                      handleInputChange(
-                        exerciseIndex,
-                        setIndex,
-                        Number(e.target.value)
-                      )
-                    }
-                    className='p-2 border rounded-md w-md'
-                    placeholder='Reps'
-                    min={1}
-                  />
+        <div className='rounded-2xl border border-slate-200 bg-white shadow-sm p-6'>
+          {exercises.length === 0 ? (
+            <div className='rounded-xl border border-dashed border-slate-300 p-10 text-center text-slate-500'>
+              No exercises yet. Use the library on the right to add some.
+            </div>
+          ) : (
+            <div className='grid gap-4'>
+              {exercises.map((ex, exerciseIndex) => (
+                <div
+                  key={`${asObjId(ex.exercise)}-${exerciseIndex}`}
+                  className='relative rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm'
+                >
                   <button
-                    onClick={() =>
-                      handleInputChange(
-                        exerciseIndex,
-                        setIndex,
-                        Math.max(set - 1, 1)
-                      )
-                    }
-                    className='bg-red-500 text-white p-2 rounded-md hover:bg-red-600'
-                  >
-                    <FaMinus />
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleInputChange(exerciseIndex, setIndex, set + 1)
-                    }
-                    className='bg-green-500 text-white p-2 rounded-md hover:bg-green-600'
-                  >
-                    <FaPlus />
-                  </button>
-                  <button
-                    onClick={() => handleRemoveSet(exerciseIndex, setIndex)}
-                    className='text-red-500 ml-2'
+                    onClick={() => handleRemoveExercise(exerciseIndex)}
+                    className='absolute right-3 top-3 rounded-md bg-red-500 p-2 text-white hover:bg-red-600'
+                    title='Remove exercise'
                   >
                     <FaTrash />
                   </button>
+
+                  <div className='mb-3 flex items-center gap-3'>
+                    <div className='relative h-14 w-14 overflow-hidden rounded-md ring-1 ring-slate-200'>
+                      <img
+                        src={
+                          ex.exercise?.tutorial?.endsWith?.('.gif')
+                            ? ex.exercise.tutorial.replace(
+                                '/upload/',
+                                '/upload/f_jpg/so_0/'
+                              )
+                            : ex.exercise?.tutorial
+                        }
+                        alt={ex.exercise?.title || 'Exercise'}
+                        className='absolute inset-0 h-full w-full object-cover'
+                        onMouseEnter={e => {
+                          const t = ex.exercise?.tutorial;
+                          if (t && t.endsWith('.gif')) e.currentTarget.src = t;
+                        }}
+                        onMouseLeave={e => {
+                          const t = ex.exercise?.tutorial;
+                          if (t && t.endsWith('.gif'))
+                            e.currentTarget.src = t.replace(
+                              '/upload/',
+                              '/upload/f_jpg/so_0/'
+                            );
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <p className='font-semibold'>
+                        {ex.exercise?.title || 'Exercise'}
+                      </p>
+                      <p className='text-xs text-slate-500'>
+                        {ex.sets.length} set(s) •{' '}
+                        {ex.sets.reduce((a, b) => a + (Number(b) || 0), 0)} reps
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className='mb-2 grid grid-cols-[80px_1fr_36px_36px_36px] items-center gap-2 px-1 text-sm font-medium text-slate-600'>
+                    <span className='text-center'>Set</span>
+                    <span>Reps</span>
+                    <span className='text-center'>-</span>
+                    <span className='text-center'>+</span>
+                    <span />
+                  </div>
+
+                  {ex.sets.map((set, setIndex) => (
+                    <div
+                      key={setIndex}
+                      className='mb-2 grid grid-cols-[80px_1fr_36px_36px_36px] items-center gap-2'
+                    >
+                      <span className='rounded-md border border-slate-300 bg-white py-2 text-center'>
+                        {setIndex + 1}
+                      </span>
+
+                      <input
+                        type='number'
+                        min={1}
+                        value={set}
+                        onChange={e =>
+                          handleInputChange(
+                            exerciseIndex,
+                            setIndex,
+                            Math.max(1, Number(e.target.value) || 1)
+                          )
+                        }
+                        className='rounded-md border border-slate-300 bg-white px-3 py-2 text-center outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+                      />
+
+                      <button
+                        onClick={() =>
+                          handleInputChange(
+                            exerciseIndex,
+                            setIndex,
+                            Math.max(1, Number(set) - 1)
+                          )
+                        }
+                        className='rounded-md p-2 text-red-600 ring-1 ring-slate-300 hover:bg-red-50'
+                        title='Decrease reps'
+                      >
+                        <FaMinus />
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          handleInputChange(
+                            exerciseIndex,
+                            setIndex,
+                            Number(set) + 1
+                          )
+                        }
+                        className='rounded-md p-2 text-emerald-600 ring-1 ring-slate-300 hover:bg-emerald-50'
+                        title='Increase reps'
+                      >
+                        <FaPlus />
+                      </button>
+
+                      <button
+                        onClick={() => handleRemoveSet(exerciseIndex, setIndex)}
+                        disabled={ex.sets.length <= 1}
+                        className={`rounded-md p-2 ${
+                          ex.sets.length <= 1
+                            ? 'cursor-not-allowed text-slate-300 ring-1 ring-slate-200'
+                            : 'text-red-500 hover:bg-red-50 ring-1 ring-slate-300'
+                        }`}
+                        title='Remove set'
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  ))}
+
+                  <button
+                    onClick={() => handleAddSet(exerciseIndex)}
+                    className='mt-1 text-left text-blue-600 hover:underline'
+                  >
+                    + Add Set
+                  </button>
                 </div>
               ))}
-              <button
-                onClick={() => handleAddSet(exerciseIndex)}
-                className='mt-2 text-blue-600'
-              >
-                + Add Set
-              </button>
             </div>
-          ))
-        ) : (
-          <p>Please select exercises from the library.</p>
-        )}
+          )}
+        </div>
       </div>
 
-      <div className='w-1/3 border-l p-4 rounded-lg shadow-lg'>
-        <ExerciseLibrary handleAddExercise={handleAddExercise} />
-      </div>
+      <aside className='xl:sticky xl:top-6 h-fit'>
+        <div className='rounded-2xl border border-slate-200 bg-white shadow-sm'>
+          <div className='border-b border-slate-100 px-6 py-4'>
+            <h3 className='text-lg font-semibold'>Exercise Library</h3>
+            <p className='text-xs text-slate-500'>
+              Thêm bài tập vào routine của bạn.
+            </p>
+          </div>
+          <div className='p-5 h-[82vh] overflow-auto'>
+            <ExerciseLibrary handleAddExercise={handleAddExercise} />
+          </div>
+        </div>
+      </aside>
     </div>
   );
 };
