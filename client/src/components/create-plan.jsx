@@ -27,7 +27,8 @@ const CreatePlan = () => {
     const updated = [...days];
     updated.splice(index, 1);
     setDays(updated);
-    if (selectedDay >= updated.length) setSelectedDay(updated.length - 1);
+    if (selectedDay >= updated.length)
+      setSelectedDay(Math.max(0, updated.length - 1));
   };
 
   const handleDayTitleChange = (index, value) => {
@@ -38,23 +39,31 @@ const CreatePlan = () => {
 
   const handleAddExercise = (dayIndex, exercise) => {
     const updated = [...days];
-    const selectedDay = updated[dayIndex];
+    const day = updated[dayIndex];
 
-    if (selectedDay.workouts.length === 0) {
-      selectedDay.workouts.push({
+    if (day.workouts.length === 0) {
+      day.workouts.push({
         title: `Workout ${dayIndex + 1}`,
         image: null,
         exercises: []
       });
     }
 
-    const workout = selectedDay.workouts[0];
+    const workout = day.workouts[0];
 
-    const exists = workout.exercises.some(ex => ex.exercise === exercise._id);
+    const exists = workout.exercises.some(
+      ex =>
+        (ex.exercise && ex.exercise._id === exercise._id) ||
+        ex.exercise === exercise._id
+    );
 
     if (!exists) {
       workout.exercises.push({
-        exercise: exercise._id,
+        exercise: {
+          _id: exercise._id,
+          title: exercise.title,
+          tutorial: exercise.tutorial
+        },
         sets: [1]
       });
     }
@@ -89,7 +98,7 @@ const CreatePlan = () => {
   ) => {
     const updated = [...days];
     updated[dayIndex].workouts[workoutIndex].exercises[exIndex].sets[setIndex] =
-      Number(value);
+      Math.max(1, Number(value) || 1);
     setDays(updated);
   };
 
@@ -101,10 +110,9 @@ const CreatePlan = () => {
 
   const handleRemoveSet = (dayIndex, workoutIndex, exIndex, setIndex) => {
     const updated = [...days];
-    updated[dayIndex].workouts[workoutIndex].exercises[exIndex].sets.splice(
-      setIndex,
-      1
-    );
+    const arr =
+      updated[dayIndex].workouts[workoutIndex].exercises[exIndex].sets;
+    if (arr.length > 1) arr.splice(setIndex, 1);
     setDays(updated);
   };
 
@@ -120,7 +128,6 @@ const CreatePlan = () => {
       toast.error('Please add at least one workout!');
       return;
     }
-
     const hasExercise = days.some(d =>
       d.workouts?.some(
         w => Array.isArray(w.exercises) && w.exercises.length > 0
@@ -151,9 +158,11 @@ const CreatePlan = () => {
           formData.append(`workouts[${workoutIndex}][image]`, workout.image);
 
         workout.exercises.forEach((ex, exIndex) => {
+          const exId =
+            typeof ex.exercise === 'object' ? ex.exercise._id : ex.exercise;
           formData.append(
             `workouts[${workoutIndex}][exercises][${exIndex}][exercise]`,
-            ex.exercise
+            exId
           );
           ex.sets.forEach((set, setIndex) => {
             formData.append(
@@ -162,6 +171,7 @@ const CreatePlan = () => {
             );
           });
         });
+
         workoutIndex++;
       });
     });
@@ -205,7 +215,6 @@ const CreatePlan = () => {
             <label className='block font-medium mb-2 text-gray-700'>
               Plan Image
             </label>
-
             <div className='relative border-2 border-dashed border-gray-300 rounded-xl h-48 flex items-center justify-center cursor-pointer hover:border-blue-400 transition group overflow-hidden'>
               <input
                 type='file'
@@ -214,22 +223,14 @@ const CreatePlan = () => {
                 onChange={e => {
                   const file = e.target.files[0];
                   if (!file) return;
-
-                  if (!file.type.startsWith('image/')) {
-                    alert('Please upload an image file!');
-                    return;
-                  }
-
-                  if (file.size > 5 * 1024 * 1024) {
-                    alert('Image must be smaller than 5MB.');
-                    return;
-                  }
-
+                  if (!file.type.startsWith('image/'))
+                    return alert('Please upload an image file!');
+                  if (file.size > 5 * 1024 * 1024)
+                    return alert('Image must be smaller than 5MB.');
                   setPlanImage(file);
                 }}
                 className='absolute inset-0 opacity-0 cursor-pointer z-10'
               />
-
               {planImage ? (
                 <div className='relative w-full h-full'>
                   <img
@@ -254,7 +255,6 @@ const CreatePlan = () => {
                 </div>
               )}
             </div>
-
             {planImage && (
               <div className='flex justify-center mt-3'>
                 <button
@@ -288,9 +288,7 @@ const CreatePlan = () => {
         {days.map((day, dayIndex) => (
           <div
             key={dayIndex}
-            className={`mb-6 p-4 rounded-lg shadow-sm border ${
-              selectedDay === dayIndex ? 'border-blue-500' : 'border-gray-300'
-            }`}
+            className={`mb-6 p-4 rounded-lg shadow-sm border ${selectedDay === dayIndex ? 'border-blue-500' : 'border-gray-300'}`}
           >
             <div className='flex justify-between items-center mb-3'>
               <input
@@ -347,6 +345,39 @@ const CreatePlan = () => {
                         key={exIndex}
                         className='border p-3 rounded-md flex flex-col gap-2 bg-white'
                       >
+                        <div className='flex items-center gap-3 mb-2'>
+                          <div className='relative h-12 w-12 overflow-hidden rounded-md ring-1 ring-slate-200'>
+                            <img
+                              src={
+                                exercise.exercise?.tutorial?.endsWith?.('.gif')
+                                  ? exercise.exercise.tutorial.replace(
+                                      '/upload/',
+                                      '/upload/f_jpg/so_0/'
+                                    )
+                                  : exercise.exercise?.tutorial
+                              }
+                              alt={exercise.exercise?.title || 'Exercise'}
+                              className='absolute inset-0 h-full w-full object-cover'
+                              onMouseEnter={e => {
+                                const t = exercise.exercise?.tutorial;
+                                if (t && t.endsWith('.gif'))
+                                  e.currentTarget.src = t;
+                              }}
+                              onMouseLeave={e => {
+                                const t = exercise.exercise?.tutorial;
+                                if (t && t.endsWith('.gif'))
+                                  e.currentTarget.src = t.replace(
+                                    '/upload/',
+                                    '/upload/f_jpg/so_0/'
+                                  );
+                              }}
+                            />
+                          </div>
+                          <span className='font-semibold'>
+                            {exercise.exercise?.title || 'Exercise'}
+                          </span>
+                        </div>
+
                         <div className='grid grid-cols-2 gap-20 mb-3'>
                           <span className='font-semibold text-center mr-30'>
                             Set
@@ -359,7 +390,7 @@ const CreatePlan = () => {
                             key={setIndex}
                             className='flex items-center gap-2'
                           >
-                            <span className='p-2 border rounded-md w-100 text-center'>
+                            <span className='p-2 border rounded-md w-95 text-center'>
                               {setIndex + 1}
                             </span>
                             <input
@@ -374,7 +405,7 @@ const CreatePlan = () => {
                                   e.target.value
                                 )
                               }
-                              className='p-2 border rounded-md w-100 text-center'
+                              className='p-2 border rounded-md w-110 text-center'
                               min={1}
                             />
                             <button
@@ -392,6 +423,7 @@ const CreatePlan = () => {
                             </button>
                           </div>
                         ))}
+
                         <button
                           onClick={() =>
                             handleAddSet(dayIndex, workoutIndex, exIndex)
