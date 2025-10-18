@@ -181,8 +181,8 @@ const WorkoutList = () => {
             My Workout List
           </h4>
           <p className='mt-2 max-w-2xl text-slate-600 md:text-lg'>
-            All workouts created by your account (no pagination). Scroll to see
-            more.
+            Filter and refine your search to find the perfect workout plan for
+            your fitness goals
           </p>
         </div>
 

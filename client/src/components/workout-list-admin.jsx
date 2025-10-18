@@ -153,8 +153,7 @@ export default function WorkoutListAdmin() {
               Admin Workouts
             </h2>
             <p className='mt-1 text-slate-600'>
-              Chỉ hiển thị các workout do <b>Admin</b> tạo (lọc theo Users
-              slice).
+              <b>Admin's Workouts</b>
             </p>
           </div>
 
