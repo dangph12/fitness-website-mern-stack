@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import {
   FaClipboardList,
   FaDumbbell,
@@ -17,6 +17,10 @@ export default function ExerciseDetail() {
   const { currentExercise, loading, error } = useSelector(
     state => state.exercises
   );
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   useEffect(() => {
     if (id) dispatch(fetchExerciseById(id));
