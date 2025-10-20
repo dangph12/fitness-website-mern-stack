@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import {
   FaClipboardList,
   FaDrumstickBite,
@@ -26,6 +26,10 @@ const CreateMeal = () => {
   const [selectedFoods, setSelectedFoods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   const totalNutrients = selectedFoods.reduce(
     (totals, food) => {

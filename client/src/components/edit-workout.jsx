@@ -1,31 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { FaBook, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 
-import { createWorkout } from '~/store/features/workout-slice';
+import {
+  fetchWorkoutById,
+  updateWorkout
+} from '~/store/features/workout-slice';
 
 import ExerciseLibrary from './exercise-library';
 
-const CreateWorkout = () => {
-  const [exercises, setExercises] = useState([]);
-  const [title, setTitle] = useState('My Workout');
-  const [image, setImage] = useState(null);
-  const userId = useSelector(state => state.auth.user.id);
+const EditWorkout = () => {
+  const { workoutId } = useParams();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
-  const { loading, error } = useSelector(state => state.workouts);
+  const { currentWorkout, loading, error } = useSelector(
+    state => state.workouts
+  );
+  const userId = useSelector(state => state.auth.user.id);
+
+  const [exercises, setExercises] = useState([]);
+  const [title, setTitle] = useState('');
+  const [image, setImage] = useState(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleAddExercise = exercise => {
-    const exerciseExists = exercises.some(e => e.exercise._id === exercise._id);
+  useEffect(() => {
+    dispatch(fetchWorkoutById(workoutId));
+  }, [dispatch, workoutId]);
 
-    if (!exerciseExists) {
+  useEffect(() => {
+    if (currentWorkout) {
+      setTitle(currentWorkout.title || '');
+      setExercises(currentWorkout.exercises || []);
+    }
+  }, [currentWorkout]);
+
+  const handleAddExercise = exercise => {
+    const exists = exercises.some(e => e.exercise._id === exercise._id);
+    if (!exists) {
       setExercises([
         ...exercises,
         {
@@ -40,74 +57,79 @@ const CreateWorkout = () => {
     }
   };
 
-  const handleRemoveExercise = exerciseIndex => {
-    const updatedExercises = [...exercises];
-    updatedExercises.splice(exerciseIndex, 1);
-    setExercises(updatedExercises);
+  const handleRemoveExercise = index => {
+    const updated = [...exercises];
+    updated.splice(index, 1);
+    setExercises(updated);
   };
 
   const handleInputChange = (exerciseIndex, setIndex, value) => {
-    const updatedExercises = [...exercises];
-    updatedExercises[exerciseIndex].sets[setIndex] = value;
-    setExercises(updatedExercises);
+    const updated = [...exercises];
+    updated[exerciseIndex].sets[setIndex] = Number(value);
+    setExercises(updated);
   };
 
   const handleAddSet = exerciseIndex => {
-    const updatedExercises = [...exercises];
-    updatedExercises[exerciseIndex].sets.push(1);
-    setExercises(updatedExercises);
+    setExercises(prev =>
+      prev.map((ex, i) =>
+        i === exerciseIndex ? { ...ex, sets: [...ex.sets, 1] } : ex
+      )
+    );
   };
 
   const handleRemoveSet = (exerciseIndex, setIndex) => {
-    const updatedExercises = [...exercises];
-    updatedExercises[exerciseIndex].sets.splice(setIndex, 1);
-    setExercises(updatedExercises);
+    const updated = [...exercises];
+    updated[exerciseIndex].sets.splice(setIndex, 1);
+    setExercises(updated);
   };
 
-  const handleTitleChange = e => {
-    setTitle(e.target.value);
-  };
+  const handleTitleChange = e => setTitle(e.target.value);
 
   const handleImageChange = e => {
     const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-    }
+    if (file) setImage(file);
   };
 
-  const handleSubmitWorkout = () => {
-    const workoutData = new FormData();
-    workoutData.append('title', title);
-    workoutData.append('image', image);
-    workoutData.append('isPublic', true);
-    workoutData.append('user', userId);
+  const handleUpdateWorkout = () => {
+    const updateData = new FormData();
+    updateData.append('title', title);
+    updateData.append('image', image);
+    updateData.append('user', userId);
+    updateData.append('isPublic', true);
 
     exercises.forEach((exercise, index) => {
-      workoutData.append(
-        `exercises[${index}][exercise]`,
-        exercise.exercise._id
-      );
+      updateData.append(`exercises[${index}][exercise]`, exercise.exercise._id);
       exercise.sets.forEach((set, setIndex) => {
-        workoutData.append(`exercises[${index}][sets][${setIndex}]`, set);
+        updateData.append(`exercises[${index}][sets][${setIndex}]`, set);
       });
     });
 
-    console.log('Workout data:', workoutData);
-
-    dispatch(createWorkout(workoutData))
+    dispatch(updateWorkout({ workoutId, updateData }))
       .then(() => {
-        toast.success('Workout created successfully!');
-        navigate('/workouts');
+        toast.success('Workout updated successfully!');
+        navigate(`/workouts`);
       })
-      .catch(error => {
-        toast.error('Failed to create workout');
-      });
+      .catch(() => toast.error('Failed to update workout.'));
   };
+
+  if (loading && !currentWorkout)
+    return (
+      <div className='flex justify-center items-center h-screen text-gray-500'>
+        Loading workout...
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className='flex justify-center items-center h-screen text-red-600'>
+        Error: {error}
+      </div>
+    );
 
   return (
     <div className='flex gap-8 p-6 bg-white rounded-lg shadow-md'>
       <div className='w-2/3 p-4 bg-white rounded-lg border border-gray-200 border-opacity-50'>
-        <h2 className='text-2xl font-semibold mb-4'>Create Workout</h2>
+        <h2 className='text-2xl font-semibold mb-4'>Edit Workout</h2>
 
         <div className='flex gap-8 mb-10'>
           <div className='w-1/2'>
@@ -140,6 +162,12 @@ const CreateWorkout = () => {
                     alt='Workout Preview'
                     className='w-full h-full object-cover mx-auto'
                   />
+                ) : currentWorkout?.image ? (
+                  <img
+                    src={currentWorkout.image}
+                    alt='Workout Preview'
+                    className='w-full h-full object-cover mx-auto'
+                  />
                 ) : (
                   <div>
                     <p>No Image Selected</p>
@@ -153,12 +181,12 @@ const CreateWorkout = () => {
 
         <div className='flex justify-between mb-4'>
           <button
-            onClick={handleSubmitWorkout}
+            onClick={handleUpdateWorkout}
             className='bg-blue-600 text-white px-4 py-2 rounded-md flex items-center'
             disabled={loading}
           >
             <FaBook className='mr-2' />
-            {loading ? 'Creating Workout...' : 'Create Workout'}
+            {loading ? 'Updating...' : 'Update Workout'}
           </button>
         </div>
 
@@ -170,7 +198,7 @@ const CreateWorkout = () => {
             >
               <button
                 onClick={() => handleRemoveExercise(exerciseIndex)}
-                className='absolute top-3 right-3 bg-red-200 text-white font-medium px-3 py-2 rounded-md flex items-center justify-center hover:bg-red-700'
+                className='absolute top-3 right-3 bg-red-400 text-white font-medium px-3 py-2 rounded-md flex items-center justify-center hover:bg-red-700'
               >
                 <FaTrash className='mr-2' />
                 Delete Exercise
@@ -215,7 +243,11 @@ const CreateWorkout = () => {
                     type='number'
                     value={set}
                     onChange={e =>
-                      handleInputChange(exerciseIndex, setIndex, e.target.value)
+                      handleInputChange(
+                        exerciseIndex,
+                        setIndex,
+                        Number(e.target.value)
+                      )
                     }
                     className='p-2 border rounded-md w-md'
                     placeholder='Reps'
@@ -229,7 +261,7 @@ const CreateWorkout = () => {
                         Math.max(set - 1, 1)
                       )
                     }
-                    className='bg-red-200 text-white p-2 rounded-md hover:bg-red-600'
+                    className='bg-red-500 text-white p-2 rounded-md hover:bg-red-600'
                   >
                     <FaMinus />
                   </button>
@@ -237,7 +269,7 @@ const CreateWorkout = () => {
                     onClick={() =>
                       handleInputChange(exerciseIndex, setIndex, set + 1)
                     }
-                    className='bg-green-200 text-white p-2 rounded-md hover:bg-green-600'
+                    className='bg-green-500 text-white p-2 rounded-md hover:bg-green-600'
                   >
                     <FaPlus />
                   </button>
@@ -269,4 +301,4 @@ const CreateWorkout = () => {
   );
 };
 
-export default CreateWorkout;
+export default EditWorkout;

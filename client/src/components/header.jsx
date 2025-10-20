@@ -80,7 +80,7 @@ function Header() {
           isDropdown={true}
           links={[
             { label: 'Rountine Database', href: '/plans/routine-database' },
-            { label: 'Rountine Builder', href: '/plans/rountine-builder' }
+            { label: 'Rountine Builder', href: '/plans/plan-list' }
           ]}
         />
         <MenuItem
