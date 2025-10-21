@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -16,9 +16,13 @@ const NutriBanner = () => {
       toast.error('Bạn chưa đăng nhập, vui lòng đăng nhập để tiếp tục!');
       setTimeout(() => {
         navigate('/auth/login');
-      }, 3000);
+      }, 1000);
     }
   };
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   return (
     <motion.div
@@ -32,25 +36,33 @@ const NutriBanner = () => {
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.7 }}
-          className='text-center lg:text-left space-y-6'
+          className='space-y-5 text-center lg:text-left'
         >
-          <h1 className='text-7xl font-bold leading-tight'>
-            Good health starts with good nutrition.
+          <h1 className='text-balance text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl'>
+            Good health starts with{' '}
+            <span className='bg-gradient-to-r from-[#3067B6] to-teal-500 bg-clip-text text-transparent'>
+              good nutrition.
+            </span>
           </h1>
-          <p className='text-lg'>
+
+          <p className='mx-auto max-w-2xl text-base text-slate-700 sm:text-lg lg:mx-0'>
             Want to be more mindful of what you eat? Track your meals, learn
             more about your habits, and achieve your goals with MyFitnessPal.
           </p>
 
-          <motion.div whileHover={{ scale: 1.05 }}>
+          <motion.div whileHover={{ scale: 1.02 }}>
             <Link
               to='/nutrition/create-meal'
               onClick={handleClick}
-              className='inline-block bg-blue-500 text-white py-3 px-6 rounded-lg text-lg hover:bg-blue-600 transition'
+              className='inline-flex items-center justify-center rounded-xl bg-[#3067B6] px-6 py-3 text-lg font-semibold text-white shadow-sm transition hover:bg-[#275397]'
             >
               Bắt đầu tạo bữa ăn
             </Link>
           </motion.div>
+
+          <p className='text-xs text-slate-500'>
+            Không cần thẻ tín dụng • Hủy bất cứ lúc nào
+          </p>
         </motion.div>
 
         <motion.div

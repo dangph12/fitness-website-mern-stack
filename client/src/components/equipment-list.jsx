@@ -42,9 +42,27 @@ const EquipmentList = () => {
 
   return (
     <div className='container mx-auto p-5'>
-      <h3 className='text-3xl font-semibold text-gray-800 mb-8'>
-        Select Equipment
-      </h3>
+      <div className='mb-6 flex items-end justify-between'>
+        <div>
+          <h3 className='flex items-center gap-2 text-2xl font-semibold text-slate-900 sm:text-3xl'>
+            <span className='inline-block h-2 w-2 rounded-full bg-indigo-500' />
+            Select Equipment
+          </h3>
+          <p className='mt-1 text-sm text-slate-500'>
+            Chọn thiết bị để lọc bài tập nhanh chóng
+          </p>
+        </div>
+
+        {Array.isArray(selectedEquipments) && selectedEquipments.length > 0 && (
+          <button
+            type='button'
+            onClick={() => setSelectedEquipments([])}
+            className='hidden rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 sm:inline-block'
+          >
+            Clear
+          </button>
+        )}
+      </div>
 
       <div className='flex flex-wrap justify-center gap-6'>
         {equipments.map(equipment => {

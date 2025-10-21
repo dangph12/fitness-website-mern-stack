@@ -2,102 +2,125 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import axiosInstance from '~/lib/axios-instance';
 
-// Fetch workouts with filters (page, limit, sortBy, sortOrder, title)
+// Server pagination (list)
 export const fetchWorkouts = createAsyncThunk(
   'workouts/fetchWorkouts',
   async ({
     page = 1,
-    limit = 10,
+    limit = 4,
     sortBy = 'createdAt',
     sortOrder = 'desc',
     title = ''
   }) => {
+    const res = await axiosInstance.get('/api/workouts/filter', {
+      params: { page, limit, sortBy, sortOrder, title }
+    });
+    return res.data.data;
+  }
+);
+
+// Get ALL workouts (no pagination)
+export const fetchAllWorkouts = createAsyncThunk(
+  'workouts/fetchAllWorkouts',
+  async (_args, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get('/api/workouts/filter', {
-        params: { page, limit, sortBy, sortOrder, title }
-      });
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching workouts:', error);
-      throw error;
+      const res = await axiosInstance.get('/api/workouts');
+      const data = res?.data?.data;
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || err.message);
     }
   }
 );
 
-// Fetch workout by ID
+// Get workouts by user
+export const fetchWorkoutsByUser = createAsyncThunk(
+  'workouts/fetchWorkoutsByUser',
+  async (userId, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get(`/api/workouts/user/${userId}`);
+      const data = res?.data?.data;
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || err.message);
+    }
+  }
+);
+
+// Get by id
 export const fetchWorkoutById = createAsyncThunk(
   'workouts/fetchWorkoutById',
   async id => {
-    try {
-      const response = await axiosInstance.get(`/api/workouts/${id}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching workout by ID:', error);
-      throw error;
-    }
+    const res = await axiosInstance.get(`/api/workouts/${id}`);
+    return res.data.data;
   }
 );
 
-// Create a new workout
+// Create
 export const createWorkout = createAsyncThunk(
   'workouts/createWorkout',
   async workoutData => {
-    try {
-      const response = await axiosInstance.post('/api/workouts', workoutData);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error creating workout:', error);
-      throw new Error(error.response?.data?.message || error.message);
-    }
+    const res = await axiosInstance.post('/api/workouts', workoutData);
+    return res.data.data;
   }
 );
 
-// Update workout
+// Update
 export const updateWorkout = createAsyncThunk(
   'workouts/updateWorkout',
   async ({ workoutId, updateData }) => {
-    try {
-      const response = await axiosInstance.put(
-        `/api/workouts/${workoutId}`,
-        updateData
-      );
-      return response.data.data;
-    } catch (error) {
-      console.error('Error updating workout:', error);
-      throw error;
-    }
+    const res = await axiosInstance.put(
+      `/api/workouts/${workoutId}`,
+      updateData
+    );
+    return res.data.data;
   }
 );
 
-// Delete workout
+// Delete
 export const deleteWorkout = createAsyncThunk(
   'workouts/deleteWorkout',
   async id => {
-    try {
-      await axiosInstance.delete(`/api/workouts/${id}`);
-      return id;
-    } catch (error) {
-      console.error('Error deleting workout:', error);
-      throw error;
-    }
+    await axiosInstance.delete(`/api/workouts/${id}`);
+    return id;
   }
 );
 
-// Workout slice
+const upsertById = (arr, item) => {
+  const i = arr.findIndex(x => x._id === item._id);
+  if (i === -1) arr.unshift(item);
+  else arr[i] = item;
+};
+const removeById = (arr, id) => arr.filter(x => x._id !== id);
+
 export const workoutSlice = createSlice({
   name: 'workouts',
   initialState: {
     workouts: [],
-    currentWorkout: null,
     totalWorkouts: 0,
     totalPages: 1,
+
+    // current detail
+    currentWorkout: null,
+
+    // loading/error paged
     loading: false,
-    error: null
+    error: null,
+
+    // ALL (no pagination)
+    allWorkouts: [],
+    loadingAll: false,
+    errorAll: null,
+
+    //(no pagination)
+    workoutsByUser: [],
+    loadingByUser: false,
+    errorByUser: null
   },
   reducers: {},
   extraReducers: builder => {
     builder
-      // Fetch workouts with filters
+      /* ---- Paged list ---- */
       .addCase(fetchWorkouts.pending, state => {
         state.loading = true;
         state.error = null;
@@ -114,48 +137,94 @@ export const workoutSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch workouts';
       })
 
-      //fetch workout by id
+      /* ---- Get ALL (no pagination) ---- */
+      .addCase(fetchAllWorkouts.pending, state => {
+        state.loadingAll = true;
+        state.errorAll = null;
+      })
+      .addCase(fetchAllWorkouts.fulfilled, (state, action) => {
+        state.loadingAll = false;
+        state.allWorkouts = action.payload;
+      })
+      .addCase(fetchAllWorkouts.rejected, (state, action) => {
+        state.loadingAll = false;
+        state.errorAll =
+          action.payload ||
+          action.error.message ||
+          'Failed to fetch all workouts';
+      })
+
+      /* ----Get BY USER (no pagination) ---- */
+      .addCase(fetchWorkoutsByUser.pending, state => {
+        state.loadingByUser = true;
+        state.errorByUser = null;
+      })
+      .addCase(fetchWorkoutsByUser.fulfilled, (state, action) => {
+        state.loadingByUser = false;
+        state.workoutsByUser = action.payload || [];
+      })
+      .addCase(fetchWorkoutsByUser.rejected, (state, action) => {
+        state.loadingByUser = false;
+        state.errorByUser =
+          action.payload ||
+          action.error.message ||
+          'Failed to fetch workouts by user';
+      })
+
+      /* ---- Get by id ---- */
       .addCase(fetchWorkoutById.fulfilled, (state, action) => {
         const workout = action.payload;
-        const exists = state.workouts.some(w => w._id === workout._id);
-        if (!exists) {
-          state.workouts.push(workout);
-        }
+
+        // update paged list
+        const idx = state.workouts.findIndex(w => w._id === workout._id);
+        if (idx === -1) state.workouts.unshift(workout);
+        else state.workouts[idx] = workout;
+
+        // update all lists
+        upsertById(state.allWorkouts, workout);
+        upsertById(state.workoutsByUser, workout);
+
         state.currentWorkout = workout;
       })
 
-      // Create workout
+      /* ---- Create ---- */
       .addCase(createWorkout.pending, state => {
         state.loading = true;
         state.error = null;
       })
       .addCase(createWorkout.fulfilled, (state, action) => {
         state.loading = false;
-        state.workouts.unshift(action.payload);
+        const w = action.payload;
+        state.workouts.unshift(w);
+        upsertById(state.allWorkouts, w);
+        upsertById(state.workoutsByUser, w);
       })
       .addCase(createWorkout.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to create workout';
       })
 
-      // Update workout
+      /* ---- Update ---- */
       .addCase(updateWorkout.fulfilled, (state, action) => {
-        const index = state.workouts.findIndex(
-          workout => workout._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.workouts[index] = action.payload;
-        }
-        if (state.currentWorkout?._id === action.payload._id) {
-          state.currentWorkout = action.payload;
-        }
+        const w = action.payload;
+
+        const i = state.workouts.findIndex(x => x._id === w._id);
+        if (i !== -1) state.workouts[i] = w;
+
+        if (state.currentWorkout?._id === w._id) state.currentWorkout = w;
+
+        upsertById(state.allWorkouts, w);
+        upsertById(state.workoutsByUser, w);
       })
 
-      // Delete workout
+      /* ---- Delete ---- */
       .addCase(deleteWorkout.fulfilled, (state, action) => {
-        state.workouts = state.workouts.filter(
-          workout => workout._id !== action.payload
-        );
+        const id = action.payload;
+        state.workouts = removeById(state.workouts, id);
+        state.allWorkouts = removeById(state.allWorkouts, id);
+        state.workoutsByUser = removeById(state.workoutsByUser, id);
+
+        if (state.currentWorkout?._id === id) state.currentWorkout = null;
       });
   }
 });

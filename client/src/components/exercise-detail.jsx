@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import {
   FaClipboardList,
   FaDumbbell,
@@ -11,12 +11,16 @@ import { useParams } from 'react-router';
 
 import { fetchExerciseById } from '~/store/features/exercise-slice';
 
-const ExerciseDetail = () => {
+export default function ExerciseDetail() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { currentExercise, loading, error } = useSelector(
     state => state.exercises
   );
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   useEffect(() => {
     if (id) dispatch(fetchExerciseById(id));
@@ -24,13 +28,27 @@ const ExerciseDetail = () => {
 
   if (loading)
     return (
-      <div className='text-center text-gray-500 mt-10'>Loading exercise...</div>
+      <div className='grid min-h-[40vh] place-items-center'>
+        <p className='rounded-xl border border-slate-200 bg-white px-4 py-2 text-slate-600 shadow-sm'>
+          Loading exercise…
+        </p>
+      </div>
     );
   if (error)
-    return <div className='text-center text-red-500 mt-10'>{error}</div>;
+    return (
+      <div className='grid min-h-[40vh] place-items-center'>
+        <p className='rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-red-600 shadow-sm'>
+          {error}
+        </p>
+      </div>
+    );
   if (!currentExercise)
     return (
-      <div className='text-center text-gray-500 mt-10'>No exercise found.</div>
+      <div className='grid min-h-[40vh] place-items-center'>
+        <p className='rounded-xl border border-slate-200 bg-white px-4 py-2 text-slate-600 shadow-sm'>
+          No exercise found.
+        </p>
+      </div>
     );
 
   const {
@@ -39,128 +57,144 @@ const ExerciseDetail = () => {
     difficulty,
     type,
     instructions,
-    muscles,
-    equipments
+    muscles = [],
+    equipments = []
   } = currentExercise;
 
+  const Chip = ({ children, tone = 'sky' }) => {
+    const toneMap = {
+      sky: 'border-sky-200 bg-sky-50 text-sky-700',
+      emerald: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+      amber: 'border-amber-200 bg-amber-50 text-amber-700'
+    };
+    return (
+      <span
+        className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium ${toneMap[tone]}`}
+      >
+        {children}
+      </span>
+    );
+  };
+
   return (
-    <div className='min-h-screen bg-white text-gray-900 px-8 lg:px-20 py-12'>
-      <div className='flex flex-col lg:flex-row gap-12 items-start'>
-        <div className='flex-1 flex justify-center'>
-          <img
-            src={tutorial}
-            alt={title}
-            className='rounded-lg shadow-lg w-full max-w-full border border-gray-200 object-cover'
-          />
-        </div>
+    <section className='relative bg-gradient-to-b from-[#F5F2EC] to-white'>
+      <div className='mx-auto max-w-7xl px-6 py-10'>
+        <header className='mb-6'>
+          <h1 className='text-balance text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl'>
+            {title}
+          </h1>
+          <div className='mt-4 flex flex-wrap gap-2'>
+            <Chip tone='sky'>
+              <FaUserAlt className='mr-2' />
+              Difficulty: {difficulty || '—'}
+            </Chip>
+            <Chip tone='emerald'>
+              <FaClipboardList className='mr-2' />
+              Type: {type || '—'}
+            </Chip>
+            <Chip tone='amber'>
+              <FaWeightHanging className='mr-2' />
+              Log: Weight & Reps
+            </Chip>
+          </div>
+        </header>
 
-        <div className='flex-1 space-y-6'>
-          <div className='flex justify-between items-start'>
-            <h1 className='text-6xl font-extrabold text-gray-900'>{title}</h1>
-            <button className='bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-md font-semibold text-white text-sm transition'>
-              Try it out
-            </button>
+        <div className='grid gap-8 lg:grid-cols-2'>
+          <div className='lg:sticky lg:top-6 h-fit'>
+            <div className='overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm'>
+              <img
+                src={tutorial}
+                alt={title}
+                className='block h-auto w-full object-cover'
+              />
+              <div className='flex items-center justify-end gap-3 border-t border-slate-100 p-4'>
+                <button className='rounded-xl bg-[#3067B6] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#275397]'>
+                  Try it out
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <h3 className='text-sm font-bold uppercase text-gray-500 mb-2 flex items-center gap-2'>
-              <GiMuscleUp className='text-blue-600 text-lg' /> Target Muscle
-              Groups
-            </h3>
-            <div className='flex flex-wrap gap-4'>
-              {muscles?.length ? (
-                muscles.map(m => (
-                  <div
-                    key={m._id || m}
-                    className='bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-center text-blue-700 font-medium text-sm w-24 shadow-sm hover:shadow-md transition'
-                  >
-                    {m.image && (
-                      <img
-                        src={m.image}
-                        alt={m.title}
-                        className='w-12 h-12 object-contain mx-auto mb-1'
-                      />
-                    )}
-                    <p className='truncate'>{m.title || m}</p>
-                  </div>
-                ))
+          <div className='space-y-8'>
+            <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+              <h3 className='mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500'>
+                <GiMuscleUp className='text-sky-600 text-lg' />
+                Target Muscle Groups
+              </h3>
+              {muscles.length ? (
+                <ul className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+                  {muscles.map(m => (
+                    <li
+                      key={m._id || m}
+                      className='group flex items-center gap-3 rounded-xl border border-sky-200 bg-sky-50/60 px-3 py-2 text-sky-800 ring-1 ring-white/40 transition hover:bg-sky-50'
+                    >
+                      {m.image ? (
+                        <img
+                          src={m.image}
+                          alt={m.title}
+                          className='h-12 w-12 rounded-lg object-contain ring-1 ring-white/60'
+                        />
+                      ) : (
+                        <span className='grid h-12 w-12 place-items-center rounded-lg bg-white text-sky-500 ring-1 ring-sky-100'>
+                          <GiMuscleUp />
+                        </span>
+                      )}
+                      <span className='truncate text-sm font-semibold'>
+                        {m.title || m}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <p className='text-gray-500'>N/A</p>
+                <p className='text-sm text-slate-500'>N/A</p>
               )}
-            </div>
-          </div>
+            </section>
 
-          <div>
-            <h3 className='text-sm font-bold uppercase text-gray-500 mb-2 flex items-center gap-2'>
-              <FaDumbbell className='text-blue-600 text-lg' /> Equipment
-            </h3>
-            <div className='flex flex-wrap gap-4'>
-              {equipments?.length ? (
-                equipments.map(e => (
-                  <div
-                    key={e._id || e}
-                    className='bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-center text-blue-700 font-medium text-sm w-24 shadow-sm hover:shadow-md transition'
-                  >
-                    {e.image && (
-                      <img
-                        src={e.image}
-                        alt={e.title}
-                        className='w-12 h-12 object-contain mx-auto mb-1'
-                      />
-                    )}
-                    <p className='truncate'>{e.title || e}</p>
-                  </div>
-                ))
+            <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+              <h3 className='mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500'>
+                <FaDumbbell className='text-indigo-600 text-lg' />
+                Equipment
+              </h3>
+              {equipments.length ? (
+                <ul className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+                  {equipments.map(e => (
+                    <li
+                      key={e._id || e}
+                      className='group flex items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50/60 px-3 py-2 text-indigo-800 ring-1 ring-white/40 transition hover:bg-indigo-50'
+                    >
+                      {e.image ? (
+                        <img
+                          src={e.image}
+                          alt={e.title}
+                          className='h-12 w-12 rounded-lg object-contain ring-1 ring-white/60'
+                        />
+                      ) : (
+                        <span className='grid h-12 w-12 place-items-center rounded-lg bg-white text-indigo-500 ring-1 ring-indigo-100'>
+                          <FaDumbbell />
+                        </span>
+                      )}
+                      <span className='truncate text-sm font-semibold'>
+                        {e.title || e}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <p className='text-gray-500'>N/A</p>
+                <p className='text-sm text-slate-500'>N/A</p>
               )}
-            </div>
-          </div>
+            </section>
 
-          <div className='grid grid-cols-3 gap-6 mt-4'>
-            <div className='flex items-center gap-3'>
-              <FaUserAlt className='text-blue-600 text-xl' />
-              <div>
-                <h4 className='text-xs text-gray-500 uppercase'>Difficulty</h4>
-                <p className='text-base font-medium text-gray-800'>
-                  {difficulty}
-                </p>
+            <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+              <h3 className='mb-3 text-2xl font-bold text-slate-900'>
+                Instructions
+              </h3>
+              <div className='whitespace-pre-line leading-relaxed text-slate-700'>
+                {instructions || 'No instructions provided.'}
               </div>
-            </div>
-
-            <div className='flex items-center gap-3'>
-              <FaClipboardList className='text-blue-600 text-xl' />
-              <div>
-                <h4 className='text-xs text-gray-500 uppercase'>
-                  Exercise Type
-                </h4>
-                <p className='text-base font-medium text-gray-800'>{type}</p>
-              </div>
-            </div>
-
-            <div className='flex items-center gap-3'>
-              <FaWeightHanging className='text-blue-600 text-xl' />
-              <div>
-                <h4 className='text-xs text-gray-500 uppercase'>Log Type</h4>
-                <p className='text-base font-medium text-gray-800'>
-                  Weight And Reps
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className='mt-6'>
-            <h3 className='text-2xl font-bold mb-3 text-gray-900'>
-              Instructions
-            </h3>
-            <div className='bg-gray-50 border border-gray-200 p-5 rounded-lg leading-relaxed text-gray-700 whitespace-pre-line'>
-              {instructions || 'No instructions provided.'}
-            </div>
+            </section>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
-};
-
-export default ExerciseDetail;
+}
