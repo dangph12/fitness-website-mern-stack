@@ -3,14 +3,12 @@ import { Types } from 'mongoose';
 export interface IWorkout {
   title: string;
   image: string;
-  userId: Types.ObjectId;
-  planId?: Types.ObjectId;
+  isPublic?: boolean;
+  user: Types.ObjectId;
   exercises: [
     {
-      exerciseId: Types.ObjectId;
-      sets: number;
-      reps: number;
-      rest?: number;
+      exercise: Types.ObjectId;
+      sets: number[];
     }
   ];
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import {
   FaClipboardList,
   FaDrumstickBite,
@@ -27,6 +27,10 @@ const CreateMeal = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
+
   const totalNutrients = selectedFoods.reduce(
     (totals, food) => {
       const qty = Number(food.quantity) || 1;
@@ -38,7 +42,7 @@ const CreateMeal = () => {
   );
 
   const handleCreateMeal = async () => {
-    if (selectedFoods.length === 0) {
+    if (!Array.isArray(selectedFoods) || selectedFoods.length === 0) {
       toast.warning('Please select some foods before creating the meal!');
       return;
     }
@@ -46,11 +50,11 @@ const CreateMeal = () => {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('mealType', mealType);
-    formData.append('userId', userId);
+    formData.append('user', userId);
     if (image) formData.append('image', image);
 
     selectedFoods.forEach((food, index) => {
-      formData.append(`foods[${index}][foodId]`, food.foodId);
+      formData.append(`foods[${index}][food]`, food.food);
       formData.append(`foods[${index}][quantity]`, food.quantity);
     });
 

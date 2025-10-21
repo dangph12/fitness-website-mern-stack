@@ -1,8 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
@@ -33,6 +33,7 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const { user } = useSelector(state => state.auth);
 
   const form = useForm({
     resolver: yupResolver(signUpSchema),
@@ -69,7 +70,6 @@ const SignUp = () => {
 
       dispatch(loadUser({ accessToken }));
 
-      navigate('/');
       toast.success('Account created successfully!');
     } catch (error) {
       if (error.response?.data?.message) {
@@ -79,6 +79,17 @@ const SignUp = () => {
       }
     }
   };
+
+  // Navigate based on profile completion status after user state updates
+  useEffect(() => {
+    if (user) {
+      if (user.profileCompleted === false) {
+        navigate('/onboarding');
+      } else {
+        navigate('/');
+      }
+    }
+  }, [user, navigate]);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();

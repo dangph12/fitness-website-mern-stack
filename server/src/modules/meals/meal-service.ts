@@ -9,8 +9,8 @@ import { IMeal } from './meal-type';
 const MealService = {
   findAll: async () => {
     const meals = await MealModel.find()
-      .populate('userId')
-      .populate('foods.foodId');
+      .populate('user')
+      .populate('foods.food');
 
     return meals;
   },
@@ -21,8 +21,8 @@ const MealService = {
     }
 
     const meal = await MealModel.findById(mealId)
-      .populate('userId')
-      .populate('foods.foodId');
+      .populate('user')
+      .populate('foods.food');
 
     if (!meal) {
       throw createHttpError(404, 'Meal not found');
@@ -32,7 +32,7 @@ const MealService = {
   },
 
   create: async (mealData: IMeal, file?: Express.Multer.File) => {
-    if (!Types.ObjectId.isValid(mealData.userId)) {
+    if (!Types.ObjectId.isValid(mealData.user)) {
       throw createHttpError(400, 'Invalid userId');
     }
 
@@ -78,7 +78,7 @@ const MealService = {
       throw createHttpError(400, 'Invalid ObjectId');
     }
 
-    if (updateData.userId && !Types.ObjectId.isValid(updateData.userId)) {
+    if (updateData.user && !Types.ObjectId.isValid(updateData.user)) {
       throw createHttpError(400, 'Invalid userId');
     }
 

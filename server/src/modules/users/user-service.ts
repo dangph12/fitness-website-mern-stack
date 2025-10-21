@@ -1,9 +1,14 @@
+import crypto from 'crypto';
 import createHttpError from 'http-errors';
 import { Types } from 'mongoose';
 
+import { hashPassword } from '~/utils/bcrypt';
 import { deleteAvatar, uploadAvatar } from '~/utils/cloudinary';
 import { uploadImage } from '~/utils/cloudinary';
+import { sendMail } from '~/utils/email/mailer';
 
+import AuthModel from '../auth/auth-model';
+import BodyRecordModel from '../body-records/body-record-model';
 import UserModel from './user-model';
 import { IUser } from './user-type';
 
@@ -74,9 +79,26 @@ const UserService = {
       throw createHttpError(400, 'User with this email already exists');
     }
 
+    const password = crypto.randomBytes(4).toString('hex');
+
     const newUser = await UserModel.create({
+      password,
       ...userData,
       isActive: true
+    });
+
+    const hashedPassword = await hashPassword(password);
+    await AuthModel.create({
+      user: newUser._id,
+      provider: 'local',
+      providerId: newUser.email,
+      localPassword: hashedPassword
+    });
+
+    await sendMail({
+      to: userData.email,
+      subject: 'Login Credentials for F-Fitness',
+      text: `Hello ${userData.name},\n\nYour account has been created successfully. Your password is: ${password}\n\nPlease change your password after logging in.\n\nBest regards,\nF-Fitness Team`
     });
 
     if (avatar) {
@@ -188,6 +210,47 @@ const UserService = {
     }
 
     return uploadResult.data.secure_url;
+  },
+
+  completeOnboarding: async (
+    userId: string,
+    onboardingData: {
+      dob: Date;
+      gender: string;
+      height: number;
+      weight: number;
+      bmi: number;
+    }
+  ) => {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw createHttpError(404, 'User not found');
+    }
+
+    if (user.profileCompleted) {
+      throw createHttpError(400, 'Profile already completed');
+    }
+
+    user.dob = onboardingData.dob;
+    user.gender = onboardingData.gender;
+    user.profileCompleted = true;
+    await user.save();
+
+    const bodyRecord = await BodyRecordModel.create({
+      user: userId,
+      height: onboardingData.height,
+      weight: onboardingData.weight,
+      bmi: onboardingData.bmi
+    });
+
+    return {
+      user,
+      bodyRecord
+    };
   }
 };
 
