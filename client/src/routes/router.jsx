@@ -129,12 +129,13 @@ const router = createBrowserRouter([
       },
       {
         path: '',
-        Component: () => (
-          <PrivateRoute allowedRoles={['admin']}>
-            <AdminLayout />
-          </PrivateRoute>
-        ),
-        // Component: AdminLayout,
+        // Component: () => (
+        //   <PrivateRoute allowedRoles={['admin']}>
+        //     <AdminLayout />
+        //   </PrivateRoute>
+        // ),
+        Component: AdminLayout,
+
         children: [
           {
             index: true,
@@ -154,6 +155,38 @@ const router = createBrowserRouter([
             path: 'manage-users/update/:id',
             Component: lazy(
               () => import('~/app/admin/manage-users/update-user/page')
+            )
+          },
+          {
+            path: 'manage-exercises',
+            Component: lazy(() => import('~/app/admin/manage-exercises/page'))
+          },
+          {
+            path: 'manage-exercises/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-exercises/create-exercise/page')
+            )
+          },
+          {
+            path: 'manage-exercises/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-exercises/update-exercise/page')
+            )
+          },
+          {
+            path: 'manage-foods',
+            Component: lazy(() => import('~/app/admin/manage-foods/page'))
+          },
+          {
+            path: 'manage-foods/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-foods/create-food/page')
+            )
+          },
+          {
+            path: 'manage-foods/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-foods/update-food/page')
             )
           }
         ]

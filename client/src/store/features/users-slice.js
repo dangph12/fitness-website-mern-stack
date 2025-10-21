@@ -29,6 +29,8 @@ export const fetchUsers = createAsyncThunk(
         params.gender = Array.isArray(gender) ? gender.join(',') : gender;
       }
 
+      console.log('Fetching users with params:', params);
+
       const response = await axiosInstance.get('/api/users', {
         params
       });

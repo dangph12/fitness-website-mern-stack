@@ -256,7 +256,7 @@ export function UsersFilters() {
             <div className='space-y-2'>
               <h4 className='font-medium leading-none'>Filter by Role</h4>
               <div className='space-y-2'>
-                {['admin', 'instructor', 'user'].map(role => (
+                {['admin', 'user'].map(role => (
                   <div key={role} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`role-${role}`}
@@ -298,7 +298,7 @@ export function UsersFilters() {
             <div className='space-y-2'>
               <h4 className='font-medium leading-none'>Filter by Gender</h4>
               <div className='space-y-2'>
-                {['male', 'female', 'other'].map(gender => (
+                {['male', 'female'].map(gender => (
                   <div key={gender} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`gender-${gender}`}
