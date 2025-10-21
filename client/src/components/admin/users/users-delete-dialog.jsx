@@ -1,9 +1,10 @@
-import { AlertTriangle, Loader2, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { toast } from 'sonner';
+'use client';
 
-import { Alert, AlertDescription } from '~/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { Alert } from '~/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -13,95 +14,114 @@ import {
   DialogHeader,
   DialogTitle
 } from '~/components/ui/dialog';
-import { deleteFood } from '~/store/features/food-slice';
+import { Spinner } from '~/components/ui/spinner';
+import { deleteUser, fetchUsers } from '~/store/features/users-slice';
 
-import { useFoodsContext } from './foods-provider';
+import { useUsers } from './users-provider';
 
-export function FoodsDeleteDialog() {
+export function UsersDeleteDialog({ open, onOpenChange, user }) {
   const dispatch = useDispatch();
-  const {
-    selectedFood,
-    isDeleteDialogOpen,
-    setIsDeleteDialogOpen,
-    setSelectedFood
-  } = useFoodsContext();
+  const { deleteLoading, deleteError, currentPage, limit, filters } =
+    useSelector(state => state.users);
+  const { closeDialog } = useUsers();
 
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState('');
+  // Helper function to get user display name
+  const getUserDisplayName = user => {
+    if (!user) return 'Unknown User';
+    return user.name || user.fullName || user.username || 'Unknown User';
+  };
 
-  const handleClose = () => {
-    setIsDeleteDialogOpen(false);
-    setSelectedFood(null);
-    setError('');
-    setIsDeleting(false);
+  // Helper function to get user initials
+  const getUserInitials = user => {
+    if (!user) return 'U';
+    const name = getUserDisplayName(user);
+    if (name === 'Unknown User') return 'U';
+
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   const handleDelete = async () => {
-    if (!selectedFood) return;
-
-    setIsDeleting(true);
-    setError('');
+    if (!user) return;
 
     try {
-      await dispatch(deleteFood(selectedFood._id)).unwrap();
-
-      toast.success('Food deleted successfully!');
-
-      handleClose();
+      await dispatch(deleteUser(user._id)).unwrap();
+      // Refresh the users list
+      dispatch(
+        fetchUsers({
+          page: currentPage,
+          limit,
+          search: filters.search,
+          role: filters.role,
+          gender: filters.gender
+        })
+      );
+      closeDialog('delete');
     } catch (error) {
-      const errorMessage = error.message || 'Failed to delete food';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsDeleting(false);
+      // Error is handled by the reducer
     }
   };
 
-  if (!selectedFood) return null;
+  const handleClose = () => {
+    if (onOpenChange) {
+      onOpenChange(false);
+    } else {
+      closeDialog('delete');
+    }
+  };
 
   return (
-    <Dialog open={isDeleteDialogOpen} onOpenChange={handleClose}>
-      <DialogContent className='max-w-md'>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className='flex items-center gap-2 text-destructive'>
-            <Trash2 className='h-5 w-5' />
-            Delete Food
+          <DialogTitle className='flex items-center gap-2'>
+            <AlertTriangle className='h-5 w-5 text-red-600' />
+            Delete User
           </DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the food
-            item.
+            Are you sure you want to delete this user? This action cannot be
+            undone.
           </DialogDescription>
         </DialogHeader>
 
-        <div className='space-y-4'>
-          <div className='flex items-center gap-2 p-3 bg-destructive/10 rounded-lg'>
-            <AlertTriangle className='h-4 w-4 text-destructive' />
-            <div>
-              <p className='font-medium'>{selectedFood.title}</p>
-              <p className='text-sm text-muted-foreground'>
-                Category: {selectedFood.category}
-              </p>
+        {user && (
+          <div className='my-4 p-4 border rounded-lg bg-muted/50'>
+            <div className='flex items-center space-x-3'>
+              <Avatar className='h-10 w-10'>
+                <AvatarImage src={user.avatar} />
+                <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <div className='font-medium'>{getUserDisplayName(user)}</div>
+                <div className='text-sm text-muted-foreground'>
+                  {user.email}
+                </div>
+              </div>
             </div>
           </div>
+        )}
 
-          {error && (
-            <Alert variant='destructive'>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-        </div>
+        {deleteError && <Alert variant='destructive'>{deleteError}</Alert>}
 
         <DialogFooter>
-          <Button variant='outline' onClick={handleClose} disabled={isDeleting}>
+          <Button
+            variant='outline'
+            onClick={handleClose}
+            disabled={deleteLoading}
+          >
             Cancel
           </Button>
           <Button
             variant='destructive'
             onClick={handleDelete}
-            disabled={isDeleting}
+            disabled={deleteLoading || !user}
           >
-            {isDeleting && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-            Delete Food
+            {deleteLoading && <Spinner className='mr-2 h-4 w-4' />}
+            Delete User
           </Button>
         </DialogFooter>
       </DialogContent>
