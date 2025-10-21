@@ -122,6 +122,22 @@ const router = createBrowserRouter([
             )
           },
           {
+            path: 'manage-exercises',
+            Component: lazy(() => import('~/app/admin/manage-exercises/page'))
+          },
+          {
+            path: 'manage-exercises/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-exercises/create-exercise/page')
+            )
+          },
+          {
+            path: 'manage-exercises/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-exercises/update-exercise/page')
+            )
+          },
+          {
             path: 'manage-foods',
             Component: lazy(() => import('~/app/admin/manage-foods/page'))
           },
