@@ -22,19 +22,17 @@ export const ExercisesFilters = () => {
     equipmentsMap = {}
   } = useExercises();
 
-  // Use local pending state and only apply on "Apply" click to avoid infinite loops
   const [pending, setPending] = useState({
-    title: filters.title || filters.search || '',
+    title: filters.title || '',
     difficulty: filters.difficulty || '',
     type: filters.type || '',
     muscles: filters.muscles || '',
     equipments: filters.equipments || ''
   });
 
-  // keep pending synced when provider filters change (e.g. reset from elsewhere)
   useEffect(() => {
     setPending({
-      title: filters.title || filters.search || '',
+      title: filters.title || '',
       difficulty: filters.difficulty || '',
       type: filters.type || '',
       muscles: filters.muscles || '',
@@ -42,7 +40,6 @@ export const ExercisesFilters = () => {
     });
   }, [filters]);
 
-  // Convert maps to arrays for dropdowns
   const musclesList = Object.entries(musclesMap).map(([id, name]) => ({
     id,
     name
@@ -64,14 +61,33 @@ export const ExercisesFilters = () => {
     setPending(p => ({ ...p, equipments: value === 'all' ? '' : value }));
 
   const applyFilters = () => {
-    // Backend expects title param (not 'search'), so map title accordingly
-    handleFiltersChange({
-      title: pending.title ? String(pending.title).trim() : '',
-      difficulty: pending.difficulty || '',
-      type: pending.type || '',
-      muscles: pending.muscles || '',
-      equipments: pending.equipments || ''
+    console.log('🔍 Applying filters:', {
+      title: pending.title,
+      muscles: pending.muscles,
+      equipments: pending.equipments
     });
+
+    // Only send non-empty values to avoid sending empty strings
+    const filtersToSend = {};
+
+    if (pending.title && pending.title.trim()) {
+      filtersToSend.title = pending.title.trim();
+    }
+    if (pending.difficulty) {
+      filtersToSend.difficulty = pending.difficulty;
+    }
+    if (pending.type) {
+      filtersToSend.type = pending.type;
+    }
+    if (pending.muscles) {
+      filtersToSend.muscles = pending.muscles;
+    }
+    if (pending.equipments) {
+      filtersToSend.equipments = pending.equipments;
+    }
+
+    console.log('📤 Sending only active filters:', filtersToSend);
+    handleFiltersChange(filtersToSend);
   };
 
   const handleReset = () => {
@@ -85,6 +101,12 @@ export const ExercisesFilters = () => {
     clearFilters();
   };
 
+  const handleKeyPress = e => {
+    if (e.key === 'Enter') {
+      applyFilters();
+    }
+  };
+
   const hasActiveFilters = Boolean(
     (pending.title && pending.title.trim()) ||
       pending.difficulty ||
@@ -95,7 +117,6 @@ export const ExercisesFilters = () => {
 
   return (
     <div className='space-y-4'>
-      {/* First Row: Search, Difficulty, Type */}
       <div className='flex items-center space-x-4'>
         <div className='relative'>
           <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
@@ -103,6 +124,7 @@ export const ExercisesFilters = () => {
             placeholder='Search by title...'
             value={pending.title}
             onChange={handleTitleChange}
+            onKeyPress={handleKeyPress}
             className='pl-8 w-[250px]'
           />
         </div>
@@ -187,20 +209,18 @@ export const ExercisesFilters = () => {
 
         <Button
           onClick={applyFilters}
-          className='h-8 px-3'
+          className='h-10 px-4'
           disabled={!hasActiveFilters}
         >
-          Apply Filters
+          Apply
         </Button>
 
-        <Button
-          variant='ghost'
-          onClick={handleReset}
-          className='h-8 px-2 lg:px-3'
-        >
-          Reset
-          <X className='ml-2 h-4 w-4' />
-        </Button>
+        {hasActiveFilters && (
+          <Button variant='ghost' onClick={handleReset} className='h-10 px-3'>
+            Reset
+            <X className='ml-2 h-4 w-4' />
+          </Button>
+        )}
       </div>
     </div>
   );
