@@ -42,6 +42,9 @@ const AdminLayout = () => {
       'manage-foods': 'Foods Management',
       'create-food': 'Create Food',
       'update-food': 'Update Food',
+      'manage-muscles': 'Muscle Management',
+      'create-muscle': 'Create Muscle',
+      'update-muscle': 'Update Muscle',
       analytics: 'Analytics',
       settings: 'Settings'
     };

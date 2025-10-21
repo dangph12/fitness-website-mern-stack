@@ -103,7 +103,7 @@ const muscleSlice = createSlice({
   },
   reducers: {
     setMuscles: (state, action) => {
-      state.muscles = action.payload;
+      state.muscles = [action.payload, ...state.muscles];
     },
     clearMuscles: state => {
       state.muscles = [];
@@ -137,7 +137,7 @@ const muscleSlice = createSlice({
       })
       .addCase(createMuscle.fulfilled, (state, action) => {
         state.loading = false;
-        state.muscles.unshift(action.payload);
+        state.muscles = [action.payload, ...state.muscles];
       })
       .addCase(createMuscle.rejected, (state, action) => {
         state.loading = false;

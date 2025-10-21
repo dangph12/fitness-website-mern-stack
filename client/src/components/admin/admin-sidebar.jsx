@@ -71,6 +71,11 @@ export function AdminSidebar({ ...props }) {
           title: 'Foods Management',
           url: '/admin/manage-foods',
           icon: Utensils
+        },
+        {
+          title: 'Muscles Management',
+          url: '/admin/manage-muscles',
+          icon: Activity
         }
       ]
     }

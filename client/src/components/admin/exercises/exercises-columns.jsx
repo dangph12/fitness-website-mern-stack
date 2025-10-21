@@ -164,7 +164,7 @@ export const useExercisesColumns = () => {
 
     {
       accessorKey: 'muscles',
-      header: 'Target Muscles',
+      header: 'Muscles',
       cell: ({ row }) => {
         const muscles = row.getValue('muscles');
         if (!muscles || !Array.isArray(muscles) || muscles.length === 0)
