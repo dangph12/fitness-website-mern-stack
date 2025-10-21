@@ -18,6 +18,36 @@ export const fetchExercises = createAsyncThunk(
   }
 );
 
+// Fetch reference lists (muscles & equipments)
+export const fetchReferenceLists = createAsyncThunk(
+  'exercises/fetchReferenceLists',
+  async () => {
+    try {
+      const [mResp, eResp] = await Promise.all([
+        axiosInstance.get('/api/muscles').then(r => r.data?.data || []),
+        axiosInstance.get('/api/equipments').then(r => r.data?.data || [])
+      ]);
+
+      const mMap = {};
+      (Array.isArray(mResp) ? mResp : []).forEach(item => {
+        const id = item._id || item.id;
+        if (id) mMap[id] = item.name || item.title || item.label || id;
+      });
+
+      const eMap = {};
+      (Array.isArray(eResp) ? eResp : []).forEach(item => {
+        const id = item._id || item.id;
+        if (id) eMap[id] = item.name || item.title || item.label || id;
+      });
+
+      return { musclesMap: mMap, equipmentsMap: eMap };
+    } catch (err) {
+      console.warn('Failed to load muscles/equipments lists', err);
+      return { musclesMap: {}, equipmentsMap: {} };
+    }
+  }
+);
+
 // Fetch all (no pagination)
 export const fetchAllExercises = createAsyncThunk(
   'exercises/fetchAllExercises',
@@ -74,7 +104,10 @@ export const exerciseSlice = createSlice({
     totalExercises: 0,
     totalPages: 1,
     loading: false,
-    error: null
+    error: null,
+    musclesMap: {},
+    equipmentsMap: {},
+    referencesLoading: false
   },
   reducers: {
     setExercises: (state, action) => {
@@ -102,6 +135,21 @@ export const exerciseSlice = createSlice({
       .addCase(fetchExercises.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch exercises';
+      })
+
+      // FETCH REFERENCE LISTS
+      .addCase(fetchReferenceLists.pending, state => {
+        state.referencesLoading = true;
+      })
+      .addCase(fetchReferenceLists.fulfilled, (state, action) => {
+        state.referencesLoading = false;
+        state.musclesMap = action.payload.musclesMap;
+        state.equipmentsMap = action.payload.equipmentsMap;
+      })
+      .addCase(fetchReferenceLists.rejected, (state, action) => {
+        state.referencesLoading = false;
+        state.musclesMap = {};
+        state.equipmentsMap = {};
       })
 
       // FETCH ALL
