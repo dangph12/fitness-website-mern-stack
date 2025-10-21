@@ -1,4 +1,5 @@
 import { Search, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
@@ -13,30 +14,74 @@ import {
 export function FoodsFilters({ filters, onFiltersChange, onClearFilters }) {
   const categories = ['Meat', 'Fruits & Vegetables', 'Egg'];
 
-  const handleSearchChange = e => {
-    const value = e.target.value;
-    onFiltersChange({
-      ...filters,
-      title: value || undefined // Use undefined instead of empty string
+  // Use local pending state - only apply on "Apply" click
+  const [pending, setPending] = useState({
+    title: filters.title || '',
+    category: filters.category || '',
+    caloriesRange: filters.caloriesRange || ''
+  });
+
+  // Keep pending synced when filters change from parent
+  useEffect(() => {
+    setPending({
+      title: filters.title || '',
+      category: filters.category || '',
+      caloriesRange: filters.caloriesRange || ''
     });
+  }, [filters]);
+
+  const handleTitleChange = e => {
+    setPending(prev => ({ ...prev, title: e.target.value }));
   };
 
   const handleCategoryChange = value => {
-    onFiltersChange({
-      ...filters,
-      category: value === 'all' ? undefined : value
-    });
+    setPending(prev => ({
+      ...prev,
+      category: value === 'all' ? '' : value
+    }));
   };
 
   const handleCaloriesChange = value => {
-    onFiltersChange({
-      ...filters,
-      caloriesRange: value === 'all' ? undefined : value
-    });
+    setPending(prev => ({
+      ...prev,
+      caloriesRange: value === 'all' ? '' : value
+    }));
   };
 
-  const hasActiveFilters =
-    filters.title || filters.category || filters.caloriesRange;
+  // Apply filters - send to parent
+  const applyFilters = () => {
+    const newFilters = {};
+
+    if (pending.title && pending.title.trim()) {
+      newFilters.title = pending.title.trim();
+    }
+
+    if (pending.category) {
+      newFilters.category = pending.category;
+    }
+
+    if (pending.caloriesRange) {
+      newFilters.caloriesRange = pending.caloriesRange;
+    }
+
+    onFiltersChange(newFilters);
+  };
+
+  // Reset filters
+  const handleReset = () => {
+    setPending({
+      title: '',
+      category: '',
+      caloriesRange: ''
+    });
+    onClearFilters();
+  };
+
+  const hasActiveFilters = Boolean(
+    (pending.title && pending.title.trim()) ||
+      pending.category ||
+      pending.caloriesRange
+  );
 
   return (
     <div className='flex flex-col gap-4 sm:flex-row sm:items-center'>
@@ -44,14 +89,14 @@ export function FoodsFilters({ filters, onFiltersChange, onClearFilters }) {
         <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
         <Input
           placeholder='Search foods...'
-          value={filters.title || ''}
-          onChange={handleSearchChange}
+          value={pending.title}
+          onChange={handleTitleChange}
           className='pl-8'
         />
       </div>
 
       <Select
-        value={filters.category || 'all'}
+        value={pending.category || 'all'}
         onValueChange={handleCategoryChange}
       >
         <SelectTrigger className='w-[180px]'>
@@ -67,28 +112,18 @@ export function FoodsFilters({ filters, onFiltersChange, onClearFilters }) {
         </SelectContent>
       </Select>
 
-      <Select
-        value={filters.caloriesRange || 'all'}
-        onValueChange={handleCaloriesChange}
-      >
-        <SelectTrigger className='w-[180px]'>
-          <SelectValue placeholder='Calories Range' />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='all'>All Ranges</SelectItem>
-          <SelectItem value='0-100'>0-100 cal</SelectItem>
-          <SelectItem value='100-200'>100-200 cal</SelectItem>
-          <SelectItem value='200-400'>200-400 cal</SelectItem>
-          <SelectItem value='400+'>400+ cal</SelectItem>
-        </SelectContent>
-      </Select>
-
-      {hasActiveFilters && (
-        <Button variant='ghost' onClick={onClearFilters} size='sm'>
-          <X className='mr-2 h-4 w-4' />
-          Clear
+      <div className='flex items-center gap-2'>
+        <Button onClick={applyFilters} size='lg' disabled={!hasActiveFilters}>
+          Apply Filters
         </Button>
-      )}
+
+        {hasActiveFilters && (
+          <Button variant='ghost' onClick={handleReset} size='sm'>
+            <X className='mr-2 h-4 w-4' />
+            Clear
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
