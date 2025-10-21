@@ -1,24 +1,22 @@
 import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
-import { Button } from '../../ui/button';
+import { Button } from '~/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from '../../ui/dropdown-menu';
+} from '~/components/ui/dropdown-menu';
+
 import { useFoodsContext } from './foods-provider';
 
 export function FoodRowActions({ row }) {
   const food = row.original;
-  const {
-    setSelectedFood,
-    setIsViewDialogOpen,
-    setIsEditDialogOpen,
-    setIsDeleteDialogOpen
-  } = useFoodsContext();
+  const navigate = useNavigate();
+  const { setSelectedFood, setIsViewDialogOpen, setIsDeleteDialogOpen } =
+    useFoodsContext();
 
   const handleView = () => {
     setSelectedFood(food);
@@ -26,8 +24,7 @@ export function FoodRowActions({ row }) {
   };
 
   const handleEdit = () => {
-    setSelectedFood(food);
-    setIsEditDialogOpen(true);
+    navigate(`/admin/manage-foods/update/${food._id}`);
   };
 
   const handleDelete = () => {
