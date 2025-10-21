@@ -5,5 +5,5 @@ export interface IBodyRecord {
   weight: number;
   bmi: number;
   user: Types.ObjectId;
-  bodyClassification: Types.ObjectId;
+  bodyClassification?: Types.ObjectId;
 }

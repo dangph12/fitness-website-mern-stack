@@ -5,6 +5,6 @@ export interface IMeal {
   image: string;
   mealType: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Brunch' | 'Dessert';
   quantity: number;
-  userId: Types.ObjectId;
-  foods: { foodId: Types.ObjectId; quantity: number }[];
+  user: Types.ObjectId;
+  foods: { food: Types.ObjectId; quantity: number }[];
 }

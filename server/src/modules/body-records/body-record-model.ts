@@ -11,11 +11,11 @@ const BodyRecordSchema = new Schema<IBodyRecord>(
     bodyClassification: {
       type: Schema.Types.ObjectId,
       ref: 'BodyClassification',
-      required: true
+      required: false
     }
   },
   { timestamps: true }
 );
 
-const BodyRecord = model<IBodyRecord>('WeightRecord', BodyRecordSchema);
+const BodyRecord = model<IBodyRecord>('BodyRecord', BodyRecordSchema);
 export default BodyRecord;

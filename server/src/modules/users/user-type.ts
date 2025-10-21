@@ -6,4 +6,5 @@ export interface IUser {
   dob?: Date;
   gender?: string;
   isActive?: boolean;
+  profileCompleted?: boolean;
 }
