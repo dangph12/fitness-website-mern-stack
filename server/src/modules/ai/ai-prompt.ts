@@ -1,4 +1,8 @@
+import { MealType } from '../meals/meal-type';
 import { IInputGenerateMeal } from './ai-type';
+
+const MEAL_TYPES = Object.values(MealType);
+const MEAL_TYPES_LIST = MEAL_TYPES.map(v => `"${v}"`).join(', ');
 
 const mealPrompt = ({
   age,
@@ -19,6 +23,7 @@ const mealPrompt = ({
      - Calculate appropriate daily calorie intake based on the person's stats and goals
      - Create a balanced meal plan with proper macronutrient distribution
      - Include a variety of nutrient-dense foods while respecting dietary restrictions
+     - "mealType" MUST be EXACTLY one of: ${MEAL_TYPES_LIST}
      - Consider meal timing around workouts for optimal performance and recovery
      
      CRITICAL SCHEMA INSTRUCTIONS:
@@ -33,18 +38,9 @@ const mealPrompt = ({
          "title": "Healthy Breakfast",
          "mealType": "Breakfast",
          "foods": [
-           {
-             "food": "68de1f47c4bb5bf8343f5d87",  // Bittermelon
-             "quantity": 1
-           },
-           {
-             "food": "68de1f41019458184ed0aa5f",  // Lettuce
-             "quantity": 1
-           },
-           {
-             "food": "68de1f3c283d884cd362fddb",  // Beetroot
-             "quantity": 1
-           }
+           { "food": "68de1eca0ac8cfd1a7f68780", "quantity": 1 },
+           { "food": "68de1ed3dbaa958a9167055a", "quantity": 2 },
+           { "food": "68de1eda2c206ba06b417b9f", "quantity": 3 }
          ]
        }
      
