@@ -23,7 +23,7 @@ const WorkoutController = {
     });
     return res
       .status(200)
-      .json(ApiResponse.success('Plans retrieved successfully', workouts));
+      .json(ApiResponse.success('Workouts retrieved successfully', workouts));
   },
 
   findAll: async (req: Request, res: Response) => {
