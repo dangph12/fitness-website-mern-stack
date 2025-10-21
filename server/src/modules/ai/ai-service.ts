@@ -1,16 +1,50 @@
-import mealPrompt from '~/modules/ai/meal-prompt';
+import createHttpError from 'http-errors';
+
+import mealPrompt from '~/modules/ai/ai-prompt';
+import BodyRecordService from '~/modules/body-records/body-record-service';
+import { IBodyRecord } from '~/modules/body-records/body-record-type';
+import FoodService from '~/modules/foods/food-service';
+import { IFood } from '~/modules/foods/food-type';
+import GoalService from '~/modules/goals/goal-service';
+import { IGoal } from '~/modules/goals/goal-type';
+import { IMeal, MealType } from '~/modules/meals/meal-type';
+import UserService from '~/modules/users/user-service';
+import { IUser } from '~/modules/users/user-type';
 import { generateByOpenAI } from '~/utils/openai';
 
-import BodyRecordService from '../body-records/body-record-service';
-import { IBodyRecord } from '../body-records/body-record-type';
-import FoodService from '../foods/food-service';
-import { IFood } from '../foods/food-type';
-import GoalService from '../goals/goal-service';
-import { IGoal } from '../goals/goal-type';
-import { IMeal } from '../meals/meal-type';
-import UserService from '../users/user-service';
-import { IUser } from '../users/user-type';
 import { IGenerateMeal, IInputGenerateMeal } from './ai-type';
+import MealOutputSchema from './ai-validation';
+
+const extractJson = (raw: unknown): string => {
+  const s = typeof raw === 'string' ? raw : JSON.stringify(raw);
+  const match = s.match(/\{[\s\S]*\}/);
+  if (match) return match[0];
+  return s;
+};
+
+const normalizeMealType = (v: any): any => {
+  try {
+    if (
+      v &&
+      typeof v === 'object' &&
+      'mealType' in v &&
+      typeof v.mealType === 'string'
+    ) {
+      const map = Object.values(MealType).reduce<Record<string, MealType>>(
+        (acc, mt) => {
+          acc[String(mt).toLowerCase()] = mt;
+          return acc;
+        },
+        {}
+      );
+      const key = v.mealType.toLowerCase();
+      if (map[key]) v.mealType = map[key];
+    }
+  } catch {
+    throw createHttpError(400, 'Invalid Object');
+  }
+  return v;
+};
 
 const AIService = {
   generateMealByAI: async (query: string, userId: string) => {
@@ -38,26 +72,23 @@ const AIService = {
     };
 
     const prompt = mealPrompt(input);
-    const mealData = generateByOpenAI(prompt);
+    const mealRaw = await generateByOpenAI(prompt);
 
-    const generatedMeal: IGenerateMeal = JSON.parse(mealData as any);
-    if (
-      generatedMeal &&
-      typeof generatedMeal.title === 'string' &&
-      ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Brunch', 'Dessert'].includes(
-        generatedMeal.mealType
-      ) &&
-      Array.isArray(generatedMeal.foods) &&
-      generatedMeal.foods.every(
-        food =>
-          food.food &&
-          typeof food.food === 'string' &&
-          typeof food.quantity === 'number'
-      )
-    ) {
-      return generatedMeal;
-    } else {
-      throw new Error('Invalid meal structure');
+    const jsonText = extractJson(mealRaw);
+    let candidate: unknown;
+    try {
+      candidate = JSON.parse(jsonText);
+    } catch (e) {
+      throw new Error('AI output is not valid JSON');
     }
+
+    candidate = normalizeMealType(candidate);
+
+    const result = MealOutputSchema.safeParse(candidate);
+    if (!result.success) {
+      throw new Error(`AI validation failed: ${result.error.message}`);
+    }
+
+    return result.data;
   }
 };
