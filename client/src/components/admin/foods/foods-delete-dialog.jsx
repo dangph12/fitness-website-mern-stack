@@ -1,10 +1,10 @@
 import { AlertTriangle, Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { toast } from 'sonner';
 
-import { deleteFood, fetchFoods } from '../../../store/features/food-slice';
-import { Alert, AlertDescription } from '../../ui/alert';
-import { Button } from '../../ui/button';
+import { Alert, AlertDescription } from '~/components/ui/alert';
+import { Button } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '../../ui/dialog';
+} from '~/components/ui/dialog';
+import { deleteFood } from '~/store/features/food-slice';
+
 import { useFoodsContext } from './foods-provider';
 
 export function FoodsDeleteDialog() {
@@ -41,19 +43,18 @@ export function FoodsDeleteDialog() {
     setError('');
 
     try {
+      // Chỉ delete - KHÔNG fetch lại
       await dispatch(deleteFood(selectedFood._id)).unwrap();
 
-      // Refresh foods list
-      dispatch(
-        fetchFoods({
-          page: 1,
-          limit: 10
-        })
-      );
-
+      toast.success('Food deleted successfully!');
       handleClose();
+
+      // Redux sẽ tự động update state.foods.foods
+      // Không cần gọi refreshData() hoặc fetchFoods()
     } catch (error) {
-      setError(error.message || 'Failed to delete food');
+      const errorMessage = error.message || 'Failed to delete food';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsDeleting(false);
     }
