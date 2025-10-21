@@ -21,12 +21,7 @@ export const useMuscles = () => {
 
 export const MusclesProvider = ({ children }) => {
   const dispatch = useDispatch();
-  const {
-    muscles: rawMuscles,
-    loading,
-    totalPages: sliceTotalPages,
-    totalMuscles: sliceTotalMuscles
-  } = useSelector(state => state.muscles);
+  const { muscles: rawMuscles, loading } = useSelector(state => state.muscles);
 
   // Dialog states
   const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
@@ -44,56 +39,11 @@ export const MusclesProvider = ({ children }) => {
     sortBy: 'createdAt',
     sortOrder: 'desc'
   });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
 
-  // Central fetch function (uses current provider state)
-  const fetchData = useCallback(
-    async (opts = {}) => {
-      const page = typeof opts.page === 'number' ? opts.page : currentPage;
-      const limit = typeof opts.limit === 'number' ? opts.limit : pageSize;
-      const sortBy = opts.sortBy || sorting.sortBy;
-      const sortOrder = opts.sortOrder || sorting.sortOrder;
-      const filterParams = opts.filterParams || { ...filters };
-
-      dispatch(
-        fetchMuscles({
-          page,
-          limit,
-          sortBy,
-          sortOrder,
-          filterParams
-        })
-      );
-    },
-    [currentPage, pageSize, sorting, filters, dispatch]
-  );
-
-  // Public method: fetch a specific page immediately
-  const fetchPage = useCallback(
-    (page, limit) => {
-      setCurrentPage(page);
-      if (typeof limit === 'number' && limit !== pageSize) {
-        setPageSize(limit);
-      }
-      // Dispatch immediately for quick response
-      dispatch(
-        fetchMuscles({
-          page,
-          limit: typeof limit === 'number' ? limit : pageSize,
-          sortBy: sorting.sortBy,
-          sortOrder: sorting.sortOrder,
-          filterParams: { ...filters }
-        })
-      );
-    },
-    [dispatch, pageSize, sorting, filters]
-  );
-
-  // Effect: fetch data when filters/sorting/currentPage/pageSize change
+  // Initial fetch
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    dispatch(fetchMuscles());
+  }, [dispatch]);
 
   // Computed muscles with client-side filtering and sorting
   const muscles = React.useMemo(() => {
@@ -103,8 +53,9 @@ export const MusclesProvider = ({ children }) => {
 
     // Apply search filter
     if (filters.search) {
+      const searchLower = filters.search.toLowerCase().trim();
       filtered = filtered.filter(muscle =>
-        muscle.title?.toLowerCase().includes(filters.search.toLowerCase())
+        muscle.title?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -133,7 +84,6 @@ export const MusclesProvider = ({ children }) => {
   }, [rawMuscles, filters, sorting]);
 
   // Dialog handlers
-
   const openDeleteDialog = muscle => {
     setSelectedMuscle(muscle);
     setIsDeleteDialogOpen(true);
@@ -152,43 +102,25 @@ export const MusclesProvider = ({ children }) => {
   };
 
   // Handlers
-  const handlePageChange = page => {
-    setCurrentPage(page);
-  };
-
-  const handlePageSizeChange = size => {
-    setPageSize(size);
-    setCurrentPage(1);
-  };
-
   const handleSortingChange = (sortBy, sortOrder) => {
     setSorting({ sortBy, sortOrder });
-    setCurrentPage(1);
   };
 
-  const handleFiltersChange = newFilters => {
+  const handleFiltersChange = useCallback(newFilters => {
     setFilters(prev => ({ ...prev, ...newFilters }));
-    setCurrentPage(1);
-  };
+  }, []);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setFilters({ search: '' });
-    setCurrentPage(1);
-  };
+  }, []);
 
-  const refreshData = () => {
-    fetchData();
-  };
+  const refreshData = useCallback(() => {
+    dispatch(fetchMuscles());
+  }, [dispatch]);
 
   const value = {
     muscles,
     loading,
-    pagination: {
-      currentPage,
-      pageSize,
-      totalPages: sliceTotalPages || Math.ceil(muscles.length / pageSize),
-      totalMuscles: sliceTotalMuscles || muscles.length
-    },
     // Dialog states
     isActionDialogOpen,
     isDeleteDialogOpen,
@@ -201,15 +133,11 @@ export const MusclesProvider = ({ children }) => {
     // Filters & Sorting
     filters,
     sorting,
-    currentPage,
-    pageSize,
     // Handlers
-    handlePageChange,
-    handlePageSizeChange,
     handleSortingChange,
     handleFiltersChange,
     clearFilters,
-
+    // Dialog handlers
     openDeleteDialog,
     openDetailsDialog,
     closeAllDialogs,
@@ -217,7 +145,6 @@ export const MusclesProvider = ({ children }) => {
     setIsDeleteDialogOpen,
     setIsDetailsDialogOpen,
     // Data fetching
-    fetchPage,
     refreshData
   };
 
