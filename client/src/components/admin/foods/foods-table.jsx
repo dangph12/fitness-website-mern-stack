@@ -47,64 +47,86 @@ export function FoodsTable() {
   const totalPages =
     foods?.totalPages || Math.ceil(totalCount / pagination.pageSize);
 
-  // Fetch foods when component mounts or filters change
+  // Fetch foods when pagination, sorting, or filters change
   useEffect(() => {
     dispatch(
       fetchFoods({
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
-        sortBy: sorting[0]?.id,
+        sortBy: sorting[0]?.id || 'createdAt',
         sortOrder: sorting[0]?.desc ? 'desc' : 'asc',
         filterParams: filters
       })
     );
-  }, [dispatch, pagination, sorting, filters]);
-
-  // Update selected foods when row selection changes
-  useEffect(() => {
-    const selectedFoodsList = Object.keys(rowSelection)
-      .filter(key => rowSelection[key])
-      .map(key => foodsData[parseInt(key)])
-      .filter(Boolean);
-    setSelectedFoods(selectedFoodsList);
-  }, [rowSelection, foodsData, setSelectedFoods]);
+  }, [dispatch, pagination.pageIndex, pagination.pageSize, sorting, filters]);
 
   const table = useReactTable({
     data: foodsData,
     columns: FoodsColumns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    onPaginationChange: setPagination,
+    pageCount: totalPages,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination
+      pagination: {
+        pageIndex: Math.max(0, currentPage - 1),
+        pageSize: pagination.pageSize
+      }
     },
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: updater => {
+      const currentPageIndex = Math.max(0, currentPage - 1);
+      const currentSize = pagination.pageSize;
+
+      const newState =
+        typeof updater === 'function'
+          ? updater({ pageIndex: currentPageIndex, pageSize: currentSize })
+          : updater;
+
+      const newPage = newState.pageIndex || 0;
+      const newSize = newState.pageSize || currentSize;
+
+      // Update local pagination state
+      setPagination({
+        pageIndex: newPage,
+        pageSize: newSize
+      });
+
+      // Clear row selection when changing pages
+      setRowSelection({});
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     manualPagination: true,
     manualSorting: true,
-    manualFiltering: true, // Add this for server-side filtering
-    pageCount: totalPages
+    manualFiltering: true
   });
+
+  // Update selected foods when row selection changes
+  useEffect(() => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const selectedFoodsList = selectedRows.map(row => row.original);
+    setSelectedFoods(selectedFoodsList);
+  }, [rowSelection, setSelectedFoods, table]);
 
   const handleFiltersChange = newFilters => {
     setFilters(newFilters);
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
-    setRowSelection({}); // Clear selection when filters change
+    setRowSelection({});
   };
 
   const handleClearFilters = () => {
     setFilters({});
     setColumnFilters([]);
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
-    setRowSelection({}); // Clear selection when filters are cleared
+    setRowSelection({});
   };
 
   if (loading && foodsData.length === 0) {
@@ -138,29 +160,20 @@ export function FoodsTable() {
 
   return (
     <div className='space-y-4'>
+      {/* Header with Filters and Actions */}
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold'>Foods Management</h1>
-        <FoodsPrimaryButtons />
-      </div>
-
-      <FoodsFilters
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-        onClearFilters={handleClearFilters}
-      />
-
-      <div className='flex items-center justify-between'>
-        <div className='text-sm text-muted-foreground'>
-          {totalCount} food(s) found
-          {Object.keys(rowSelection).length > 0 && (
-            <span className='ml-2'>
-              ({Object.keys(rowSelection).length} selected)
-            </span>
-          )}
+        <FoodsFilters
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          onClearFilters={handleClearFilters}
+        />
+        <div className='flex items-center space-x-2'>
+          <DataTableViewOptions table={table} />
+          <FoodsPrimaryButtons selectedFoods={selectedFoods} />
         </div>
-        <DataTableViewOptions table={table} />
       </div>
 
+      {/* Table */}
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
@@ -185,7 +198,6 @@ export function FoodsTable() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className={row.getIsSelected() ? 'bg-muted/50' : ''}
                 >
                   {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id}>
@@ -203,7 +215,7 @@ export function FoodsTable() {
                   colSpan={FoodsColumns.length}
                   className='h-24 text-center'
                 >
-                  {loading ? 'Loading...' : 'No foods found.'}
+                  {loading ? 'Loading foods...' : 'No foods found.'}
                 </TableCell>
               </TableRow>
             )}
@@ -211,6 +223,7 @@ export function FoodsTable() {
         </Table>
       </div>
 
+      {/* Pagination */}
       <DataTablePagination
         table={table}
         loading={loading}
