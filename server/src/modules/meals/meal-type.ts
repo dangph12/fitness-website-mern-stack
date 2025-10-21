@@ -1,5 +1,14 @@
 import { Types } from 'mongoose';
 
+export enum MealType {
+  Breakfast = 'Breakfast',
+  Lunch = 'Lunch',
+  Dinner = 'Dinner',
+  Snack = 'Snack',
+  Brunch = 'Brunch',
+  Dessert = 'Dessert'
+}
+
 export interface IMeal {
   title: string;
   image: string;
