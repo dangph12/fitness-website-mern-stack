@@ -24,7 +24,6 @@ const FavoriteService = {
         throw createHttpError(400, `Invalid workoutId: ${workoutId}`);
       }
 
-      // Check if favorite already exists
       const existingFavorite = await FavoriteModel.findOne({
         user: userId,
         workout: workoutId
@@ -39,7 +38,6 @@ const FavoriteService = {
       }
     }
 
-    // Return all favorites for this user with population
     const favorites = await FavoriteModel.find({ user: userId })
       .populate('user')
       .populate({
@@ -73,24 +71,7 @@ const FavoriteService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const filterRecord: Record<string, any> = { user: userId };
-
-    for (const [key, value] of Object.entries(filterParams)) {
-      if (value && value !== '') {
-        filterRecord[key] = { $regex: value, $options: 'i' };
-      }
-    }
-
-    const skip = (page - 1) * limit;
-    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as any;
-
-    const totalFavorites = await FavoriteModel.countDocuments(filterRecord);
-    const totalPages = Math.ceil(totalFavorites / limit);
-
-    const favorites = await FavoriteModel.find(filterRecord)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
+    let favorites = await FavoriteModel.find({ user: userId })
       .populate('user')
       .populate({
         path: 'workout',
@@ -103,8 +84,38 @@ const FavoriteService = {
         ]
       });
 
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value && value !== '') {
+        favorites = favorites.filter((favorite: any) => {
+          const workoutField = favorite.workout?.[key];
+          if (typeof workoutField === 'string') {
+            return workoutField
+              .toLowerCase()
+              .includes((value as string).toLowerCase());
+          }
+          return false;
+        });
+      }
+    }
+
+    favorites.sort((a: any, b: any) => {
+      const aValue = a.workout?.[sortBy] || a[sortBy];
+      const bValue = b.workout?.[sortBy] || b[sortBy];
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    const totalFavorites = favorites.length;
+    const totalPages = Math.ceil(totalFavorites / limit);
+    const skip = (page - 1) * limit;
+    const paginatedFavorites = favorites.slice(skip, skip + limit);
+
     return {
-      favorites,
+      favorites: paginatedFavorites,
       totalFavorites,
       totalPages
     };
@@ -140,7 +151,6 @@ const FavoriteService = {
       }
     }
 
-    // Return remaining favorites for this user with population
     const favorites = await FavoriteModel.find({ user: userId })
       .populate('user')
       .populate({

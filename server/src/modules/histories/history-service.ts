@@ -85,24 +85,7 @@ const HistoryService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const filterRecord: Record<string, any> = { user: userId };
-
-    for (const [key, value] of Object.entries(filterParams)) {
-      if (value && value !== '') {
-        filterRecord[key] = { $regex: value, $options: 'i' };
-      }
-    }
-
-    const skip = (page - 1) * limit;
-    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as any;
-
-    const totalHistories = await HistoryModel.countDocuments(filterRecord);
-    const totalPages = Math.ceil(totalHistories / limit);
-
-    const histories = await HistoryModel.find(filterRecord)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
+    let histories = await HistoryModel.find({ user: userId })
       .populate('user')
       .populate({
         path: 'workout',
@@ -128,12 +111,38 @@ const HistoryService = {
         ]
       });
 
-    if (!histories) {
-      throw createHttpError(404, 'History not found');
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value && value !== '') {
+        histories = histories.filter((history: any) => {
+          const workoutField = history.workout?.[key];
+          if (typeof workoutField === 'string') {
+            return workoutField
+              .toLowerCase()
+              .includes((value as string).toLowerCase());
+          }
+          return false;
+        });
+      }
     }
 
+    histories.sort((a: any, b: any) => {
+      const aValue = a.workout?.[sortBy] || a[sortBy];
+      const bValue = b.workout?.[sortBy] || b[sortBy];
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    const totalHistories = histories.length;
+    const totalPages = Math.ceil(totalHistories / limit);
+    const skip = (page - 1) * limit;
+    const paginatedHistories = histories.slice(skip, skip + limit);
+
     return {
-      histories,
+      histories: paginatedHistories,
       totalHistories,
       totalPages
     };
