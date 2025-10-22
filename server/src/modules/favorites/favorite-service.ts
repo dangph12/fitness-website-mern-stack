@@ -40,10 +40,37 @@ const FavoriteService = {
     }
 
     await favorite.save();
-    return favorite;
+
+    const populatedFavorite = await FavoriteModel.findById(favorite._id)
+      .populate('user')
+      .populate({
+        path: 'workouts',
+        populate: [
+          { path: 'user' },
+          {
+            path: 'exercises.exercise',
+            populate: [{ path: 'muscles' }, { path: 'equipments' }]
+          }
+        ]
+      });
+
+    if (!populatedFavorite) {
+      throw createHttpError(500, 'Failed to populate favorite');
+    }
+
+    return populatedFavorite;
   },
 
-  listByUser: async (userId: string) => {
+  listByUser: async (
+    userId: string,
+    {
+      page = 1,
+      limit = 10,
+      filterParams = {},
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    }
+  ) => {
     if (!userId) {
       throw createHttpError(400, 'userId is required');
     }
@@ -51,15 +78,45 @@ const FavoriteService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    let favorite = await FavoriteModel.findOne({ user: userId }).populate(
-      'workouts'
-    );
+    const filterRecord: Record<string, any> = { user: userId };
 
-    if (!favorite) {
-      favorite = await FavoriteModel.create({ user: userId, workouts: [] });
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value && value !== '') {
+        filterRecord[key] = { $regex: value, $options: 'i' };
+      }
     }
 
-    return favorite;
+    const skip = (page - 1) * limit;
+    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as any;
+
+    const totalFavorites = await FavoriteModel.countDocuments(filterRecord);
+    const totalPages = Math.ceil(totalFavorites / limit);
+
+    let favorites = await FavoriteModel.findOne({ user: userId })
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate('user')
+      .populate({
+        path: 'workouts',
+        populate: [
+          { path: 'user' },
+          {
+            path: 'exercises.exercise',
+            populate: [{ path: 'muscles' }, { path: 'equipments' }]
+          }
+        ]
+      });
+
+    if (!favorites) {
+      favorites = await FavoriteModel.create({ user: userId, workouts: [] });
+    }
+
+    return {
+      favorites,
+      totalFavorites,
+      totalPages
+    };
   },
 
   removeFavoriteItem: async (userId: string, favoriteData: IFavorite) => {
@@ -74,10 +131,10 @@ const FavoriteService = {
       throw createHttpError(400, 'workoutId is required');
     }
 
-    const favourite = await FavoriteModel.findOne({ user: userId });
+    const favorite = await FavoriteModel.findOne({ user: userId });
 
-    if (!favourite) {
-      throw createHttpError(404, 'Favourite list not found');
+    if (!favorite) {
+      throw createHttpError(404, 'Favorite list not found');
     }
 
     for (const workoutId of favoriteData.workouts) {
@@ -85,21 +142,39 @@ const FavoriteService = {
         throw createHttpError(400, `Invalid workoutId: ${workoutId}`);
       }
 
-      const initialLength = favourite.workouts.length;
-      favourite.workouts = favourite.workouts.filter(
+      const initialLength = favorite.workouts.length;
+      favorite.workouts = favorite.workouts.filter(
         id => !id.equals(new Types.ObjectId(workoutId))
       );
 
-      if (favourite.workouts.length === initialLength) {
+      if (favorite.workouts.length === initialLength) {
         throw createHttpError(
           404,
-          `Workout ${workoutId} not found in favourites`
+          `Workout ${workoutId} not found in favorites`
         );
       }
     }
 
-    await favourite.save();
-    return favourite;
+    await favorite.save();
+
+    const populatedFavorite = await FavoriteModel.findById(favorite._id)
+      .populate('user')
+      .populate({
+        path: 'workouts',
+        populate: [
+          { path: 'user' },
+          {
+            path: 'exercises.exercise',
+            populate: [{ path: 'muscles' }, { path: 'equipments' }]
+          }
+        ]
+      });
+
+    if (!populatedFavorite) {
+      throw createHttpError(500, 'Failed to populate favorite');
+    }
+
+    return populatedFavorite;
   }
 };
 
