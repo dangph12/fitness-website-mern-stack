@@ -35,10 +35,49 @@ const HistoryService = {
       time: historyData.time
     });
 
-    return history;
+    const populatedHistory = await HistoryModel.findById(history._id)
+      .populate('user')
+      .populate({
+        path: 'workout',
+        populate: [
+          { path: 'user' },
+          {
+            path: 'exercises.exercise',
+            populate: [{ path: 'muscles' }, { path: 'equipments' }]
+          }
+        ]
+      })
+      .populate({
+        path: 'plan',
+        populate: [
+          { path: 'user' },
+          {
+            path: 'workouts',
+            populate: {
+              path: 'exercises.exercise',
+              populate: [{ path: 'muscles' }, { path: 'equipments' }]
+            }
+          }
+        ]
+      });
+
+    if (!populatedHistory) {
+      throw createHttpError(500, 'Failed to populate history');
+    }
+
+    return populatedHistory;
   },
 
-  listByUser: async (userId: string) => {
+  listByUser: async (
+    userId: string,
+    {
+      page = 1,
+      limit = 10,
+      filterParams = {},
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    }
+  ) => {
     if (!userId) {
       throw createHttpError(400, 'userId is required');
     }
@@ -46,15 +85,58 @@ const HistoryService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const history = await HistoryModel.find({ user: userId })
-      .populate('workout')
-      .populate('plan');
+    const filterRecord: Record<string, any> = { user: userId };
 
-    if (!history) {
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value && value !== '') {
+        filterRecord[key] = { $regex: value, $options: 'i' };
+      }
+    }
+
+    const skip = (page - 1) * limit;
+    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as any;
+
+    const totalHistories = await HistoryModel.countDocuments(filterRecord);
+    const totalPages = Math.ceil(totalHistories / limit);
+
+    const histories = await HistoryModel.find(filterRecord)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate('user')
+      .populate({
+        path: 'workout',
+        populate: [
+          { path: 'user' },
+          {
+            path: 'exercises.exercise',
+            populate: [{ path: 'muscles' }, { path: 'equipments' }]
+          }
+        ]
+      })
+      .populate({
+        path: 'plan',
+        populate: [
+          { path: 'user' },
+          {
+            path: 'workouts',
+            populate: {
+              path: 'exercises.exercise',
+              populate: [{ path: 'muscles' }, { path: 'equipments' }]
+            }
+          }
+        ]
+      });
+
+    if (!histories) {
       throw createHttpError(404, 'History not found');
     }
 
-    return history;
+    return {
+      histories,
+      totalHistories,
+      totalPages
+    };
   },
 
   removeFromHistory: async (historyId: string) => {
