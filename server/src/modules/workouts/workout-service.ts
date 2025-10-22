@@ -242,7 +242,7 @@ const WorkoutService = {
       });
 
     if (!populatedWorkout) {
-      throw createHttpError(500, 'Failed to create workout');
+      throw createHttpError(500, 'Failed to update workout');
     }
 
     return populatedWorkout;
