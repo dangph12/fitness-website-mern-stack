@@ -21,6 +21,7 @@ const MealsList = () => {
     if (userId) {
       dispatch(fetchMeals({ page: 1, limit: 10 }));
     }
+    console.log(meals);
   }, [dispatch, userId]);
 
   const handleSelectMeal = meal => {
@@ -38,8 +39,10 @@ const MealsList = () => {
   const getTotalNutrients = foods => {
     return foods.reduce(
       (totals, food) => {
-        totals.calories += food.foodId.calories * food.quantity;
-        totals.fats += food.foodId.fats * food.quantity;
+        if (food?.food && food.food.calories && food.food.fats) {
+          totals.calories += food.food.calories * food.quantity || 0;
+          totals.fats += food.food.fats * food.quantity || 0;
+        }
         return totals;
       },
       { calories: 0, fats: 0 }
@@ -156,7 +159,6 @@ const MealsList = () => {
             >
               &times;
             </button>
-
             <h2 className='text-2xl font-semibold text-center mb-4'>
               {selectedMeal.title}
             </h2>
@@ -168,9 +170,7 @@ const MealsList = () => {
             <p className='text-center text-lg text-gray-600 mb-6'>
               {selectedMeal.mealType}
             </p>
-
-            <UserCard user={selectedMeal.userId} />
-
+            <UserCard user={selectedMeal.user} />{' '}
             <div className='mt-7'>
               <h3 className='text-xl font-semibold mb-2'>Foods in this Meal</h3>
               <ul className='space-y-4'>
@@ -178,30 +178,29 @@ const MealsList = () => {
                   <li
                     key={food._id}
                     className='flex items-center space-x-4 border border-gray-300 p-4 rounded-lg hover:shadow-lg transition-all cursor-pointer'
-                    onClick={() => handleSelectFood(food.foodId._id)}
+                    onClick={() => handleSelectFood(food.food._id)} // Chú ý sử dụng food.foodId thay vì foodId
                   >
                     <img
-                      src={food.foodId.image}
-                      alt={food.foodId.title}
+                      src={food.food.image}
+                      alt={food.food.title}
                       className='w-16 h-16 object-cover rounded-full'
                     />
                     <div className='flex-1'>
-                      <p className='font-medium'>{food.foodId.title}</p>
+                      <p className='font-medium'>{food.food.title}</p>
                       <p className='text-sm text-gray-600'>
                         Quantity: {food.quantity} units
                       </p>
                       <p className='text-sm text-gray-500'>
-                        Calories: {food.foodId.calories} kcal
+                        Calories: {food.food.calories} kcal
                       </p>
                       <p className='text-sm text-gray-500'>
-                        Fat: {food.foodId.fats} g
+                        Fat: {food.food.fats} g
                       </p>
                     </div>
                   </li>
                 ))}
               </ul>
             </div>
-
             {selectedMeal.foods && (
               <div className='text-center mb-6 mt-3'>
                 <div className='flex justify-center space-x-8 bg-gradient-to-r from-blue-400 to-blue-300 p-4 rounded-lg shadow-lg'>

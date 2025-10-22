@@ -2,5 +2,14 @@ import { Types } from 'mongoose';
 
 export interface IGoal {
   targetWeight: number;
-  userId: Types.ObjectId;
+  user: Types.ObjectId;
+  diet:
+    | 'Mediterranean'
+    | 'Ketogenic (Keto)'
+    | 'Paleo'
+    | 'Vegetarian'
+    | 'Vegan'
+    | 'Gluten-Free'
+    | 'Low-Carb';
+  fitnessGoal: 'Lose Weight' | 'Build Muscle' | 'To be Healthy';
 }

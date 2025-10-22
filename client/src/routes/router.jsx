@@ -48,6 +48,42 @@ const router = createBrowserRouter([
       {
         path: 'exercise/:id',
         Component: lazy(() => import('~/app/exercises/[id]/page'))
+      },
+      {
+        path: 'onboarding',
+        Component: lazy(() => import('~/app/onboarding/page'))
+      },
+      {
+        path: 'workouts',
+        Component: lazy(() => import('~/app/workouts/workouts-list/page'))
+      },
+      {
+        path: 'workouts/create-workout',
+        Component: lazy(() => import('~/app/workouts/create-workout/page'))
+      },
+      {
+        path: 'workouts/workout-detail/:workoutId',
+        Component: lazy(() => import('~/app/workouts/workout-detail/[id]/page'))
+      },
+      {
+        path: 'plans/plan-list',
+        Component: lazy(() => import('~/app/plans/plan-list/page'))
+      },
+      {
+        path: 'plans/rountine-builder',
+        Component: lazy(() => import('~/app/plans/rountine-builder/page'))
+      },
+      {
+        path: 'workout/edit-workout/:workoutId',
+        Component: lazy(() => import('~/app/workouts/edit-workout/page'))
+      },
+      {
+        path: 'plans/plan-detail/:planId',
+        Component: lazy(() => import('~/app/plans/plan-detail/[planId]/page'))
+      },
+      {
+        path: 'plans/edit-plan/:planId',
+        Component: lazy(() => import('~/app/plans/plan-edit/[planId]/page'))
       }
     ],
     ErrorBoundary: ErrorComponent

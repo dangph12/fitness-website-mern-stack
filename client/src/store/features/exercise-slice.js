@@ -52,7 +52,7 @@ export const fetchReferenceLists = createAsyncThunk(
 export const fetchAllExercises = createAsyncThunk(
   'exercises/fetchAllExercises',
   async () => {
-    const response = await axiosInstance.get('/api/exercises/all');
+    const response = await axiosInstance.get('/api/exercises');
     return response.data.data;
   }
 );
@@ -61,8 +61,13 @@ export const fetchAllExercises = createAsyncThunk(
 export const fetchExerciseById = createAsyncThunk(
   'exercises/fetchExerciseById',
   async id => {
-    const response = await axiosInstance.get(`/api/exercises/${id}`);
-    return response.data.data;
+    try {
+      const response = await axiosInstance.get(`/api/exercises/${id}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching exercises:', error);
+      throw error;
+    }
   }
 );
 
@@ -158,7 +163,15 @@ export const exerciseSlice = createSlice({
       })
 
       // FETCH BY ID
+      // In exercise-slice.js, in the extraReducers:
       .addCase(fetchExerciseById.fulfilled, (state, action) => {
+        // Add the exercise to the exercises array
+        const existingExercise = state.exercises.find(
+          ex => ex._id === action.payload._id
+        );
+        if (!existingExercise) {
+          state.exercises.push(action.payload); // Ensure we add the exercise if it's not already there
+        }
         state.currentExercise = action.payload;
       })
 

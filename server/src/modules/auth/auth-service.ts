@@ -15,7 +15,7 @@ import UserService from '../users/user-service';
 import { IUser } from '../users/user-type';
 
 const AuthService = {
-  login: async (email: string, password: string, role: string) => {
+  login: async (email: string, password: string, role?: string) => {
     const user = await UserService.findByEmail(email);
 
     const auth = await AuthModel.findOne({ user: user._id, provider: 'local' });
@@ -26,7 +26,7 @@ const AuthService = {
 
     const isPasswordValid = await comparePassword(password, auth.localPassword);
 
-    if (!isPasswordValid || user.role !== role) {
+    if (!isPasswordValid || (role && user.role !== role)) {
       throw createHttpError(401, 'Username or password is incorrect');
     }
 
@@ -36,7 +36,8 @@ const AuthService = {
 
     const { accessToken, refreshToken } = generateToken({
       id: user._id.toString(),
-      role: user.role
+      role: user.role,
+      profileCompleted: user.profileCompleted
     });
 
     return {
@@ -63,7 +64,8 @@ const AuthService = {
 
     const { accessToken, refreshToken } = generateToken({
       id: user._id.toString(),
-      role: user.role
+      role: user.role,
+      profileCompleted: user.profileCompleted
     });
 
     return {
@@ -143,7 +145,8 @@ const AuthService = {
 
     const { accessToken } = generateToken({
       id: user._id.toString(),
-      role: user.role
+      role: user.role,
+      profileCompleted: user.profileCompleted
     });
 
     return accessToken;

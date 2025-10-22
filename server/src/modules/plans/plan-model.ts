@@ -8,7 +8,7 @@ const PlanSchema = new Schema<IPlan>(
     description: { type: String, default: '' },
     image: { type: String, default: '' },
     isPublic: { type: Boolean, default: false },
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     workouts: [{ type: Schema.Types.ObjectId, ref: 'Workout', required: true }]
   },
   { timestamps: true }
