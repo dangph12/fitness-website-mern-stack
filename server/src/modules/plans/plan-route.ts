@@ -12,9 +12,7 @@ import {
 
 const router: Router = express.Router();
 
-router.get('/filter', asyncHandler(PlanController.find));
-
-router.get('/', asyncHandler(PlanController.findAll));
+router.get('/', asyncHandler(PlanController.find));
 
 router.get('/user/:userId', asyncHandler(PlanController.findByUser));
 

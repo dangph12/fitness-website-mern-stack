@@ -35,18 +35,21 @@ const PlanService = {
     const plans = await PlanModel.find(filterRecord)
       .sort(sort)
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .populate('user')
+      .populate({
+        path: 'workouts',
+        populate: {
+          path: 'exercises.exercise',
+          populate: [{ path: 'muscles' }, { path: 'equipments' }]
+        }
+      });
 
     return {
       plans,
       totalPlans,
       totalPages
     };
-  },
-
-  findAll: async () => {
-    const plans = await PlanModel.find().populate('user').populate('workouts');
-    return plans;
   },
 
   findById: async (planId: string) => {
@@ -56,7 +59,13 @@ const PlanService = {
 
     const plan = await PlanModel.findById(planId)
       .populate('user')
-      .populate('workouts');
+      .populate({
+        path: 'workouts',
+        populate: {
+          path: 'exercises.exercise',
+          populate: [{ path: 'muscles' }, { path: 'equipments' }]
+        }
+      });
 
     if (!plan) {
       throw createHttpError(404, 'Plan not found');
@@ -65,20 +74,52 @@ const PlanService = {
     return plan;
   },
 
-  findByUser: async (userId: string) => {
+  findByUser: async (
+    userId: string,
+    {
+      page = 1,
+      limit = 10,
+      filterParams = {},
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    }
+  ) => {
     if (!Types.ObjectId.isValid(userId)) {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const plan = await PlanModel.findOne({ user: userId })
-      .populate('user')
-      .populate('workouts');
+    const filterRecord: Record<string, any> = { user: userId };
 
-    if (!plan) {
-      throw createHttpError(404, 'Plan not found');
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value && value !== '') {
+        filterRecord[key] = { $regex: value, $options: 'i' };
+      }
     }
 
-    return plan;
+    const skip = (page - 1) * limit;
+    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as any;
+
+    const totalPlans = await PlanModel.countDocuments(filterRecord);
+    const totalPages = Math.ceil(totalPlans / limit);
+
+    const plans = await PlanModel.find(filterRecord)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate('user')
+      .populate({
+        path: 'workouts',
+        populate: {
+          path: 'exercises.exercise',
+          populate: [{ path: 'muscles' }, { path: 'equipments' }]
+        }
+      });
+
+    return {
+      plans,
+      totalPlans,
+      totalPages
+    };
   },
 
   create: async (planData: ICreatePlan, file?: Express.Multer.File) => {
@@ -157,7 +198,21 @@ const PlanService = {
       throw createHttpError(500, 'Failed to create plan');
     }
 
-    return newPlan;
+    const populatedPlan = await PlanModel.findById(newPlan._id)
+      .populate('user')
+      .populate({
+        path: 'workouts',
+        populate: {
+          path: 'exercises.exercise',
+          populate: [{ path: 'muscles' }, { path: 'equipments' }]
+        }
+      });
+
+    if (!populatedPlan) {
+      throw createHttpError(500, 'Failed to populate plan');
+    }
+
+    return populatedPlan;
   },
 
   update: async (
@@ -289,7 +344,21 @@ const PlanService = {
       throw createHttpError(500, 'Failed to update plan');
     }
 
-    return updatedPlan;
+    const populatedPlan = await PlanModel.findById(planId)
+      .populate('user')
+      .populate({
+        path: 'workouts',
+        populate: {
+          path: 'exercises.exercise',
+          populate: [{ path: 'muscles' }, { path: 'equipments' }]
+        }
+      });
+
+    if (!populatedPlan) {
+      throw createHttpError(500, 'Failed to populate plan');
+    }
+
+    return populatedPlan;
   },
 
   remove: async (planId: string) => {
