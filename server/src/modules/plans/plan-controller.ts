@@ -6,7 +6,13 @@ import PlanService from './plan-service';
 
 const PlanController = {
   find: async (req: Request, res: Response) => {
-    const { page, limit, sortBy, sortOrder, ...filterParams } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      ...filterParams
+    } = req.query;
 
     const plans = await PlanService.find({
       page: Number(page),
@@ -32,7 +38,13 @@ const PlanController = {
   findByUser: async (req: Request, res: Response) => {
     const userId = req.params.userId;
 
-    const { page, limit, sortBy, sortOrder, ...filterParams } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      ...filterParams
+    } = req.query;
 
     const plans = await PlanService.findByUser(userId, {
       page: Number(page),

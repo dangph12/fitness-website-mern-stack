@@ -6,7 +6,13 @@ import MealService from './meal-service';
 
 const MealController = {
   find: async (req: Request, res: Response) => {
-    const { page, limit, sortBy, sortOrder, ...filterParams } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      ...filterParams
+    } = req.query;
 
     const meals = await MealService.find({
       page: Number(page),

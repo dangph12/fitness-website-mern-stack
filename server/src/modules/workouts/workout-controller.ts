@@ -6,7 +6,13 @@ import WorkoutService from './workout-service';
 
 const WorkoutController = {
   find: async (req: Request, res: Response) => {
-    const { page, limit, sortBy, sortOrder, ...filterParams } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      ...filterParams
+    } = req.query;
 
     const workouts = await WorkoutService.find({
       page: Number(page),
@@ -31,7 +37,13 @@ const WorkoutController = {
 
   findByUser: async (req: Request, res: Response) => {
     const userId = req.params.userId;
-    const { page, limit, sortBy, sortOrder, ...filterParams } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      ...filterParams
+    } = req.query;
 
     const workouts = await WorkoutService.findByUser(userId, {
       page: Number(page),
