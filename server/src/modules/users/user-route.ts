@@ -6,25 +6,38 @@ import asyncHandler from '~/utils/async-handler';
 import { uploadSingle } from '~/utils/multer';
 
 import UserController from './user-controller';
-import UserValidationSchema from './user-validation';
+import UserValidationSchema, { OnboardingValidation } from './user-validation';
 
 const router: Router = express.Router();
 
-// In list method, you can implement pagination, sorting, and filtering logic
 router.get('/', asyncHandler(UserController.find));
 
 router.post(
   '/',
+  uploadSingle('avatar'),
   validate(UserValidationSchema.shape),
   asyncHandler(UserController.create)
 );
 
 router.get('/:id', authenticate(), asyncHandler(UserController.findById));
 
-// For update, because some fields are optional, we use partial validation
-router.patch(
+router.get(
+  '/email/:email',
+  authenticate(),
+  asyncHandler(UserController.findByEmail)
+);
+
+router.put(
+  '/onboarding',
+  authenticate(),
+  validate(OnboardingValidation.shape),
+  asyncHandler(UserController.completeOnboarding)
+);
+
+router.put(
   '/:id',
-  validate(UserValidationSchema.partial().shape),
+  uploadSingle('avatar'),
+  validate(UserValidationSchema.shape),
   asyncHandler(UserController.update)
 );
 

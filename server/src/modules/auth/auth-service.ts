@@ -15,7 +15,7 @@ import UserService from '../users/user-service';
 import { IUser } from '../users/user-type';
 
 const AuthService = {
-  login: async (email: string, password: string) => {
+  login: async (email: string, password: string, role?: string) => {
     const user = await UserService.findByEmail(email);
 
     const auth = await AuthModel.findOne({ user: user._id, provider: 'local' });
@@ -26,13 +26,18 @@ const AuthService = {
 
     const isPasswordValid = await comparePassword(password, auth.localPassword);
 
-    if (!isPasswordValid) {
-      throw createHttpError(401, 'Password is incorrect');
+    if (!isPasswordValid || (role && user.role !== role)) {
+      throw createHttpError(401, 'Username or password is incorrect');
+    }
+
+    if (!user.isActive) {
+      throw createHttpError(403, 'User account is deactivated');
     }
 
     const { accessToken, refreshToken } = generateToken({
       id: user._id.toString(),
-      role: user.role
+      role: user.role,
+      profileCompleted: user.profileCompleted
     });
 
     return {
@@ -46,19 +51,7 @@ const AuthService = {
     password: string,
     avatarFile?: Express.Multer.File
   ) => {
-    const user = await UserService.create(userData);
-
-    if (avatarFile) {
-      const uploadResult = await uploadAvatar(
-        avatarFile.buffer,
-        user._id.toString()
-      );
-      if (uploadResult.success && uploadResult.data) {
-        await UserService.update(user._id.toString(), {
-          avatar: uploadResult.data.secure_url
-        });
-      }
-    }
+    const user = await UserService.create(userData, avatarFile);
 
     const hashedPassword = await hashPassword(password);
 
@@ -71,7 +64,8 @@ const AuthService = {
 
     const { accessToken, refreshToken } = generateToken({
       id: user._id.toString(),
-      role: user.role
+      role: user.role,
+      profileCompleted: user.profileCompleted
     });
 
     return {
@@ -151,7 +145,8 @@ const AuthService = {
 
     const { accessToken } = generateToken({
       id: user._id.toString(),
-      role: user.role
+      role: user.role,
+      profileCompleted: user.profileCompleted
     });
 
     return accessToken;

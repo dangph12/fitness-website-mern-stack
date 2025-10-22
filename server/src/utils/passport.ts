@@ -63,6 +63,12 @@ const configurePassport = () => {
               });
             }
 
+            if (!user.isActive) {
+              return done(null, false, {
+                message: 'user_inactive'
+              });
+            }
+
             await AuthService.loginWithProvider('facebook', profile.id, user);
 
             return done(null, user);
@@ -94,6 +100,12 @@ const configurePassport = () => {
                 name: profile.displayName || '',
                 avatar: profile.photos?.[0]?.value || '',
                 role: 'user'
+              });
+            }
+
+            if (!user.isActive) {
+              return done(null, false, {
+                message: 'user_inactive'
               });
             }
 

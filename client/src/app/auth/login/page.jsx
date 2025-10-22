@@ -1,9 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 
 import { Button } from '~/components/ui/button';
@@ -30,8 +30,11 @@ import { loginSchema } from '~/lib/validations/auth';
 import { loadUser } from '~/store/features/auth-slice';
 
 const Login = () => {
+  const [searchParams] = useSearchParams();
+  const error = searchParams.get('error');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector(state => state.auth);
 
   const form = useForm({
     resolver: yupResolver(loginSchema),
@@ -42,18 +45,42 @@ const Login = () => {
     }
   });
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (error) {
+        toast.error(
+          error === 'user_inactive'
+            ? 'User account is deactivated'
+            : 'Login failed.'
+        );
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [error]);
+
   const onSubmit = async data => {
     try {
       const { isRemember, ...loginData } = data;
       const response = await axiosInstance.post('/api/auth/login', loginData);
       const { accessToken } = response.data.data;
       dispatch(loadUser({ accessToken, isRemember }));
-      navigate('/');
       toast.success('Login successful!');
     } catch (error) {
-      toast.error('Login failed.');
+      toast.error(error?.response?.data?.message || 'Login failed.');
     }
   };
+
+  // Navigate based on profile completion status after user state updates
+  useEffect(() => {
+    if (user) {
+      if (user.profileCompleted === false) {
+        navigate('/onboarding');
+      } else {
+        navigate('/');
+      }
+    }
+  }, [user, navigate]);
 
   return (
     <div className='flex min-h-screen items-center justify-center p-4'>

@@ -1,8 +1,13 @@
-import { model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 
+import FavoriteModel from '../favorites/favorite-model';
+import GoalModel from '../goals/goal-model';
+import HistoryModel from '../histories/history-model';
 import { IUser } from './user-type';
 
-const UserSchema = new Schema<IUser>(
+export interface IUserDocument extends IUser, Document {}
+
+const UserSchema = new Schema<IUserDocument>(
   {
     email: { type: String, lowercase: true, unique: true, sparse: true },
     name: { type: String, required: true },
@@ -14,10 +19,40 @@ const UserSchema = new Schema<IUser>(
       enum: ['user', 'admin'],
       default: 'user'
     },
-    isActive: { type: Boolean, default: true }
+    dob: { type: Date },
+    isActive: { type: Boolean, default: true },
+    profileCompleted: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
+
+UserSchema.post('save', async (doc: IUserDocument, next) => {
+  try {
+    if (doc.role === 'user') {
+      await GoalModel.updateOne(
+        { user: doc._id },
+        {
+          $setOnInsert: {
+            user: doc._id,
+            targetWeight: 0,
+            diet: '',
+            fitnessGoal: ''
+          }
+        },
+        { upsert: true }
+      );
+
+      await FavoriteModel.updateOne(
+        { user: doc._id },
+        { $setOnInsert: { user: doc._id, workouts: [] } },
+        { upsert: true }
+      );
+    }
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
 
 const User = model<IUser>('User', UserSchema);
 export default User;

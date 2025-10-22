@@ -1,4 +1,8 @@
-#!/bin/bash
-set -e
-echo "=== Pre-commit hook starting ==="
-npx lint-staged
+#!/bin/sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "win32" ]]; then
+  npx.cmd lint-staged
+else
+  npx lint-staged
+fi
