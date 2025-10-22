@@ -34,20 +34,22 @@ const WorkoutService = {
     const workouts = await WorkoutModel.find(filterRecord)
       .sort(sort)
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .populate('user')
+      .populate({
+        path: 'exercises.exercise',
+        populate: [
+          // ✅ Populate BOTH muscles and equipments
+          { path: 'muscles' },
+          { path: 'equipments' }
+        ]
+      });
 
     return {
       workouts,
       totalWorkouts,
       totalPages
     };
-  },
-
-  findAll: async () => {
-    const workouts = await WorkoutModel.find()
-      .populate('user')
-      .populate('exercises.exercise');
-    return workouts;
   },
 
   findById: async (workoutId: string) => {
@@ -57,7 +59,14 @@ const WorkoutService = {
 
     const workout = await WorkoutModel.findById(workoutId)
       .populate('user')
-      .populate('exercises.exercise');
+      .populate({
+        path: 'exercises.exercise',
+        populate: [
+          // ✅ Populate BOTH muscles and equipments
+          { path: 'muscles' },
+          { path: 'equipments' }
+        ]
+      });
 
     if (!workout) {
       throw createHttpError(404, 'Workout not found');
@@ -66,16 +75,49 @@ const WorkoutService = {
     return workout;
   },
 
-  findByUser: async (userId: string) => {
+  findByUser: async (
+    userId: string,
+    {
+      page = 1,
+      limit = 10,
+      filterParams = {},
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    }
+  ) => {
     if (!Types.ObjectId.isValid(userId)) {
       throw createHttpError(400, 'Invalid ObjectId');
     }
 
-    const workouts = await WorkoutModel.find({ user: userId })
-      .populate('user')
-      .populate('exercises.exercise');
+    const filterRecord: Record<string, any> = { user: userId };
 
-    return workouts;
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value && value !== '') {
+        filterRecord[key] = { $regex: value, $options: 'i' };
+      }
+    }
+
+    const skip = (page - 1) * limit;
+    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as any;
+
+    const totalWorkouts = await WorkoutModel.countDocuments(filterRecord);
+    const totalPages = Math.ceil(totalWorkouts / limit);
+
+    const workouts = await WorkoutModel.find(filterRecord)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate('user')
+      .populate({
+        path: 'exercises.exercise',
+        populate: [{ path: 'muscles' }, { path: 'equipments' }]
+      });
+
+    return {
+      workouts,
+      totalWorkouts,
+      totalPages
+    };
   },
 
   create: async (workoutData: IWorkout, file?: Express.Multer.File) => {
