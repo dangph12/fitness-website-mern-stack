@@ -38,11 +38,7 @@ const WorkoutService = {
       .populate('user')
       .populate({
         path: 'exercises.exercise',
-        populate: [
-          // ✅ Populate BOTH muscles and equipments
-          { path: 'muscles' },
-          { path: 'equipments' }
-        ]
+        populate: [{ path: 'muscles' }, { path: 'equipments' }]
       });
 
     return {
@@ -61,11 +57,7 @@ const WorkoutService = {
       .populate('user')
       .populate({
         path: 'exercises.exercise',
-        populate: [
-          // ✅ Populate BOTH muscles and equipments
-          { path: 'muscles' },
-          { path: 'equipments' }
-        ]
+        populate: [{ path: 'muscles' }, { path: 'equipments' }]
       });
 
     if (!workout) {
@@ -157,15 +149,20 @@ const WorkoutService = {
 
     const newWorkoutData = { ...workoutData, image: imageUrl };
 
-    const workout = (await WorkoutModel.create(newWorkoutData)).populate(
-      'exercises.exercise user'
-    );
+    const workout = await WorkoutModel.create(newWorkoutData);
 
-    if (!workout) {
+    const populatedWorkout = await WorkoutModel.findById(workout._id)
+      .populate('user')
+      .populate({
+        path: 'exercises.exercise',
+        populate: [{ path: 'muscles' }, { path: 'equipments' }]
+      });
+
+    if (!populatedWorkout) {
       throw createHttpError(500, 'Failed to create workout');
     }
 
-    return workout;
+    return populatedWorkout;
   },
 
   update: async (
@@ -235,13 +232,20 @@ const WorkoutService = {
         new: true,
         runValidators: true
       }
-    ).populate('exercises.exercise user');
+    );
 
-    if (!updatedWorkout) {
-      throw createHttpError(500, 'Failed to update workout');
+    const populatedWorkout = await WorkoutModel.findById(workoutId)
+      .populate('user')
+      .populate({
+        path: 'exercises.exercise',
+        populate: [{ path: 'muscles' }, { path: 'equipments' }]
+      });
+
+    if (!populatedWorkout) {
+      throw createHttpError(500, 'Failed to create workout');
     }
 
-    return updatedWorkout;
+    return populatedWorkout;
   },
 
   remove: async (workoutId: string) => {
