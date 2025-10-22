@@ -5,8 +5,16 @@ import ApiResponse from '~/types/api-response';
 import MealService from './meal-service';
 
 const MealController = {
-  findAll: async (req: Request, res: Response) => {
-    const meals = await MealService.findAll();
+  find: async (req: Request, res: Response) => {
+    const { page, limit, sortBy, sortOrder, ...filterParams } = req.query;
+
+    const meals = await MealService.find({
+      page: Number(page),
+      limit: Number(limit),
+      filterParams: filterParams,
+      sortBy: sortBy as string,
+      sortOrder: sortOrder as string
+    });
 
     return res
       .status(200)

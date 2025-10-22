@@ -9,7 +9,7 @@ import MealValidationSchema from './meal-validation';
 
 const router: Router = express.Router();
 
-router.get('/', asyncHandler(MealController.findAll));
+router.get('/', asyncHandler(MealController.find));
 
 router.get('/:id', asyncHandler(MealController.findById));
 
