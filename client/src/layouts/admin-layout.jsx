@@ -38,7 +38,10 @@ const AdminLayout = () => {
       'manage-foods': 'Foods Management',
       'create-food': 'Create Food',
       'manage-muscles': 'Muscle Management',
-      'create-muscle': 'Create Muscle'
+      'create-muscle': 'Create Muscle',
+      'manage-equipments': 'Equipment Management',
+      'create-equipment': 'Create Equipment',
+      'update-equipment': 'Update Equipment'
     };
 
     const items = [];
