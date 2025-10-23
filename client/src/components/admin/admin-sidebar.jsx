@@ -1,23 +1,16 @@
 import {
   Activity,
-  BarChart3,
-  ChevronRight,
   Dumbbell,
-  FileText,
-  HelpCircle,
   Home,
   LogOut,
-  MessageSquare,
-  Settings,
-  Shield,
-  ShoppingCart,
-  User,
   Users,
   Utensils
 } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
+
+import { fetchUserProfile, logout } from '~/store/features/auth-slice';
 
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -32,11 +25,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarRail,
-  SidebarSeparator
+  SidebarRail
 } from '../ui/sidebar';
 
 export function AdminSidebar({ ...props }) {
@@ -45,7 +34,19 @@ export function AdminSidebar({ ...props }) {
   const dispatch = useDispatch();
 
   // Lấy thông tin user từ Redux store
-  const { user } = useSelector(state => state.auth);
+  const {
+    user: authUser,
+    userProfile,
+    loading: authLoading,
+    profileLoading
+  } = useSelector(state => state.auth);
+
+  // Fetch full user data khi component mount
+  useEffect(() => {
+    if (authUser?.id && !authLoading && !userProfile) {
+      dispatch(fetchUserProfile(authUser.id));
+    }
+  }, [authUser?.id, authLoading, userProfile, dispatch]);
 
   // Routes thực tế từ router.jsx
   const navMain = [
@@ -79,17 +80,40 @@ export function AdminSidebar({ ...props }) {
         }
       ]
     }
-    // Có thể thêm các routes admin khác khi chúng được tạo
   ];
 
-  const handleLogout = () => {
-    dispatch({ type: 'auth/logout' });
-    navigate('/admin/login');
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap();
+      navigate('/admin/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      navigate('/admin/login');
+    }
   };
 
   const handleNavigation = url => {
     navigate(url);
   };
+
+  // Lấy initials từ tên user
+  const getUserInitials = () => {
+    const displayName = userProfile?.name || authUser?.name;
+    if (!displayName) return 'AD';
+    return displayName
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Get display values
+  const displayName = userProfile?.name || authUser?.name || 'Admin User';
+  const displayEmail =
+    userProfile?.email || authUser?.email || 'admin@fitness.com';
+  const displayAvatar =
+    userProfile?.avatar || userProfile?.profilePicture || authUser?.avatar;
 
   return (
     <Sidebar collapsible='icon' {...props}>
@@ -149,25 +173,25 @@ export function AdminSidebar({ ...props }) {
           <SidebarMenuItem className='transition-all duration-300 ease-in-out'>
             <div className='flex items-center gap-2 px-2 py-1.5 transition-all duration-300 ease-in-out group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:gap-0'>
               <Avatar className='h-8 w-8 transition-all duration-300 ease-in-out'>
-                <AvatarImage
-                  src={user?.avatar || user?.profilePicture}
-                  alt={user?.name || 'Admin'}
-                />
-                <AvatarFallback className='bg-gradient-to-r from-green-400 to-blue-500 text-white transition-all duration-300 ease-in-out'>
-                  {user?.name
-                    ? user.name
-                        .split(' ')
-                        .map(n => n[0])
-                        .join('')
-                    : 'AD'}
-                </AvatarFallback>
+                {profileLoading ? (
+                  <div className='flex h-full w-full items-center justify-center bg-gradient-to-r from-green-400 to-blue-500'>
+                    <span className='text-xs text-white'>...</span>
+                  </div>
+                ) : (
+                  <>
+                    <AvatarImage src={displayAvatar} alt={displayName} />
+                    <AvatarFallback className='bg-gradient-to-r from-green-400 to-blue-500 text-white transition-all duration-300 ease-in-out'>
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </>
+                )}
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0 overflow-hidden'>
                 <span className='truncate font-semibold transition-all duration-300 ease-in-out'>
-                  {user?.name || 'Admin User'}
+                  {profileLoading ? 'Đang tải...' : displayName}
                 </span>
                 <span className='truncate text-xs text-muted-foreground transition-all duration-300 ease-in-out'>
-                  {user?.email || 'admin@fitness.com'}
+                  {profileLoading ? '...' : displayEmail}
                 </span>
               </div>
               <Button
