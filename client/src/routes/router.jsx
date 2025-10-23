@@ -143,12 +143,12 @@ const router = createBrowserRouter([
       },
       {
         path: '',
-        Component: () => (
-          <PrivateRoute allowedRoles={['admin']}>
-            <AdminLayout />
-          </PrivateRoute>
-        ),
-        // Component: AdminLayout,
+        // Component: () => (
+        //   <PrivateRoute allowedRoles={['admin']}>
+        //     <AdminLayout />
+        //   </PrivateRoute>
+        // ),
+        Component: AdminLayout,
 
         children: [
           {
