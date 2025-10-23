@@ -25,6 +25,21 @@ export const initializeAuth = createAsyncThunk(
   }
 );
 
+// Thêm action mới để fetch full user profile
+export const fetchUserProfile = createAsyncThunk(
+  'auth/fetchUserProfile',
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/api/users/${userId}`);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to fetch user profile'
+      );
+    }
+  }
+);
+
 export const logout = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
@@ -41,8 +56,11 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
+    userProfile: null, // Thêm state cho full user profile
     loading: true,
-    error: null
+    profileLoading: false, // Thêm loading riêng cho profile
+    error: null,
+    profileError: null
   },
   reducers: {
     loadUser: (state, action) => {
@@ -75,6 +93,9 @@ export const authSlice = createSlice({
         localStorage.removeItem('accessToken');
         sessionStorage.removeItem('accessToken');
       }
+    },
+    clearProfileError: state => {
+      state.profileError = null;
     }
   },
   extraReducers: builder => {
@@ -102,12 +123,26 @@ export const authSlice = createSlice({
         state.error = action.payload;
         state.user = null;
       })
+      // Handle fetchUserProfile
+      .addCase(fetchUserProfile.pending, state => {
+        state.profileLoading = true;
+        state.profileError = null;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.profileLoading = false;
+        state.userProfile = action.payload;
+      })
+      .addCase(fetchUserProfile.rejected, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = action.payload;
+      })
       .addCase(logout.pending, state => {
         state.loading = true;
       })
       .addCase(logout.fulfilled, state => {
         state.loading = false;
         state.user = null;
+        state.userProfile = null;
         state.error = null;
         localStorage.removeItem('accessToken');
         sessionStorage.removeItem('accessToken');
@@ -115,6 +150,7 @@ export const authSlice = createSlice({
       .addCase(logout.rejected, state => {
         state.loading = false;
         state.user = null;
+        state.userProfile = null;
         state.error = null;
         localStorage.removeItem('accessToken');
         sessionStorage.removeItem('accessToken');
@@ -122,6 +158,6 @@ export const authSlice = createSlice({
   }
 });
 
-export const { loadUser } = authSlice.actions;
+export const { loadUser, clearProfileError } = authSlice.actions;
 
 export default authSlice.reducer;
