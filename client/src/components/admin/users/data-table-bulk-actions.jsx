@@ -30,10 +30,10 @@ export function DataTableBulkActions({ selectedCount }) {
       <span className='text-sm text-muted-foreground'>
         {selectedCount} row(s) selected
       </span>
-      <Button variant='outline' size='sm' onClick={handleBulkEmail}>
+      {/* <Button variant='outline' size='sm' onClick={handleBulkEmail}>
         <Mail className='mr-2 h-4 w-4' />
         Send Email
-      </Button>
+      </Button> */}
       <Button variant='outline' size='sm' onClick={handleBulkActivate}>
         <UserCheck className='mr-2 h-4 w-4' />
         Activate
