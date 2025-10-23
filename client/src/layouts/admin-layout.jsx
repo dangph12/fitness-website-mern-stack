@@ -28,25 +28,17 @@ const AdminLayout = () => {
     const path = location.pathname;
     const segments = path.split('/').filter(Boolean);
 
-    // Generate breadcrumb items based on path
     const breadcrumbMap = {
       admin: 'Dashboard',
       'manage-users': 'Users Management',
-      'add-user': 'Add User',
-      'edit-user': 'Edit User',
-      'manage-workouts': 'Workouts Management',
+      'create-user': 'Create User',
+      'update-user': 'Update User',
       'manage-exercises': 'Exercises Management',
       'create-exercise': 'Create Exercise',
-      'update-exercise': 'Update Exercise',
-      'manage-nutrition': 'Nutrition Management',
       'manage-foods': 'Foods Management',
       'create-food': 'Create Food',
-      'update-food': 'Update Food',
       'manage-muscles': 'Muscle Management',
-      'create-muscle': 'Create Muscle',
-      'update-muscle': 'Update Muscle',
-      analytics: 'Analytics',
-      settings: 'Settings'
+      'create-muscle': 'Create Muscle'
     };
 
     const items = [];
@@ -54,26 +46,35 @@ const AdminLayout = () => {
 
     segments.forEach((segment, index) => {
       currentPath += `/${segment}`;
+
+      // Check if this is an ID (MongoDB ObjectID pattern)
+      const isMongoId = /^[0-9a-fA-F]{24}$/.test(segment);
+
+      // Skip ID segments in breadcrumb
+      if (isMongoId) {
+        return;
+      }
+
       const title =
         breadcrumbMap[segment] ||
         segment.charAt(0).toUpperCase() + segment.slice(1);
 
       if (index === 0) {
-        // First item (admin) is always a link to dashboard
         items.push({
           title: title,
           href: currentPath,
           isLast: false
         });
-      } else if (index === segments.length - 1) {
-        // Last item is current page
+      } else if (
+        index === segments.length - 1 ||
+        (isMongoId && index === segments.length - 2)
+      ) {
         items.push({
           title: title,
           href: currentPath,
           isLast: true
         });
       } else {
-        // Middle items are links
         items.push({
           title: title,
           href: currentPath,
