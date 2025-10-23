@@ -1,5 +1,6 @@
 // ...existing code...
 import { ArrowUpDown, ExternalLink, MoreHorizontal } from 'lucide-react';
+import { useState } from 'react';
 
 import { DataTableColumnHeader } from '~/components/admin/data-table-column-header';
 import { Badge } from '~/components/ui/badge';
@@ -8,6 +9,53 @@ import { Checkbox } from '~/components/ui/checkbox';
 
 import { useExercises } from './exercises-provider';
 import { ExercisesRowActions } from './exercises-row-actions';
+
+const AnimatedTutorialImage = ({ src, alt }) => {
+  const [currentSrc, setCurrentSrc] = useState(() => {
+    // Convert GIF to JPG preview (first frame)
+    const isGif = src.toLowerCase().endsWith('.gif');
+    if (isGif && src.includes('/upload/')) {
+      // Cloudinary transformation: get first frame as JPG
+      return src.replace('/upload/', '/upload/f_jpg,so_0/');
+    }
+    return src;
+  });
+
+  const originalSrc = src;
+  const previewSrc = src.includes('/upload/')
+    ? src.replace('/upload/', '/upload/f_jpg,so_0/')
+    : src;
+
+  const handleMouseEnter = e => {
+    // Switch to animated GIF on hover
+    e.currentTarget.src = originalSrc;
+    setCurrentSrc(originalSrc);
+  };
+
+  const handleMouseLeave = e => {
+    // Switch back to static preview
+    e.currentTarget.src = previewSrc;
+    setCurrentSrc(previewSrc);
+  };
+
+  return (
+    <div className='relative group'>
+      <img
+        src={currentSrc}
+        alt={alt}
+        className='h-20 w-auto rounded-md object-cover cursor-pointer hover:opacity-90 transition-opacity'
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={() =>
+          typeof window !== 'undefined' &&
+          window.open(originalSrc, '_blank', 'noopener,noreferrer')
+        }
+      />
+      <div className='absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-md pointer-events-none' />
+      <ExternalLink className='absolute top-1 right-1 h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg' />
+    </div>
+  );
+};
 
 /**
  * useExercisesColumns - hook that returns columns array.
@@ -124,24 +172,11 @@ export const useExercisesColumns = () => {
         const url = row.getValue('tutorial');
         if (!url) return '—';
 
-        // Kiểm tra nếu URL là ảnh GIF
+        // Kiểm tra nếu URL là ảnh
         const isImage = /\.(gif|jpe?g|png|webp)$/i.test(url);
 
         if (isImage) {
-          return (
-            <div className='relative group'>
-              <img
-                src={url}
-                alt='Exercise tutorial'
-                className='h-20 w-auto rounded-md object-cover cursor-pointer hover:opacity-80 transition-opacity'
-                onClick={() =>
-                  typeof window !== 'undefined' &&
-                  window.open(url, '_blank', 'noopener,noreferrer')
-                }
-              />
-              <ExternalLink className='absolute top-1 right-1 h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity' />
-            </div>
-          );
+          return <AnimatedTutorialImage src={url} alt='Exercise tutorial' />;
         }
 
         // Nếu là URL khác (video, link), hiển thị button như cũ
