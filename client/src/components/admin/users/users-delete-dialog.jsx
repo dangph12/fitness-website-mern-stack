@@ -19,19 +19,29 @@ import { deleteUser, fetchUsers } from '~/store/features/users-slice';
 
 import { useUsers } from './users-provider';
 
-export function UsersDeleteDialog({ open, onOpenChange, user }) {
+export function UsersDeleteDialog({ open, onOpenChange }) {
   const dispatch = useDispatch();
   const { deleteLoading, deleteError, currentPage, limit, filters } =
     useSelector(state => state.users);
-  const { closeDialog } = useUsers();
+  const {
+    closeDialog,
+    selectedUser,
+    selectedUsers,
+    deleteMode,
+    setSelectedUsers
+  } = useUsers();
 
-  // Helper function to get user display name
+  const isBulkDelete = deleteMode === 'bulk';
+  const usersToDelete = isBulkDelete
+    ? selectedUsers
+    : [selectedUser?._id].filter(Boolean);
+
+  // Helper functions
   const getUserDisplayName = user => {
     if (!user) return 'Unknown User';
     return user.name || user.fullName || user.username || 'Unknown User';
   };
 
-  // Helper function to get user initials
   const getUserInitials = user => {
     if (!user) return 'U';
     const name = getUserDisplayName(user);
@@ -46,10 +56,19 @@ export function UsersDeleteDialog({ open, onOpenChange, user }) {
   };
 
   const handleDelete = async () => {
-    if (!user) return;
+    if (usersToDelete.length === 0) return;
 
     try {
-      await dispatch(deleteUser(user._id)).unwrap();
+      // Delete all selected users
+      await Promise.all(
+        usersToDelete.map(userId => dispatch(deleteUser(userId)).unwrap())
+      );
+
+      // Clear selection
+      if (isBulkDelete) {
+        setSelectedUsers([]);
+      }
+
       // Refresh the users list
       dispatch(
         fetchUsers({
@@ -60,9 +79,10 @@ export function UsersDeleteDialog({ open, onOpenChange, user }) {
           gender: filters.gender
         })
       );
+
       closeDialog('delete');
     } catch (error) {
-      // Error is handled by the reducer
+      console.error('❌ Delete user error:', error);
     }
   };
 
@@ -80,32 +100,53 @@ export function UsersDeleteDialog({ open, onOpenChange, user }) {
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <AlertTriangle className='h-5 w-5 text-red-600' />
-            Delete User
+            Delete {isBulkDelete ? 'Users' : 'User'}
           </DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this user? This action cannot be
-            undone.
+            {isBulkDelete
+              ? `Are you sure you want to delete ${usersToDelete.length} user(s)? This action cannot be undone.`
+              : 'Are you sure you want to delete this user? This action cannot be undone.'}
           </DialogDescription>
         </DialogHeader>
 
-        {user && (
+        {!isBulkDelete && selectedUser && (
           <div className='my-4 p-4 border rounded-lg bg-muted/50'>
             <div className='flex items-center space-x-3'>
               <Avatar className='h-10 w-10'>
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
+                <AvatarImage src={selectedUser.avatar} />
+                <AvatarFallback>{getUserInitials(selectedUser)}</AvatarFallback>
               </Avatar>
               <div>
-                <div className='font-medium'>{getUserDisplayName(user)}</div>
+                <div className='font-medium'>
+                  {getUserDisplayName(selectedUser)}
+                </div>
                 <div className='text-sm text-muted-foreground'>
-                  {user.email}
+                  {selectedUser.email}
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {deleteError && <Alert variant='destructive'>{deleteError}</Alert>}
+        {isBulkDelete && (
+          <div className='my-4 p-4 border rounded-lg bg-muted/50'>
+            <p className='text-sm font-medium'>
+              {usersToDelete.length} user(s) will be deleted
+            </p>
+          </div>
+        )}
+
+        {!isBulkDelete && !selectedUser && (
+          <div className='my-4 p-4 border rounded-lg bg-muted/50 text-center text-muted-foreground'>
+            No user selected
+          </div>
+        )}
+
+        {deleteError && (
+          <Alert variant='destructive' className='my-4'>
+            {deleteError}
+          </Alert>
+        )}
 
         <DialogFooter>
           <Button
@@ -118,10 +159,10 @@ export function UsersDeleteDialog({ open, onOpenChange, user }) {
           <Button
             variant='destructive'
             onClick={handleDelete}
-            disabled={deleteLoading || !user}
+            disabled={deleteLoading || usersToDelete.length === 0}
           >
             {deleteLoading && <Spinner className='mr-2 h-4 w-4' />}
-            Delete User
+            Delete {isBulkDelete ? `${usersToDelete.length} User(s)` : 'User'}
           </Button>
         </DialogFooter>
       </DialogContent>
