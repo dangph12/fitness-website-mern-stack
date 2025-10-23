@@ -10,6 +10,7 @@ import {
   UserCheck,
   UserX
 } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
 import { Button } from '~/components/ui/button';
 import {
@@ -25,6 +26,11 @@ import { useUsers } from './users-provider';
 
 export function DataTableRowActions({ user }) {
   const { openDialog } = useUsers();
+  const navigate = useNavigate();
+
+  const handleEdit = () => {
+    navigate(`/admin/manage-users/update/${user._id}`);
+  };
 
   return (
     <DropdownMenu>
@@ -39,39 +45,9 @@ export function DataTableRowActions({ user }) {
           <Eye className='mr-2 h-4 w-4' />
           View Details
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => openDialog('action', user, 'edit')}>
+        <DropdownMenuItem onClick={handleEdit}>
           <Edit className='mr-2 h-4 w-4' />
           Edit User
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => openDialog('action', user, 'email')}>
-          <Mail className='mr-2 h-4 w-4' />
-          Send Email
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => openDialog('action', user, 'role')}>
-          <Shield className='mr-2 h-4 w-4' />
-          Change Role
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() =>
-            openDialog(
-              'action',
-              user,
-              user.isActive ? 'deactivate' : 'activate'
-            )
-          }
-        >
-          {user.isActive ? (
-            <>
-              <UserX className='mr-2 h-4 w-4' />
-              Deactivate
-            </>
-          ) : (
-            <>
-              <UserCheck className='mr-2 h-4 w-4' />
-              Activate
-            </>
-          )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
