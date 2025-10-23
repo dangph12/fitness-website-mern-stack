@@ -4,6 +4,7 @@ import { ArrowLeft, Loader2, Save, Upload, User } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
+import { toast } from 'sonner';
 
 import { Alert, AlertDescription } from '~/components/ui/alert';
 import { Button } from '~/components/ui/button';
@@ -60,7 +61,6 @@ export default function UpdateUserPage() {
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [localError, setLocalError] = useState('');
-  const [success, setSuccess] = useState('');
 
   // Fetch user details when component mounts
   useEffect(() => {
@@ -95,7 +95,6 @@ export default function UpdateUserPage() {
       [field]: value
     }));
     if (localError) setLocalError('');
-    if (success) setSuccess('');
   };
 
   const handleAvatarChange = e => {
@@ -103,11 +102,13 @@ export default function UpdateUserPage() {
     if (file) {
       if (!file.type.startsWith('image/')) {
         setLocalError('Please select a valid image file');
+        toast.error('Please select a valid image file');
         return;
       }
 
       if (file.size > 5 * 1024 * 1024) {
         setLocalError('Image file size must be less than 5MB');
+        toast.error('Image file size must be less than 5MB');
         return;
       }
 
@@ -124,17 +125,20 @@ export default function UpdateUserPage() {
   const validateForm = () => {
     if (!formData.name.trim()) {
       setLocalError('Name is required');
+      toast.error('Name is required');
       return false;
     }
 
     if (!formData.email.trim()) {
       setLocalError('Email is required');
+      toast.error('Email is required');
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setLocalError('Please enter a valid email address');
+      toast.error('Please enter a valid email address');
       return false;
     }
 
@@ -144,6 +148,7 @@ export default function UpdateUserPage() {
       (isNaN(formData.height) || formData.height < 1 || formData.height > 300)
     ) {
       setLocalError('Height must be between 1 and 300 cm');
+      toast.error('Height must be between 1 and 300 cm');
       return false;
     }
 
@@ -158,7 +163,6 @@ export default function UpdateUserPage() {
     }
 
     setLocalError('');
-    setSuccess('');
 
     try {
       // Prepare form data for multipart upload
@@ -196,7 +200,7 @@ export default function UpdateUserPage() {
         })
       ).unwrap();
 
-      setSuccess('User updated successfully!');
+      toast.success('User updated successfully!');
 
       // Refresh users list
       dispatch(
@@ -209,13 +213,15 @@ export default function UpdateUserPage() {
         })
       );
 
-      // Navigate back after success
+      // Navigate back after short delay
       setTimeout(() => {
         navigate('/admin/manage-users');
-      }, 2000);
+      }, 1000);
     } catch (error) {
       console.error('Failed to update user:', error);
-      setLocalError(error || 'Failed to update user. Please try again.');
+      const errorMsg = error || 'Failed to update user. Please try again.';
+      setLocalError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
@@ -268,7 +274,7 @@ export default function UpdateUserPage() {
         </div>
 
         <Card>
-          <CardContent>
+          <CardContent className='pt-6'>
             <Alert variant='destructive'>
               <AlertDescription>{userDetailsError}</AlertDescription>
             </Alert>
@@ -295,7 +301,7 @@ export default function UpdateUserPage() {
         </div>
 
         <Card>
-          <CardContent>
+          <CardContent className='pt-6'>
             <Alert>
               <AlertDescription>User not found</AlertDescription>
             </Alert>
@@ -336,12 +342,6 @@ export default function UpdateUserPage() {
             {displayError && (
               <Alert variant='destructive'>
                 <AlertDescription>{displayError}</AlertDescription>
-              </Alert>
-            )}
-
-            {success && (
-              <Alert className='border-green-200 bg-green-50 text-green-800'>
-                <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
 
@@ -426,7 +426,6 @@ export default function UpdateUserPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value='user'>User</SelectItem>
-                    <SelectItem value='instructor'>Instructor</SelectItem>
                     <SelectItem value='admin'>Admin</SelectItem>
                   </SelectContent>
                 </Select>
@@ -442,16 +441,14 @@ export default function UpdateUserPage() {
                     <SelectValue placeholder='Select gender' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='unspecified'>Not specified</SelectItem>
                     <SelectItem value='male'>Male</SelectItem>
                     <SelectItem value='female'>Female</SelectItem>
-                    <SelectItem value='other'>Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            {/* Body Measurements */}
+            {/* Additional Information */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div className='space-y-2'>
                 <Label htmlFor='dob'>Date of Birth</Label>
@@ -491,7 +488,7 @@ export default function UpdateUserPage() {
                 className='flex items-center gap-2'
               >
                 {updateLoading && <Loader2 className='h-4 w-4 animate-spin' />}
-                <Save className='h-4 h-4' />
+                <Save className='h-4 w-4' />
                 Update User
               </Button>
 
