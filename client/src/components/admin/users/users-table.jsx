@@ -363,28 +363,18 @@ export function UsersTable() {
       )}
 
       {/* Table */}
-      <div className='rounded-md border'>
+      <div className='rounded-md border w-full overflow-x-auto'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : header.column.getCanSort() ? (
-                      <Button
-                        variant='ghost'
-                        onClick={() => header.column.toggleSorting()}
-                        className='p-0 h-auto font-medium hover:bg-transparent'
-                      >
-                        {typeof header.column.columnDef.header === 'function'
-                          ? header.column.columnDef.header(header.getContext())
-                          : header.column.columnDef.header}
-                      </Button>
-                    ) : typeof header.column.columnDef.header === 'function' ? (
-                      header.column.columnDef.header(header.getContext())
-                    ) : (
-                      header.column.columnDef.header
-                    )}
+                    {header.isPlaceholder
+                      ? null
+                      : typeof header.column.columnDef.header === 'function'
+                        ? header.column.columnDef.header(header.getContext())
+                        : header.column.columnDef.header}
                   </TableHead>
                 ))}
               </TableRow>
