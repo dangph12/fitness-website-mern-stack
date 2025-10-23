@@ -1,6 +1,8 @@
 import {
   Activity,
+  BicepsFlexed,
   Dumbbell,
+  Ham,
   Home,
   LogOut,
   Users,
@@ -66,17 +68,22 @@ export function AdminSidebar({ ...props }) {
         {
           title: 'Exercises Management',
           url: '/admin/manage-exercises',
-          icon: Dumbbell
+          icon: Activity
         },
         {
           title: 'Foods Management',
           url: '/admin/manage-foods',
-          icon: Utensils
+          icon: Ham
         },
         {
           title: 'Muscles Management',
           url: '/admin/manage-muscles',
-          icon: Activity
+          icon: BicepsFlexed
+        },
+        {
+          title: 'Equipments Management',
+          url: '/admin/manage-equipments',
+          icon: Dumbbell
         }
       ]
     }
