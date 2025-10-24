@@ -1,44 +1,53 @@
 import createHttpError from 'http-errors';
 import { Types } from 'mongoose';
 
+import UserModel from '../users/user-model';
+import WorkoutModel from '../workouts/workout-model';
 import FavoriteModel from './favorite-model';
-import { IFavoriteInput } from './favorite-type';
+import { IFavorite } from './favorite-type';
 
 const FavoriteService = {
-  addFavoriteItem: async (userId: string, favoriteData: IFavoriteInput) => {
-    if (!userId) {
+  addFavoriteItem: async (favoriteData: IFavorite) => {
+    if (!favoriteData.user) {
       throw createHttpError(400, 'user is required');
     }
-    if (!Types.ObjectId.isValid(userId)) {
+    if (!Types.ObjectId.isValid(favoriteData.user)) {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    if (!favoriteData.workouts || favoriteData.workouts.length === 0) {
-      throw createHttpError(400, 'workouts is required');
+    const user = await UserModel.findById(favoriteData.user);
+    if (!user) {
+      throw createHttpError(404, 'User not found');
     }
 
-    const createdFavorites = [];
-
-    for (const workoutId of favoriteData.workouts) {
-      if (!Types.ObjectId.isValid(workoutId)) {
-        throw createHttpError(400, `Invalid workoutId: ${workoutId}`);
-      }
-
-      const existingFavorite = await FavoriteModel.findOne({
-        user: userId,
-        workout: workoutId
-      });
-
-      if (!existingFavorite) {
-        const newFavorite = await FavoriteModel.create({
-          user: userId,
-          workout: workoutId
-        });
-        createdFavorites.push(newFavorite._id);
-      }
+    if (!favoriteData.workout) {
+      throw createHttpError(400, 'workout is required');
     }
 
-    const favorites = await FavoriteModel.find({ user: userId })
+    if (!Types.ObjectId.isValid(favoriteData.workout)) {
+      throw createHttpError(400, `Invalid workoutId: ${favoriteData.workout}`);
+    }
+
+    const workout = await WorkoutModel.findById(favoriteData.workout);
+    if (!workout) {
+      throw createHttpError(404, `Workout not found: ${favoriteData.workout}`);
+    }
+
+    const existingFavorite = await FavoriteModel.findOne({
+      user: favoriteData.user,
+      workout: favoriteData.workout
+    });
+
+    if (existingFavorite) {
+      throw createHttpError(409, 'Favorite already exists');
+    }
+
+    const newFavorite = await FavoriteModel.create({
+      user: favoriteData.user,
+      workout: favoriteData.workout
+    });
+
+    const populatedFavorite = await FavoriteModel.findById(newFavorite._id)
       .populate('user')
       .populate({
         path: 'workout',
@@ -51,7 +60,7 @@ const FavoriteService = {
         ]
       });
 
-    return favorites;
+    return populatedFavorite;
   },
 
   listByUser: async (
@@ -121,50 +130,18 @@ const FavoriteService = {
     };
   },
 
-  removeFavoriteItem: async (userId: string, favoriteData: IFavoriteInput) => {
-    if (!userId) {
-      throw createHttpError(400, 'userId is required');
+  remove: async (favoriteId: string) => {
+    if (!favoriteId) {
+      throw createHttpError(400, 'favoriteId is required');
     }
-    if (!Types.ObjectId.isValid(userId)) {
-      throw createHttpError(400, 'Invalid userId');
-    }
-
-    if (!favoriteData.workouts || favoriteData.workouts.length === 0) {
-      throw createHttpError(400, 'workoutId is required');
+    if (!Types.ObjectId.isValid(favoriteId)) {
+      throw createHttpError(400, 'Invalid favoriteId');
     }
 
-    for (const workoutId of favoriteData.workouts) {
-      if (!Types.ObjectId.isValid(workoutId)) {
-        throw createHttpError(400, `Invalid workoutId: ${workoutId}`);
-      }
-
-      const deletedFavorite = await FavoriteModel.findOneAndDelete({
-        user: userId,
-        workout: workoutId
-      });
-
-      if (!deletedFavorite) {
-        throw createHttpError(
-          404,
-          `Workout ${workoutId} not found in favorites`
-        );
-      }
+    const favorite = await FavoriteModel.findByIdAndDelete(favoriteId);
+    if (!favorite) {
+      throw createHttpError(404, 'Favorite not found');
     }
-
-    const favorites = await FavoriteModel.find({ user: userId })
-      .populate('user')
-      .populate({
-        path: 'workout',
-        populate: [
-          { path: 'user' },
-          {
-            path: 'exercises.exercise',
-            populate: [{ path: 'muscles' }, { path: 'equipments' }]
-          }
-        ]
-      });
-
-    return favorites;
   }
 };
 

@@ -6,12 +6,8 @@ import FavoriteService from './favorite-service';
 
 const FavoriteController = {
   addFavoriteItem: async (req: Request, res: Response) => {
-    const userId = req.params.userId;
     const favoriteData = req.body;
-    const favorite = await FavoriteService.addFavoriteItem(
-      userId,
-      favoriteData
-    );
+    const favorite = await FavoriteService.addFavoriteItem(favoriteData);
     return res
       .status(201)
       .json(ApiResponse.success('Favorite item added successfully', favorite));
@@ -40,18 +36,12 @@ const FavoriteController = {
       );
   },
 
-  removeFavoriteItem: async (req: Request, res: Response) => {
-    const userId = req.params.userId;
-    const favoriteData = req.body;
-    const favorite = await FavoriteService.removeFavoriteItem(
-      userId,
-      favoriteData
-    );
+  remove: async (req: Request, res: Response) => {
+    const favoriteId = req.params.favoriteId;
+    await FavoriteService.remove(favoriteId);
     return res
       .status(200)
-      .json(
-        ApiResponse.success('Favorite item removed successfully', favorite)
-      );
+      .json(ApiResponse.success('Favorite item removed successfully'));
   }
 };
 
