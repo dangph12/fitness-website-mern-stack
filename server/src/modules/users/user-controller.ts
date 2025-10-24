@@ -10,8 +10,8 @@ const UserController = {
     const {
       page = 1,
       limit = 10,
-      sortBy,
-      sortOrder,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
       ...filterParams
     } = req.query;
 

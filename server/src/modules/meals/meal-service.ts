@@ -7,12 +7,39 @@ import MealModel from './meal-model';
 import { IMeal } from './meal-type';
 
 const MealService = {
-  findAll: async () => {
-    const meals = await MealModel.find()
+  find: async ({
+    page = 1,
+    limit = 10,
+    filterParams = {},
+    sortBy = 'createdAt',
+    sortOrder = 'desc'
+  }) => {
+    const filterRecord: Record<string, any> = {};
+
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (value && value !== '') {
+        filterRecord[key] = { $regex: value, $options: 'i' };
+      }
+    }
+
+    const skip = (page - 1) * limit;
+    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as any;
+
+    const totalMeals = await MealModel.countDocuments(filterRecord);
+    const totalPages = Math.ceil(totalMeals / limit);
+
+    const meals = await MealModel.find(filterRecord)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
       .populate('user')
       .populate('foods.food');
 
-    return meals;
+    return {
+      meals,
+      totalMeals,
+      totalPages
+    };
   },
 
   findById: async (mealId: string) => {
@@ -35,8 +62,6 @@ const MealService = {
     if (!Types.ObjectId.isValid(mealData.user)) {
       throw createHttpError(400, 'Invalid userId');
     }
-
-    // Pls check valid foodId and exist food in this code
 
     const existingMeal = await MealModel.findOne({
       title: mealData.title
@@ -66,7 +91,15 @@ const MealService = {
       throw createHttpError(500, 'Failed to create meal');
     }
 
-    return newMeal;
+    const populatedMeal = await MealModel.findById(newMeal._id)
+      .populate('user')
+      .populate('foods.food');
+
+    if (!populatedMeal) {
+      throw createHttpError(500, 'Failed to populate meal');
+    }
+
+    return populatedMeal;
   },
 
   update: async (
@@ -81,8 +114,6 @@ const MealService = {
     if (updateData.user && !Types.ObjectId.isValid(updateData.user)) {
       throw createHttpError(400, 'Invalid userId');
     }
-
-    // Pls check valid foodId and exist food in this code
 
     const existingMeal = await MealModel.findById(mealId);
     if (!existingMeal) {
@@ -121,7 +152,15 @@ const MealService = {
       throw createHttpError(500, 'Failed to update meal');
     }
 
-    return updatedMeal;
+    const populatedMeal = await MealModel.findById(mealId)
+      .populate('user')
+      .populate('foods.food');
+
+    if (!populatedMeal) {
+      throw createHttpError(500, 'Failed to populate meal');
+    }
+
+    return populatedMeal;
   },
 
   remove: async (mealId: string) => {

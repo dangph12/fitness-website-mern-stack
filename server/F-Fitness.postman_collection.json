@@ -1,11 +1,11 @@
 {
 	"info": {
-		"_postman_id": "5485b545-27fa-45c1-8cd9-0178f719689a",
+		"_postman_id": "20a343ba-0121-473b-b680-0f3781d42a16",
 		"name": "F-Fitness",
 		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "48985284",
-		"_collection_link": "https://fhd-cinema.postman.co/workspace/Team-Workspace~fcbca013-e3d1-454a-86f8-8ee6ecd48cd5/collection/48985284-5485b545-27fa-45c1-8cd9-0178f719689a?action=share&source=collection_link&creator=48985284"
+		"_collection_link": "https://fhd-cinema.postman.co/workspace/Team-Workspace~fcbca013-e3d1-454a-86f8-8ee6ecd48cd5/collection/38434692-20a343ba-0121-473b-b680-0f3781d42a16?action=share&source=collection_link&creator=48985284"
 	},
 	"item": [
 		{
@@ -395,11 +395,11 @@
 								{
 									"key": "tutorial",
 									"type": "file",
-									"src": "postman-cloud:///1f0a1518-b881-46a0-ab3c-46c77502c414"
+									"src": "/C:/Users/os/Downloads/53.gif"
 								},
 								{
 									"key": "title",
-									"value": "Plank",
+									"value": "Band Reverse Fly",
 									"type": "text"
 								},
 								{
@@ -416,23 +416,42 @@
 								},
 								{
 									"key": "instructions",
-									"value": "Steps : \n1.) Start by kneeling on all fours and aligning both hands right below your shoulders keep your knees beneath your hips.\n\n2.) Extend both of your feet out behind you and squeeze on your core muscles, making sure that your body is aligned straight \n\n3.) Hold this position for about 30 seconds to a minute.\n\n4.) Release, return back to the starting position and repeat for as many times as you would like to perform this exercise.",
+									"value": "A Band Reverse Fly is an excellent exercise for targeting the posterior deltoids, rhomboids, and upper back muscles. It's particularly useful because it can be done almost anywhere with minimal equipment. Here's how to perform the exercise correctly:\n\nSet Up:\n\nSecure the resistance band to a stable anchor point at about chest height. This could be a door, a sturdy pole, or any fixed object. If you don’t have an anchor point, you can hold the band with your hands.\n\nPosition Yourself:\n\nStand facing the anchor point with your feet shoulder-width apart. Hold one end of the band in each hand. If the band isn't anchored, hold the middle of the band in each hand with some tension.\n\nStarting Position:\n\nStep back to create tension in the band when your arms are extended in front of you at shoulder height. Keep a slight bend in your knees and hinge slightly forward at the hips. Engage your core to maintain a stable position.\nYour arms should be extended straight in front of you, with your palms facing each other or slightly downward.\n\nExecution:\n\nWith a slight bend in your elbows, pull the band apart by moving your arms out to the sides. Focus on squeezing your shoulder blades together. Keep your movements controlled and focus on using your upper back and shoulder muscles to move the band.\n\nEnding the Movement:\n\nContinue pulling until your arms are out to the sides and in line with your shoulders, forming a \"T\" shape with your body. Hold for a brief moment to maximize the contraction.\n\nReturn to Starting Position:\n\nSlowly return your arms to the starting position in a controlled manner, maintaining tension in the band throughout the movement.",
 									"type": "text"
 								},
 								{
 									"key": "muscles[0]",
-									"value": "68dbfb24b959a26b9a83fad4",
+									"value": "68dc88ef47215cb2e5148f1a",
 									"type": "text"
 								},
 								{
 									"key": "muscles[1]",
-									"value": "68dc003196c0756913d0a587",
-									"type": "text"
+									"value": "68dc890947215cb2e5148f1d",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "muscles[2]",
+									"value": "68dc892c47215cb2e5148f23",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "muscles[3]",
+									"value": "68dbfb24b959a26b9a83fad4",
+									"type": "text",
+									"disabled": true
 								},
 								{
 									"key": "equipments[0]",
-									"value": "68e16c81f5caf5d27d7763c8",
+									"value": "68e16cbef5caf5d27d7763cb",
 									"type": "text"
+								},
+								{
+									"key": "equipments[1]",
+									"value": "68e16d6af5caf5d27d7763d1",
+									"type": "text",
+									"disabled": true
 								}
 							]
 						},
@@ -654,7 +673,7 @@
 								},
 								{
 									"key": "email",
-									"value": "anhduck120212121212@gmail.com",
+									"value": "ducnda0212@gmail.com",
 									"type": "text"
 								},
 								{
@@ -713,14 +732,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/users/68d352760c121fa66fb1fac1",
+							"raw": "{{base_url}}/api/users/68e15d4db4068819de9bced5",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"68d352760c121fa66fb1fac1"
+								"68e15d4db4068819de9bced5"
 							]
 						}
 					},
@@ -798,18 +817,23 @@
 									"key": "isActive",
 									"value": "true",
 									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "0344420156",
+									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/api/users/68de803d557a2c84c717321a",
+							"raw": "{{base_url}}/api/users/68e15d4db4068819de9bced5",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"68de803d557a2c84c717321a"
+								"68e15d4db4068819de9bced5"
 							]
 						}
 					},
@@ -897,7 +921,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"anhduck0212@gmail.com\",\r\n    \"password\": \"0344420156\"\r\n}",
+							"raw": "{\r\n    \"email\": \"ducnda0212@gmail.com\",\r\n    \"password\": \"0344420156\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -925,7 +949,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Nguyen Dinh Anh Duc\",\r\n    \"email\": \"anhduck0212@gmail.com\",\r\n    \"role\": \"user\",\r\n    \"password\": \"0344420156\",\r\n    \"confirmPassword\": \"0344420156\"\r\n}",
+							"raw": "{\r\n    \"name\": \"Nguyen Dinh Anh Duc\",\r\n    \"email\": \"anhduck02123@gmail.com\",\r\n    \"role\": \"user\",\r\n    \"password\": \"0344420156\",\r\n    \"confirmPassword\": \"0344420156\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1447,14 +1471,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/meals/68dc890947215cb2e5148f1d",
+							"raw": "{{base_url}}/api/meals/68e77c1279b26816e2a239a3",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"meals",
-								"68dc890947215cb2e5148f1d"
+								"68e77c1279b26816e2a239a3"
 							]
 						},
 						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
@@ -1501,17 +1525,18 @@
 									"key": "mealType",
 									"value": "Breakfast",
 									"contentType": "",
+									"description": "\"Breakfast\", \"Lunch\", \"Dinner\", \"Snack\", \"Brunch\", \"Dessert\"\n",
 									"type": "text"
 								},
 								{
-									"key": "userId",
+									"key": "user",
 									"value": "68dd4aea2872890d70e038b9",
 									"contentType": "",
 									"type": "text"
 								},
 								{
-									"key": "foods[0][foodId]",
-									"value": "e3091a217f0c41e3a523fc39",
+									"key": "foods[0][food]",
+									"value": "68de1f41019458184ed0aa5f",
 									"contentType": "",
 									"type": "text"
 								},
@@ -1522,8 +1547,8 @@
 									"type": "text"
 								},
 								{
-									"key": "foods[1][foodId]",
-									"value": "eaf6588a1b834bc38e64f7da",
+									"key": "foods[1][food]",
+									"value": "68de1f41019458184ed0aa5f",
 									"contentType": "",
 									"type": "text"
 								},
@@ -1592,14 +1617,14 @@
 									"type": "text"
 								},
 								{
-									"key": "userId",
-									"value": "68dd4aea2872890d70e038b9",
+									"key": "user",
+									"value": "68e5bac03f1f1435c6f6b1d1",
 									"contentType": "",
 									"type": "text"
 								},
 								{
-									"key": "foods[0][foodId]",
-									"value": "68dd4ea44bebe3de1454b595",
+									"key": "foods[0][food]",
+									"value": "9b10944f503f45688fa517d5",
 									"contentType": "",
 									"type": "text"
 								},
@@ -1610,8 +1635,8 @@
 									"type": "text"
 								},
 								{
-									"key": "foods[1][foodId]",
-									"value": "eaf6588a1b834bc38e64f7da",
+									"key": "foods[1][food]",
+									"value": "893ec84615d742d28299a3d7",
 									"contentType": "",
 									"type": "text"
 								},
@@ -1624,13 +1649,14 @@
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/api/meals",
+							"raw": "{{base_url}}/api/meals/68e77c1279b26816e2a239a3",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
-								"meals"
+								"meals",
+								"68e77c1279b26816e2a239a3"
 							]
 						},
 						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
@@ -1874,6 +1900,1281 @@
 								"api",
 								"body-records",
 								"68e1669cb0df842f4ecc9347"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Goal",
+			"item": [
+				{
+					"name": "Get All Goals",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/goals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"goals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Goal By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": \"68e15d4db4068819de9bced5\",\r\n    \"targetWeight\": 65\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/goals/68e46e522ed5a524c10c29ec",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"goals",
+								"68e46e522ed5a524c10c29ec"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Goal By User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": \"68e15d4db4068819de9bced5\",\r\n    \"targetWeight\": 65\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/goals/user/68ebd140163edc51eac910eb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"goals",
+								"user",
+								"68ebd140163edc51eac910eb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Goal By User",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"targetWeight\": 64,\r\n    \"diet\": \"Low-Carb\",\r\n    \"fitnessGoal\": \"Build Muscle\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/goals/user/68ebd140163edc51eac910eb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"goals",
+								"user",
+								"68ebd140163edc51eac910eb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Goal By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": \"68e15d4db4068819de9bced5\",\r\n    \"targetWeight\": 64\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/goals/68e46e522ed5a524c10c29ec",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"goals",
+								"68e46e522ed5a524c10c29ec"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Workout",
+			"item": [
+				{
+					"name": "Filter Workout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/workouts?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workouts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								},
+								{
+									"key": "title",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Workout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Home Bodyweight Interval",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "isPublic",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "user",
+									"value": "68f7a176cd901d58ec210709",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][exercise]",
+									"value": "68eb7ccff65fff517ece928e",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][sets][0]",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][sets][1]",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][sets][2]",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "exercises[1][exercise]",
+									"value": "68f161b57288bb69e489d3a8",
+									"type": "text"
+								},
+								{
+									"key": "exercises[1][sets][0]",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "exercises[1][sets][1]",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "exercises[1][sets][2]",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "exercises[2][exercise]",
+									"value": "68f162067288bb69e489d3ac",
+									"type": "text"
+								},
+								{
+									"key": "exercises[2][sets][0]",
+									"value": "30",
+									"type": "text"
+								},
+								{
+									"key": "exercises[2][sets][1]",
+									"value": "30",
+									"type": "text"
+								},
+								{
+									"key": "exercises[2][sets][2]",
+									"value": "10",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "exercises[3][exercise]",
+									"value": "68e5cb0a41f9a5c54f1ef42d",
+									"type": "text"
+								},
+								{
+									"key": "exercises[3][sets][0]",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "exercises[3][sets][1]",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "exercises[3][sets][2]",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "exercises[4][exercise]",
+									"value": "68eb81f8f65fff517ece92ae",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "exercises[4][sets][0]",
+									"value": "15",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "exercises[4][sets][1]",
+									"value": "15",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "exercises[4][sets][2]",
+									"value": "15",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/workouts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workouts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Workout By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Workout test 1",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								},
+								{
+									"key": "user",
+									"value": "68e15d4db4068819de9bced5",
+									"type": "text"
+								},
+								{
+									"key": "plan",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "exercises[0][exerciseId]",
+									"value": "68e52ee5ab5b77b864fade8d",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][sets]",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][reps]",
+									"value": "8",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][rest]",
+									"value": "30",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/workouts/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workouts",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "68f831ed5e7b5959e8e12e6b"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Workout By User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Workout test 1",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								},
+								{
+									"key": "user",
+									"value": "68e15d4db4068819de9bced5",
+									"type": "text"
+								},
+								{
+									"key": "plan",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "exercises[0][exerciseId]",
+									"value": "68e52ee5ab5b77b864fade8d",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][sets]",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][reps]",
+									"value": "8",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][rest]",
+									"value": "30",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/workouts/user/:id?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workouts",
+								"user",
+								":id"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "68ee9a447960024a2cc268e8"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Workout By Id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Workout test 123",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								},
+								{
+									"key": "user",
+									"value": "68e15d4db4068819de9bced5",
+									"type": "text"
+								},
+								{
+									"key": "isPublic",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][exercise]",
+									"value": "68e5d93f41f9a5c54f1ef469",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][sets][0]",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "exercises[0][sets][1]",
+									"value": "10",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/workouts/68e76f70a70942bcaf35041d",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workouts",
+								"68e76f70a70942bcaf35041d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Workout By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/workouts/68e76f70a70942bcaf35041d",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workouts",
+								"68e76f70a70942bcaf35041d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Plan",
+			"item": [
+				{
+					"name": "Filter Plans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/plans/filter?page=1&limit=10&sortBy=createdAt&sortOrder=desc&title=12",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"plans",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								},
+								{
+									"key": "title",
+									"value": "12"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Plans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/plans",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"plans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Plan",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Home Bodyweight Challenge",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "A 3-day home training plan that strengthens your entire body using only bodyweight.",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/download (10).jpg"
+								},
+								{
+									"key": "isPublic",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "user",
+									"value": "68ee9a447960024a2cc268e8",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][title]",
+									"value": "Upper Body Strength",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][isPublic]",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][user]",
+									"value": "68ee9a447960024a2cc268e8",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][0][exercise]",
+									"value": "68e5cb0a41f9a5c54f1ef42d",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][0][sets][0]",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][0][sets][1]",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][1][exercise]",
+									"value": "68eb7ea1f65fff517ece92a2",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][1][sets][0]",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][1][sets][1]",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][2][exercise]",
+									"value": "68f162427288bb69e489d3b0",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][2][sets][0]",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][2][sets][1]",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][3][exercise]",
+									"value": "68eb81f8f65fff517ece92ae",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "workouts[0][exercises][3][sets][0]",
+									"value": "15",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "workouts[0][exercises][3][sets][1]",
+									"value": "15",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "workouts[1][title]",
+									"value": "Core & Stability",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][isPublic]",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][user]",
+									"value": "68ee9a447960024a2cc268e8",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][0][exercise]",
+									"value": "68eb7ccff65fff517ece928e",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][0][sets][0]",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][0][sets][1]",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][1][exercise]",
+									"value": "68f162067288bb69e489d3ac",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][1][sets][0]",
+									"value": "30",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][1][sets][1]",
+									"value": "30",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][2][exercise]",
+									"value": "68eb8392f65fff517ece92b6",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][2][sets][0]",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][2][sets][1]",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][3][exercise]",
+									"value": "68eb81f8f65fff517ece92ae",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "workouts[1][exercises][3][sets][0]",
+									"value": "12",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "workouts[1][exercises][3][sets][1]",
+									"value": "12",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "workouts[2][title]",
+									"value": "Lower Body & Glutes",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][isPublic]",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][user]",
+									"value": "68ee9a447960024a2cc268e8",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][exercises][0][exercise]",
+									"value": "68eb7d11f65fff517ece9292",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][exercises][0][sets][0]",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][exercises][0][sets][1]",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][exercises][1][exercise]",
+									"value": "68eb81f8f65fff517ece92ae",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][exercises][1][sets][0]",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][exercises][1][sets][1]",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][exercises][2][exercise]",
+									"value": "68eb8328f65fff517ece92b2",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][exercises][2][sets][0]",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "workouts[2][exercises][2][sets][1]",
+									"value": "12",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/plans",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"plans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Plan By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/plans/68ec85f08e89824fd70f9d6d",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"plans",
+								"68ec85f08e89824fd70f9d6d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Plan By User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/plans/user/68e15d4db4068819de9bced5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"plans",
+								"user",
+								"68e15d4db4068819de9bced5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Plan By Id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Plan Test 1",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Description for Plan Test 1",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/os/Downloads/ribbon-box.png"
+								},
+								{
+									"key": "isPublic",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "user",
+									"value": "68e15d4db4068819de9bced5",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][id]",
+									"value": "68ecb17a987287dd2b0d6987",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][title]",
+									"value": "Chest Day",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][isPublic]",
+									"value": "false",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][user]",
+									"value": "68e15d4db4068819de9bced5",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][0][exercise]",
+									"value": "68eb8630f65fff517ece92c2",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][0][sets][0]",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][0][sets][1]",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][1][exercise]",
+									"value": "68eb85fbf65fff517ece92be",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][1][sets][0]",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "workouts[0][exercises][1][sets][1]",
+									"value": "8",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][title]",
+									"value": "Back Day",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][isPublic]",
+									"value": "false",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][user]",
+									"value": "68e15d4db4068819de9bced5",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][0][exercise]",
+									"value": "68eb8630f65fff517ece92c2",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][0][sets][0]",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][0][sets][1]",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][1][exercise]",
+									"value": "68eb85fbf65fff517ece92be",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][1][sets][0]",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "workouts[1][exercises][1][sets][1]",
+									"value": "8",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/plans/68ec85f08e89824fd70f9d6d",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"plans",
+								"68ec85f08e89824fd70f9d6d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Plan By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/plans/68e53dfc66f1abc802b57187",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"plans",
+								"68e53dfc66f1abc802b57187"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Favorite",
+			"item": [
+				{
+					"name": "List By User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/favorites/68ebd140163edc51eac910eb",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"favorites",
+								"68ebd140163edc51eac910eb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Item To Favorite",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"workouts\": [\r\n        \"68e76f70a70942bcaf35041d\",\r\n        \"68ec78e4f78ca30e6b2aa680\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/favorites/68ebd140163edc51eac910eb/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"favorites",
+								"68ebd140163edc51eac910eb",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Item From Favorite",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"workouts\": [\r\n        \"68ec78e4f78ca30e6b2aa680\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/favorites/68ebd140163edc51eac910eb/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"favorites",
+								"68ebd140163edc51eac910eb",
+								"items"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "History",
+			"item": [
+				{
+					"name": "Get Histories By User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/histories/user/68ee9a447960024a2cc268e8",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"histories",
+								"user",
+								"68ee9a447960024a2cc268e8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add To History",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": \"68ee9a447960024a2cc268e8\",\r\n    \"workout\": \"68ec7afd2f17e9683289f15b\",\r\n    \"plan\": \"68ec7afd2f17e9683289f15f\",\r\n    \"time\": 300\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/histories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"histories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove From History",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/histories/68f199346a19ff5143e32b70",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"histories",
+								"68f199346a19ff5143e32b70"
 							]
 						}
 					},

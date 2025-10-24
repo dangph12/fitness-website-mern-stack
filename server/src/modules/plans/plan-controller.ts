@@ -9,8 +9,8 @@ const PlanController = {
     const {
       page = 1,
       limit = 10,
-      sortBy,
-      sortOrder,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
       ...filterParams
     } = req.query;
 
@@ -21,14 +21,6 @@ const PlanController = {
       sortBy: sortBy as string,
       sortOrder: sortOrder as string
     });
-    return res
-      .status(200)
-      .json(ApiResponse.success('Plans retrieved successfully', plans));
-  },
-
-  findAll: async (req: Request, res: Response) => {
-    const plans = await PlanService.findAll();
-
     return res
       .status(200)
       .json(ApiResponse.success('Plans retrieved successfully', plans));
@@ -45,11 +37,26 @@ const PlanController = {
 
   findByUser: async (req: Request, res: Response) => {
     const userId = req.params.userId;
-    const plan = await PlanService.findByUser(userId);
+
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      ...filterParams
+    } = req.query;
+
+    const plans = await PlanService.findByUser(userId, {
+      page: Number(page),
+      limit: Number(limit),
+      filterParams: filterParams,
+      sortBy: sortBy as string,
+      sortOrder: sortOrder as string
+    });
 
     return res
       .status(200)
-      .json(ApiResponse.success('Plan retrieved successfully', plan));
+      .json(ApiResponse.success('Plan retrieved successfully', plans));
   },
 
   create: async (req: Request, res: Response) => {
