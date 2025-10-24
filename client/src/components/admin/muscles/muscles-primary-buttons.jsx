@@ -39,19 +39,9 @@ export const MusclesPrimaryButtons = ({ selectedMuscles = [] }) => {
         </Button>
       )}
 
-      <Button
-        variant='outline'
-        size='sm'
-        onClick={handleRefresh}
-        disabled={loading}
-      >
-        <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-        <span className='hidden sm:inline ml-2'>Refresh</span>
-      </Button>
-
       <Button size='sm' onClick={handleCreate}>
         <Plus className='h-4 w-4' />
-        <span className='hidden sm:inline ml-2'>Add Muscle</span>
+        <span className='hidden sm:inline ml-2'>Create Muscle</span>
       </Button>
     </div>
   );

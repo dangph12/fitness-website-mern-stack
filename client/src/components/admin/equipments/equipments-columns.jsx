@@ -1,17 +1,20 @@
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Checkbox } from '~/components/ui/checkbox';
 
 import { DataTableColumnHeader } from '../data-table-column-header';
-import { MusclesRowActions } from './muscles-row-actions';
+import { EquipmentsRowActions } from './equipments-row-actions';
 
-export const MusclesColumns = [
+export const EquipmentsColumns = [
   {
     id: 'select',
     header: ({ table }) => (
       <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
         onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
         aria-label='Select all'
+        className='translate-y-[2px]'
       />
     ),
     cell: ({ row }) => (
@@ -19,6 +22,7 @@ export const MusclesColumns = [
         checked={row.getIsSelected()}
         onCheckedChange={value => row.toggleSelected(!!value)}
         aria-label='Select row'
+        className='translate-y-[2px]'
       />
     ),
     enableSorting: false,
@@ -27,32 +31,27 @@ export const MusclesColumns = [
   {
     accessorKey: 'image',
     header: 'Image',
-    cell: ({ row }) => {
-      const muscle = row.original;
-      return (
-        <Avatar className='h-20 w-20'>
-          <AvatarImage src={muscle.image} alt={muscle.title} />
-          <AvatarFallback>{muscle.title?.charAt(0)}</AvatarFallback>
-        </Avatar>
-      );
-    },
-    enableSorting: false,
-    enableHiding: false
+    cell: ({ row }) => (
+      <div className='w-20 h-20'>
+        <img
+          src={row.getValue('image')}
+          alt={row.getValue('title')}
+          className='w-full h-full object-cover rounded-md'
+        />
+      </div>
+    ),
+    enableSorting: false
   },
   {
     accessorKey: 'title',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Title' />
     ),
-    cell: ({ row }) => {
-      return (
-        <div className='flex space-x-2'>
-          <span className='max-w-[500px] truncate font-medium'>
-            {row.getValue('title')}
-          </span>
-        </div>
-      );
-    }
+    cell: ({ row }) => (
+      <div className='max-w-[200px] truncate font-medium'>
+        {row.getValue('title')}
+      </div>
+    )
   },
   {
     accessorKey: 'createdAt',
@@ -61,7 +60,15 @@ export const MusclesColumns = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue('createdAt'));
-      return <div>{date.toLocaleDateString()}</div>;
+      return (
+        <div className='whitespace-nowrap'>
+          {date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })}
+        </div>
+      );
     }
   },
   {
@@ -71,13 +78,19 @@ export const MusclesColumns = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue('updatedAt'));
-      return <div>{date.toLocaleDateString()}</div>;
+      return (
+        <div className='whitespace-nowrap'>
+          {date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })}
+        </div>
+      );
     }
   },
   {
     id: 'actions',
-    cell: ({ row }) => <MusclesRowActions row={row} />,
-    enableSorting: false,
-    enableHiding: false
+    cell: ({ row }) => <EquipmentsRowActions row={row} />
   }
 ];

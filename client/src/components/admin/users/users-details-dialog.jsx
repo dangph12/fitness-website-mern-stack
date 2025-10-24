@@ -1,6 +1,6 @@
 'use client';
 
-import { Baby, Calendar, Mail, Ruler, Shield, User, Users } from 'lucide-react';
+import { Mail, User } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
@@ -17,13 +17,11 @@ import { formatDate, formatDateTime } from '~/lib/utils';
 
 import { useUsers } from './users-provider';
 
-export function UsersDetailsDialog({ open, onOpenChange, user }) {
+export function UsersDetailsDialog({ open, onOpenChange }) {
   const { selectedUser, userDetailsLoading, userDetailsError } = useSelector(
     state => state.users
   );
   const { closeDialog } = useUsers();
-
-  const userToShow = selectedUser || user;
 
   // Helper functions
   const getUserDisplayName = user => {
@@ -106,7 +104,7 @@ export function UsersDetailsDialog({ open, onOpenChange, user }) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='max-w-2xl'>
+      <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <User className='h-5 w-5' />
@@ -127,7 +125,7 @@ export function UsersDetailsDialog({ open, onOpenChange, user }) {
           </div>
         )}
 
-        {userToShow && !userDetailsLoading && (
+        {selectedUser && !userDetailsLoading && !userDetailsError && (
           <div className='space-y-6'>
             {/* User Profile Card */}
             <Card>
@@ -137,29 +135,29 @@ export function UsersDetailsDialog({ open, onOpenChange, user }) {
               <CardContent>
                 <div className='flex items-start space-x-4'>
                   <Avatar className='h-16 w-16'>
-                    <AvatarImage src={userToShow.avatar} />
+                    <AvatarImage src={selectedUser.avatar} />
                     <AvatarFallback className='text-lg'>
-                      {getUserInitials(userToShow)}
+                      {getUserInitials(selectedUser)}
                     </AvatarFallback>
                   </Avatar>
                   <div className='flex-1 space-y-2'>
                     <div>
                       <h3 className='text-lg font-semibold'>
-                        {getUserDisplayName(userToShow)}
+                        {getUserDisplayName(selectedUser)}
                       </h3>
-                      {userToShow.username && (
+                      {selectedUser.username && (
                         <p className='text-sm text-muted-foreground'>
-                          @{userToShow.username}
+                          @{selectedUser.username}
                         </p>
                       )}
                     </div>
                     <div className='flex items-center gap-2'>
                       <Mail className='h-4 w-4 text-muted-foreground' />
-                      <span className='text-sm'>{userToShow.email}</span>
+                      <span className='text-sm'>{selectedUser.email}</span>
                     </div>
                     <div className='flex items-center gap-2'>
-                      {getStatusBadge(userToShow)}
-                      {getRoleBadge(userToShow.role)}
+                      {getStatusBadge(selectedUser)}
+                      {getRoleBadge(selectedUser.role)}
                     </div>
                   </div>
                 </div>
@@ -177,27 +175,31 @@ export function UsersDetailsDialog({ open, onOpenChange, user }) {
                     <span className='text-sm text-muted-foreground'>
                       User ID:
                     </span>
-                    <span className='text-sm font-mono'>{userToShow._id}</span>
+                    <span className='text-sm font-mono'>
+                      {selectedUser._id}
+                    </span>
                   </div>
                   <div className='flex justify-between items-center'>
                     <span className='text-sm text-muted-foreground'>
                       Gender:
                     </span>
-                    {getGenderBadge(userToShow.gender)}
+                    {getGenderBadge(selectedUser.gender)}
                   </div>
-                  {/* <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Height:</span>
-                    <span className="text-sm">
-                      {userToShow.height ? `${userToShow.height}cm` : 'Not provided'}
-                    </span>
-                  </div> */}
+                  {selectedUser.height && (
+                    <div className='flex justify-between'>
+                      <span className='text-sm text-muted-foreground'>
+                        Height:
+                      </span>
+                      <span className='text-sm'>{selectedUser.height}cm</span>
+                    </div>
+                  )}
                   <div className='flex justify-between'>
                     <span className='text-sm text-muted-foreground'>
                       Date of Birth:
                     </span>
                     <span className='text-sm'>
-                      {userToShow.dob
-                        ? formatDate(userToShow.dob)
+                      {selectedUser.dob
+                        ? formatDate(selectedUser.dob)
                         : 'Not provided'}
                     </span>
                   </div>
@@ -214,8 +216,8 @@ export function UsersDetailsDialog({ open, onOpenChange, user }) {
                       Joined:
                     </span>
                     <span className='text-sm'>
-                      {userToShow.createdAt
-                        ? formatDateTime(userToShow.createdAt)
+                      {selectedUser.createdAt
+                        ? formatDateTime(selectedUser.createdAt)
                         : 'N/A'}
                     </span>
                   </div>
@@ -224,32 +226,40 @@ export function UsersDetailsDialog({ open, onOpenChange, user }) {
                       Updated:
                     </span>
                     <span className='text-sm'>
-                      {userToShow.updatedAt
-                        ? formatDateTime(userToShow.updatedAt)
+                      {selectedUser.updatedAt
+                        ? formatDateTime(selectedUser.updatedAt)
                         : 'N/A'}
                     </span>
                   </div>
-                  <div className='flex justify-between'>
-                    <span className='text-sm text-muted-foreground'>
-                      Version:
-                    </span>
-                    <span className='text-sm'>{userToShow.__v || 0}</span>
-                  </div>
+                  {selectedUser.__v !== undefined && (
+                    <div className='flex justify-between'>
+                      <span className='text-sm text-muted-foreground'>
+                        Version:
+                      </span>
+                      <span className='text-sm'>{selectedUser.__v}</span>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
 
             {/* Bio/Description if available */}
-            {userToShow.bio && (
+            {selectedUser.bio && (
               <Card>
                 <CardHeader>
                   <CardTitle className='text-sm'>Bio</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className='text-sm'>{userToShow.bio}</p>
+                  <p className='text-sm'>{selectedUser.bio}</p>
                 </CardContent>
               </Card>
             )}
+          </div>
+        )}
+
+        {!selectedUser && !userDetailsLoading && !userDetailsError && (
+          <div className='text-center py-8 text-muted-foreground'>
+            No user selected
           </div>
         )}
       </DialogContent>
