@@ -1,6 +1,9 @@
 import createHttpError from 'http-errors';
 import { Types } from 'mongoose';
 
+import PlanModel from '../plans/plan-model';
+import UserModel from '../users/user-model';
+import WorkoutModel from '../workouts/workout-model';
 import HistoryModel from './history-model';
 import { IHistory } from './history-type';
 
@@ -13,6 +16,11 @@ const HistoryService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
+    const user = await UserModel.findById(historyData.user);
+    if (!user) {
+      throw createHttpError(404, 'User not found');
+    }
+
     if (!historyData.workout) {
       throw createHttpError(400, 'workout is required');
     }
@@ -20,8 +28,20 @@ const HistoryService = {
       throw createHttpError(400, 'Invalid workoutId');
     }
 
-    if (historyData.plan && !Types.ObjectId.isValid(historyData.plan)) {
-      throw createHttpError(400, 'Invalid planId');
+    const workout = await WorkoutModel.findById(historyData.workout);
+    if (!workout) {
+      throw createHttpError(404, 'Workout not found');
+    }
+
+    if (historyData.plan) {
+      if (!Types.ObjectId.isValid(historyData.plan)) {
+        throw createHttpError(400, 'Invalid planId');
+      }
+
+      const plan = await PlanModel.findById(historyData.plan);
+      if (!plan) {
+        throw createHttpError(404, 'Plan not found');
+      }
     }
 
     if (!historyData.time || historyData.time <= 0) {
