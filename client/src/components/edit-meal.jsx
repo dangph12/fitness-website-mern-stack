@@ -3,7 +3,8 @@ import {
   FaClipboardList,
   FaDrumstickBite,
   FaFire,
-  FaHamburger
+  FaHamburger,
+  FaLeaf
 } from 'react-icons/fa';
 import { MdFileUpload } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
@@ -52,6 +53,8 @@ const EditMeal = () => {
       image: f.food?.image || '',
       calories: Number(f.food?.calories) || 0,
       fat: Number(f.food?.fat) || 0,
+      carbohydrate: Number(f.food?.carbohydrate) || 0,
+      protein: Number(f.food?.protein) || 0,
       quantity: Number(f.quantity) || 1
     }));
     setSelectedFoods(foods);
@@ -73,9 +76,11 @@ const EditMeal = () => {
         const qty = Number(item.quantity) || 0;
         acc.calories += (Number(item.calories) || 0) * qty;
         acc.fat += (Number(item.fat) || 0) * qty;
+        acc.carbohydrates += (Number(item.carbohydrate) || 0) * qty;
+        acc.protein += (Number(item.protein) || 0) * qty;
         return acc;
       },
-      { calories: 0, fat: 0 }
+      { calories: 0, fat: 0, carbohydrates: 0, protein: 0 }
     );
   }, [selectedFoods]);
 
@@ -259,6 +264,40 @@ const EditMeal = () => {
                 </div>
               </div>
             </div>
+
+            <div className='rounded-xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-4'>
+              <div className='flex items-center gap-3'>
+                <div className='grid place-items-center rounded-lg bg-teal-100 h-10 w-10'>
+                  <FaDrumstickBite className='text-teal-600' />
+                </div>
+                <div>
+                  <p className='text-xs font-medium text-teal-800/80'>
+                    Total Carbohydrates
+                  </p>
+                  <p className='text-2xl font-bold text-teal-700'>
+                    {totals.carbohydrates.toFixed(1)}{' '}
+                    <span className='text-sm font-medium'>g</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className='rounded-xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-white p-4'>
+              <div className='flex items-center gap-3'>
+                <div className='grid place-items-center rounded-lg bg-yellow-100 h-10 w-10'>
+                  <FaLeaf className='text-yellow-600' />
+                </div>
+                <div>
+                  <p className='text-xs font-medium text-yellow-800/80'>
+                    Total Protein
+                  </p>
+                  <p className='text-2xl font-bold text-yellow-700'>
+                    {totals.protein.toFixed(1)}{' '}
+                    <span className='text-sm font-medium'>g</span>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -267,12 +306,14 @@ const EditMeal = () => {
         <h3 className='text-xl sm:text-2xl font-semibold text-slate-900 mb-4 text-center'>
           Foods in this Meal
         </h3>
+
         <FoodList
           selectedFoods={selectedFoods}
           setSelectedFoods={setSelectedFoods}
         />
         <p className='mt-3 text-xs text-center text-slate-500'>
-          *Tổng calories & fat thay đổi theo <b>quantity</b> của từng thực phẩm.
+          *Total calories, fat, carbohydrates, and protein change based on the{' '}
+          <b>quantity</b> of each food.
         </p>
       </div>
 
