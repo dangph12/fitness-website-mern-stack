@@ -66,6 +66,12 @@ const router = createBrowserRouter([
         Component: lazy(() => import('~/app/workouts/workout-detail/[id]/page'))
       },
       {
+        path: 'workouts/workout-session/:workoutId',
+        Component: lazy(
+          () => import('~/app/workouts/workout-session/[workoutId]/page')
+        )
+      },
+      {
         path: 'plans/plan-list',
         Component: lazy(() => import('~/app/plans/plan-list/page'))
       },
@@ -84,6 +90,14 @@ const router = createBrowserRouter([
       {
         path: 'plans/edit-plan/:planId',
         Component: lazy(() => import('~/app/plans/plan-edit/[planId]/page'))
+      },
+      {
+        path: 'plans/plan-session/:planId',
+        Component: lazy(() => import('~/app/plans/plan-session/[planId]/page'))
+      },
+      {
+        path: 'history',
+        Component: lazy(() => import('~/app/history/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
@@ -129,12 +143,13 @@ const router = createBrowserRouter([
       },
       {
         path: '',
-        Component: () => (
-          <PrivateRoute allowedRoles={['admin']}>
-            <AdminLayout />
-          </PrivateRoute>
-        ),
-        // Component: AdminLayout,
+        // Component: () => (
+        //   <PrivateRoute allowedRoles={['admin']}>
+        //     <AdminLayout />
+        //   </PrivateRoute>
+        // ),
+        Component: AdminLayout,
+
         children: [
           {
             index: true,
@@ -154,6 +169,72 @@ const router = createBrowserRouter([
             path: 'manage-users/update/:id',
             Component: lazy(
               () => import('~/app/admin/manage-users/update-user/page')
+            )
+          },
+          {
+            path: 'manage-exercises',
+            Component: lazy(() => import('~/app/admin/manage-exercises/page'))
+          },
+          {
+            path: 'manage-exercises/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-exercises/create-exercise/page')
+            )
+          },
+          {
+            path: 'manage-exercises/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-exercises/update-exercise/page')
+            )
+          },
+          {
+            path: 'manage-foods',
+            Component: lazy(() => import('~/app/admin/manage-foods/page'))
+          },
+          {
+            path: 'manage-foods/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-foods/create-food/page')
+            )
+          },
+          {
+            path: 'manage-foods/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-foods/update-food/page')
+            )
+          },
+          {
+            path: 'manage-muscles',
+            Component: lazy(() => import('~/app/admin/manage-muscles/page'))
+          },
+          {
+            path: 'manage-muscles/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-muscles/create-muscle/page')
+            )
+          },
+          {
+            path: 'manage-muscles/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-muscles/update-muscle/page')
+            )
+          },
+          {
+            path: 'manage-equipments',
+            Component: lazy(() => import('~/app/admin/manage-equipments/page'))
+          },
+          {
+            path: 'manage-equipments/create',
+            Component: lazy(
+              () =>
+                import('~/app/admin/manage-equipments/create-equipment/page')
+            )
+          },
+          {
+            path: 'manage-equipments/update/:id',
+            Component: lazy(
+              () =>
+                import('~/app/admin/manage-equipments/update-equipment/page')
             )
           }
         ]

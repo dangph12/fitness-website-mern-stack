@@ -1,153 +1,262 @@
-import { motion } from 'framer-motion';
 import React, { useState } from 'react';
-import { FaBars, FaTimes, FaUser } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router';
-
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
-import { Button } from '~/components/ui/button';
+import { Link, NavLink } from 'react-router';
 
 import logo from '../assets/logo.png';
 
-const MenuItem = ({ label, links, isDropdown }) => (
-  <div
-    className={`relative group ${isDropdown ? 'lg:inline-block' : 'lg:inline-block'}`}
-  >
-    <motion.button
-      className='hover:text-gray-300 focus:outline-none text-lg'
-      whileHover={{ scale: 1.1 }}
-      transition={{ duration: 0.3 }}
-    >
-      {label}
-    </motion.button>
-    {isDropdown && (
-      <div className='absolute left-0 mt-2 hidden group-hover:block group-focus-within:block bg-white text-black rounded-md shadow-lg w-40 z-10'>
-        {links.map((link, index) => (
-          <Link
-            key={index}
-            to={link.href}
-            className='block px-4 py-2 hover:bg-gray-100'
-          >
-            {link.label}
-          </Link>
-        ))}
-      </div>
-    )}
-  </div>
-);
+export default function Header() {
+  const [open, setOpen] = useState(false);
+  const [openPlans, setOpenPlans] = useState(false);
 
-function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const user = useSelector(state => state.auth?.user);
+  const avatarUrl = useSelector(state => state.avatar?.url);
 
-  const { user } = useSelector(state => state.auth);
-  const { url: avatarUrl } = useSelector(state => state.avatar);
+  const navLinkClass = ({ isActive }) =>
+    `px-3 py-2 rounded-lg text-lg font-semibold transition-colors ${
+      isActive
+        ? 'text-[#3067B6] bg-[#E6EEF9]'
+        : 'text-[#3067B6] hover:text-slate-700'
+    }`;
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  const Avatar = () => {
+    const letter = (user?.name || user?.email || 'U').charAt(0).toUpperCase();
+    return (
+      <Link
+        to='/profile'
+        className='inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full ring-2 ring-[#3067B6]/20 bg-white'
+        title='Profile'
+      >
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt='avatar'
+            className='h-full w-full object-cover'
+          />
+        ) : (
+          <span className='text-sm font-bold text-[#3067B6]'>{letter}</span>
+        )}
+      </Link>
+    );
   };
 
   return (
-    <header className='bg-[#F5F2EC] text-[#3067B6] px-6 py-3 flex items-center justify-between rounded-2xl'>
-      <motion.div
-        className='flex items-center space-x-0.5'
-        initial={{ opacity: 0, x: -50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <Link to='/' className='flex items-center space-x-0.5'>
-          <img src={logo} alt='Logo' className='w-28 h-28' />
-          <span className='font-bold text-3xl mb-2'>F-Fitness</span>
+    <header className='sticky top-0 z-50 border-b border-slate-200 bg-[#F5F2EC]'>
+      <div className='mx-auto flex max-w-7xl items-center justify-between px-4 py-3'>
+        <Link to='/' className='flex items-center gap-3'>
+          <img src={logo} alt='F-Fitness' className='h-12 w-12 rounded' />
+          <span className='text-2xl font-extrabold tracking-tight text-[#3067B6] md:text-3xl'>
+            F-Fitness
+          </span>
         </Link>
-      </motion.div>
 
-      <div className='lg:hidden flex items-center'>
-        <button onClick={toggleMenu} className='text-3xl'>
-          {menuOpen ? <FaTimes /> : <FaBars />}
+        <button
+          className='rounded-lg p-2 text-[#3067B6] hover:bg-white lg:hidden'
+          aria-label='Mở menu'
+          onClick={() => setOpen(v => !v)}
+        >
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            className='h-7 w-7'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='currentColor'
+            strokeWidth='2'
+          >
+            <path strokeLinecap='round' d='M4 6h16M4 12h16M4 18h16' />
+          </svg>
         </button>
-      </div>
 
-      <motion.nav
-        className={`lg:flex space-x-15 font-bold relative ${menuOpen ? 'block' : 'hidden'} lg:block`}
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      >
-        <Link to='/workouts' className='hover:text-gray-300 text-lg'>
-          Workouts
-        </Link>
-        <MenuItem
-          label='Plans'
-          isDropdown={true}
-          links={[
-            { label: 'Rountine Database', href: '/plans/routine-database' },
-            { label: 'Rountine Builder', href: '/plans/plan-list' }
-          ]}
-        />
-        <MenuItem
-          label='Courses'
-          isDropdown={true}
-          links={[
-            { label: 'Beginner', href: '#beginner' },
-            { label: 'Intermediate', href: '#intermediate' },
-            { label: 'Advanced', href: '#advanced' }
-          ]}
-        />
-        <Link to='/nutrition' className='hover:text-gray-300 text-lg'>
-          Nutrition
-        </Link>
-        <Link to='/community' className='hover:text-gray-300 text-lg'>
-          Community
-        </Link>
-        <Link to='/exercise' className='hover:text-gray-300 text-lg'>
-          Exercise
-        </Link>
-        <Link to='/about' className='hover:text-gray-300 text-lg'>
-          About
-        </Link>
-      </motion.nav>
+        <nav className='hidden items-center gap-3 lg:flex'>
+          <NavLink to='/workouts' className={navLinkClass}>
+            Workouts
+          </NavLink>
 
-      <div className='flex space-x-5'>
-        {!user ? (
-          <>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
+          <div className='group relative'>
+            <button
+              className='flex items-center gap-1 rounded-lg px-3 py-2 text-lg font-semibold text-[#3067B6] transition-colors hover:text-slate-700 focus:outline-none'
+              aria-haspopup='true'
+              aria-expanded='false'
             >
-              <Button className='bg-yellow-400 text-black px-5 py-2 rounded-full font-medium hover:bg-yellow-500 transition'>
-                <Link to='/auth/login'>Login</Link>
-              </Button>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Button className='bg-[#3067B6] text-[#F5F2EC] px-5 py-2 rounded-full font-medium transition'>
-                <Link to='/auth/sign-up'>Sign Up</Link>
-              </Button>
-            </motion.div>
-          </>
-        ) : (
-          <Link to='/profile' className='flex items-center space-x-2'>
-            {avatarUrl ? (
-              <Avatar className='w-15 h-15'>
-                <AvatarImage
-                  src={avatarUrl}
-                  alt='User Avatar'
-                  className='rounded-full border-2 border-[#3067B6]'
+              Plans
+              <svg
+                className='h-4 w-4 transition-transform group-hover:rotate-180 group-focus-within:rotate-180'
+                viewBox='0 0 20 20'
+                fill='currentColor'
+                aria-hidden='true'
+              >
+                <path
+                  fillRule='evenodd'
+                  d='M5.23 7.21a.75.75 0 011.06.02L10 10.17l3.71-2.94a.75.75 0 111.04 1.08l-4.24 3.36a.75.75 0 01-.94 0L5.21 8.31a.75.75 0 01.02-1.1z'
+                  clipRule='evenodd'
                 />
-                <AvatarFallback className='text-[#3067B6]'>
-                  {user.name ? user.name[0] : 'U'}
-                </AvatarFallback>
-              </Avatar>
-            ) : (
-              <FaUser size={30} />
-            )}
-          </Link>
-        )}
+              </svg>
+            </button>
+
+            <div
+              className='
+                pointer-events-none absolute left-0 mt-2 origin-top
+                translate-y-1 scale-y-95 transform opacity-0
+                rounded-xl border border-slate-200 bg-white p-2 shadow-xl
+                transition-all duration-200 ease-out
+                group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-y-100 group-hover:opacity-100
+                group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-y-100 group-focus-within:opacity-100
+                min-w-[14rem]
+              '
+              role='menu'
+            >
+              <Link
+                to='/plans/routine-database'
+                className='block rounded-lg px-3 py-2 text-base text-slate-700 hover:bg-slate-50 focus:bg-slate-50 focus:outline-none'
+                role='menuitem'
+              >
+                Routine Database
+              </Link>
+              <Link
+                to='/plans/plan-list'
+                className='block rounded-lg px-3 py-2 text-base text-slate-700 hover:bg-slate-50 focus:bg-slate-50 focus:outline-none'
+                role='menuitem'
+              >
+                Routine Builder
+              </Link>
+            </div>
+          </div>
+
+          <NavLink to='/nutrition' className={navLinkClass}>
+            Nutrition
+          </NavLink>
+          <NavLink to='/community' className={navLinkClass}>
+            Community
+          </NavLink>
+          <NavLink to='/exercise' className={navLinkClass}>
+            Exercise
+          </NavLink>
+          <NavLink to='/history' className={navLinkClass}>
+            History
+          </NavLink>
+          <NavLink to='/about' className={navLinkClass}>
+            About
+          </NavLink>
+        </nav>
+
+        <div className='hidden items-center gap-3 lg:flex'>
+          {user ? (
+            <Avatar />
+          ) : (
+            <>
+              <Link
+                to='/auth/login'
+                className='rounded-full bg-yellow-400 px-5 py-2.5 text-base font-semibold text-black hover:bg-yellow-500'
+              >
+                Login
+              </Link>
+              <Link
+                to='/auth/sign-up'
+                className='rounded-full bg-[#3067B6] px-5 py-2.5 text-base font-semibold text-white hover:bg-[#275397]'
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
+        </div>
       </div>
+
+      {open && (
+        <div className='border-t border-slate-200 bg-white lg:hidden'>
+          <nav className='mx-auto max-w-7xl px-4 py-4'>
+            <ul className='space-y-2'>
+              <li>
+                <NavLink
+                  to='/workouts'
+                  className={({ isActive }) =>
+                    `block rounded-lg px-3 py-2 text-lg font-semibold ${
+                      isActive
+                        ? 'bg-[#E6EEF9] text-[#3067B6]'
+                        : 'text-slate-800'
+                    }`
+                  }
+                  onClick={() => setOpen(false)}
+                >
+                  Workouts
+                </NavLink>
+              </li>
+
+              <li>
+                <button
+                  className='flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-lg font-semibold text-slate-800 hover:bg-slate-50'
+                  onClick={() => setOpenPlans(v => !v)}
+                  aria-expanded={openPlans}
+                >
+                  Plans
+                  <span
+                    className={`transition-transform ${openPlans ? 'rotate-180' : ''}`}
+                  >
+                    ▾
+                  </span>
+                </button>
+                {openPlans && (
+                  <div className='mt-1 space-y-1 pl-4'>
+                    <Link
+                      to='/plans/routine-database'
+                      className='block rounded-lg px-3 py-2 text-base text-slate-700 hover:bg-slate-50'
+                      onClick={() => setOpen(false)}
+                    >
+                      Routine Database
+                    </Link>
+                    <Link
+                      to='/plans/plan-list'
+                      className='block rounded-lg px-3 py-2 text-base text-slate-700 hover:bg-slate-50'
+                      onClick={() => setOpen(false)}
+                    >
+                      Routine Builder
+                    </Link>
+                  </div>
+                )}
+              </li>
+
+              {[
+                ['Nutrition', '/nutrition'],
+                ['Community', '/community'],
+                ['Exercise', '/exercise'],
+                ['History', '/history'],
+                ['About', '/about']
+              ].map(([label, href]) => (
+                <li key={href}>
+                  <Link
+                    to={href}
+                    className='block rounded-lg px-3 py-2 text-lg text-slate-800 hover:bg-slate-50'
+                    onClick={() => setOpen(false)}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <div className='mt-4 flex items-center gap-3'>
+              {user ? (
+                <Avatar />
+              ) : (
+                <>
+                  <Link
+                    to='/auth/login'
+                    className='flex-1 rounded-full bg-yellow-400 px-4 py-2.5 text-center text-base font-semibold text-black hover:bg-yellow-500'
+                    onClick={() => setOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to='/auth/sign-up'
+                    className='flex-1 rounded-full bg-[#3067B6] px-4 py-2.5 text-center text-base font-semibold text-white hover:bg-[#275397]'
+                    onClick={() => setOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
-
-export default Header;

@@ -37,23 +37,14 @@ export function UsersPrimaryButtons() {
         Create User
       </Button>
 
-      <Button
+      {/* <Button
         variant='outline'
         onClick={handleInviteUser}
         className='flex items-center gap-2'
       >
         <Upload className='h-4 w-4' />
         Invite User
-      </Button>
-
-      <Button
-        variant='outline'
-        onClick={handleExportUsers}
-        className='flex items-center gap-2'
-      >
-        <Download className='h-4 w-4' />
-        Export
-      </Button>
+      </Button> */}
     </div>
   );
 }

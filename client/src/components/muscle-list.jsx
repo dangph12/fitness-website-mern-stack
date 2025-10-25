@@ -43,14 +43,52 @@ const MuscleList = () => {
   return (
     <div className='container mx-auto p-6'>
       <div className='mb-8'>
-        <h2 className='text-6xl font-bold text-black'>Exercise Database</h2>
-        <p className='text-lg text-black-400 mt-2'>
-          Find the perfect workouts from the JEFIT exercise database by muscle
-          group, equipment, or try something new.
+        <h2 className='text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl'>
+          Exercise{' '}
+          <span className='bg-gradient-to-r from-sky-600 via-cyan-500 to-teal-500 bg-clip-text text-transparent'>
+            Database
+          </span>
+        </h2>
+
+        <p className='mt-3 max-w-3xl text-base text-slate-600 sm:text-lg'>
+          Find the perfect workouts by{' '}
+          <span className='font-semibold text-slate-700'>muscle group</span>,
+          <span className='font-semibold text-slate-700'> equipment</span>, or
+          try something new.
         </p>
+
+        <div className='mt-4 flex flex-wrap gap-2 text-xs text-slate-700'>
+          <span className='rounded-full border border-slate-200 bg-white px-3 py-1'>
+            1,200+ exercises
+          </span>
+          <span className='rounded-full border border-slate-200 bg-white px-3 py-1'>
+            Beginner–Advanced
+          </span>
+          <span className='rounded-full border border-slate-200 bg-white px-3 py-1'>
+            Home & Gym
+          </span>
+        </div>
       </div>
 
-      <h3 className='text-3xl font-semibold text-gray-800'>Select by Muscle</h3>
+      <div className='mb-4 flex items-end justify-between'>
+        <div>
+          <h3 className='flex items-center gap-2 text-2xl font-semibold text-slate-900 sm:text-3xl'>
+            <span className='inline-block h-2 w-2 rounded-full bg-sky-500' />
+            Select by Muscle
+          </h3>
+          <p className='mt-1 text-sm text-slate-500'>
+            Tap a muscle to filter routines
+          </p>
+        </div>
+
+        <button
+          type='button'
+          onClick={() => setSelectedMuscles?.([])}
+          className='hidden rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 sm:inline-block'
+        >
+          Clear
+        </button>
+      </div>
 
       <div className='flex justify-center gap-4 overflow-x-auto p-10'>
         {muscles.map(muscle => {

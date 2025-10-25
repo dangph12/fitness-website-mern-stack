@@ -73,6 +73,35 @@ const UserService = {
     return user;
   },
 
+  createFromSignUp: async (userData: IUser, avatar?: Express.Multer.File) => {
+    const existingUser = await UserModel.findOne({ email: userData.email });
+    if (existingUser) {
+      throw createHttpError(400, 'User with this email already exists');
+    }
+
+    const newUser = await UserModel.create({
+      ...userData,
+      isActive: true
+    });
+
+    if (avatar) {
+      const uploadResult = await uploadAvatar(
+        avatar.buffer,
+        newUser._id.toString()
+      );
+      if (uploadResult.success && uploadResult.data) {
+        newUser.avatar = uploadResult.data.secure_url;
+        await newUser.save();
+      }
+    }
+
+    if (!newUser) {
+      throw createHttpError(500, 'Failed to create user');
+    }
+
+    return newUser;
+  },
+
   create: async (userData: IUser, avatar?: Express.Multer.File) => {
     const existingUser = await UserModel.findOne({ email: userData.email });
     if (existingUser) {

@@ -1,16 +1,7 @@
 'use client';
 
-import {
-  Bug,
-  Filter,
-  Loader2,
-  Mail,
-  Search,
-  TestTube,
-  User,
-  X
-} from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { Filter, Loader2, RotateCcw, Search, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Badge } from '~/components/ui/badge';
@@ -22,145 +13,125 @@ import {
   PopoverContent,
   PopoverTrigger
 } from '~/components/ui/popover';
-import {
-  clearFilters,
-  fetchUsersExact,
-  setFilters
-} from '~/store/features/users-slice';
-
-// Debounce hook
-function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
+import { clearFilters, setFilters } from '~/store/features/users-slice';
 
 export function UsersFilters() {
   const dispatch = useDispatch();
-  const { filters, loading, users, totalUsers } = useSelector(
-    state => state.users
-  );
+  const { filters, loading } = useSelector(state => state.users);
 
-  // Local state for search input
-  const [searchInput, setSearchInput] = useState(filters.search);
+  // Pending filters state (before applying)
+  const [pendingFilters, setPendingFilters] = useState({
+    search: filters.search || '',
+    role: filters.role || [],
+    gender: filters.gender || []
+  });
 
-  // Debounced search value
-  const debouncedSearch = useDebounce(searchInput, 500);
+  // Track if there are unsaved changes
+  const hasUnsavedChanges =
+    pendingFilters.search !== filters.search ||
+    JSON.stringify(pendingFilters.role) !== JSON.stringify(filters.role) ||
+    JSON.stringify(pendingFilters.gender) !== JSON.stringify(filters.gender);
 
-  // Update filters when debounced search changes
+  // Sync pending filters with Redux when filters are cleared externally
   useEffect(() => {
-    if (debouncedSearch !== filters.search) {
-      dispatch(setFilters({ search: debouncedSearch }));
+    if (!filters.search && !filters.role?.length && !filters.gender?.length) {
+      setPendingFilters({
+        search: '',
+        role: [],
+        gender: []
+      });
     }
-  }, [debouncedSearch, filters.search, dispatch]);
-
-  // Sync local search state with Redux when filters are cleared
-  useEffect(() => {
-    if (filters.search !== searchInput) {
-      setSearchInput(filters.search);
-    }
-  }, [filters.search]);
+  }, [filters.search, filters.role, filters.gender]);
 
   const handleSearchChange = value => {
-    setSearchInput(value);
+    setPendingFilters(prev => ({
+      ...prev,
+      search: value
+    }));
   };
 
   const handleRoleChange = (role, checked) => {
-    const currentRoles = Array.isArray(filters.role) ? filters.role : [];
-    const newRoles = checked
-      ? [...currentRoles, role]
-      : currentRoles.filter(r => r !== role);
-    dispatch(setFilters({ role: newRoles }));
+    setPendingFilters(prev => {
+      const currentRoles = Array.isArray(prev.role) ? prev.role : [];
+      const newRoles = checked
+        ? [...currentRoles, role]
+        : currentRoles.filter(r => r !== role);
+      return { ...prev, role: newRoles };
+    });
   };
 
   const handleGenderChange = (gender, checked) => {
-    const currentGenders = Array.isArray(filters.gender) ? filters.gender : [];
-    const newGenders = checked
-      ? [...currentGenders, gender]
-      : currentGenders.filter(g => g !== gender);
-    dispatch(setFilters({ gender: newGenders }));
+    setPendingFilters(prev => {
+      const currentGenders = Array.isArray(prev.gender) ? prev.gender : [];
+      const newGenders = checked
+        ? [...currentGenders, gender]
+        : currentGenders.filter(g => g !== gender);
+      return { ...prev, gender: newGenders };
+    });
   };
 
-  const handleClearFilters = () => {
-    setSearchInput('');
+  const handleApplyFilters = () => {
+    console.log('🔍 Applying filters:', pendingFilters);
+
+    // Dispatch to Redux
+    dispatch(
+      setFilters({
+        search: pendingFilters.search,
+        role: pendingFilters.role,
+        gender: pendingFilters.gender
+      })
+    );
+  };
+
+  const handleResetFilters = () => {
+    console.log('🔄 Resetting filters');
+
+    setPendingFilters({
+      search: '',
+      role: [],
+      gender: []
+    });
+
     dispatch(clearFilters());
   };
 
-  // Test function giống như Postman request
-  const handleTestPostmanStyle = () => {
-    console.log('🧪 Testing Postman style request...');
-
-    // Test với exact parameters như trong Postman
-    dispatch(
-      fetchUsersExact({
-        name: 'Nguyễn Đình Anh Đức',
-        email: '',
-        role: 'user',
-        gender: ''
-      })
-    );
+  const handleClearSearch = () => {
+    setPendingFilters(prev => ({
+      ...prev,
+      search: ''
+    }));
   };
 
-  // Test search by NAME only
-  const handleTestSearchByName = () => {
-    if (!searchInput.trim()) {
-      console.log('⚠️ No search term entered');
-      return;
+  const handleRemoveRoleFilter = role => {
+    handleRoleChange(role, false);
+
+    // Auto-apply if removing active filter
+    if (filters.role?.includes(role)) {
+      setTimeout(() => {
+        dispatch(
+          setFilters({
+            ...filters,
+            role: filters.role.filter(r => r !== role)
+          })
+        );
+      }, 0);
     }
-
-    console.log('🧪 Testing search by NAME only:', searchInput);
-
-    dispatch(
-      fetchUsersExact({
-        name: searchInput.trim(),
-        email: '', // Empty email
-        role: '',
-        gender: ''
-      })
-    );
   };
 
-  // Test search by EMAIL only
-  const handleTestSearchByEmail = () => {
-    if (!searchInput.trim()) {
-      console.log('⚠️ No search term entered');
-      return;
+  const handleRemoveGenderFilter = gender => {
+    handleGenderChange(gender, false);
+
+    // Auto-apply if removing active filter
+    if (filters.gender?.includes(gender)) {
+      setTimeout(() => {
+        dispatch(
+          setFilters({
+            ...filters,
+            gender: filters.gender.filter(g => g !== gender)
+          })
+        );
+      }, 0);
     }
-
-    console.log('🧪 Testing search by EMAIL only:', searchInput);
-
-    dispatch(
-      fetchUsersExact({
-        name: '', // Empty name
-        email: searchInput.trim(),
-        role: '',
-        gender: ''
-      })
-    );
-  };
-
-  // Test với no filters để get all users
-  const handleTestGetAll = () => {
-    console.log('🧪 Testing get all users...');
-
-    dispatch(
-      fetchUsersExact({
-        name: '',
-        email: '',
-        role: '',
-        gender: ''
-      })
-    );
   };
 
   const hasActiveFilters =
@@ -168,73 +139,34 @@ export function UsersFilters() {
     (Array.isArray(filters.role) && filters.role.length > 0) ||
     (Array.isArray(filters.gender) && filters.gender.length > 0);
 
-  const roleCount = Array.isArray(filters.role) ? filters.role.length : 0;
-  const genderCount = Array.isArray(filters.gender) ? filters.gender.length : 0;
+  const roleCount = Array.isArray(pendingFilters.role)
+    ? pendingFilters.role.length
+    : 0;
+  const genderCount = Array.isArray(pendingFilters.gender)
+    ? pendingFilters.gender.length
+    : 0;
 
   return (
     <div className='space-y-4 mb-6'>
-      {/* Debug Panel */}
-      {/* <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3">
-        <div className="flex items-center gap-2 text-sm flex-wrap">
-          <span className="font-medium">Debug:</span>
-          <span>Found: {users.length}/{totalUsers} users</span>
-          <span>Search: "{filters.search}"</span>
-          
-          <div className="flex gap-1">
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={handleTestPostmanStyle} 
-              disabled={loading}
-            >
-              <TestTube className="h-3 w-3 mr-1" />
-              Postman Style
-            </Button>
-            
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={handleTestGetAll} 
-              disabled={loading}
-            >
-              <Loader2 className="h-3 w-3 mr-1" />
-              Get All
-            </Button>
-            
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={handleTestSearchByName} 
-              disabled={loading || !searchInput.trim()}
-            >
-              <User className="h-3 w-3 mr-1" />
-              By Name
-            </Button>
-            
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={handleTestSearchByEmail} 
-              disabled={loading || !searchInput.trim()}
-            >
-              <Mail className="h-3 w-3 mr-1" />
-              By Email
-            </Button>
-          </div>
-        </div>
-      </div> */}
-
-      <div className='flex items-center space-x-4'>
+      <div className='flex items-center gap-4'>
         {/* Search Input */}
         <div className='relative flex-1 max-w-sm'>
           <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
-          {loading && searchInput && (
-            <Loader2 className='absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground' />
+          {pendingFilters.search && (
+            <X
+              className='absolute right-3 top-3 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground'
+              onClick={handleClearSearch}
+            />
           )}
           <Input
-            placeholder='Search users by name...'
-            value={searchInput}
+            placeholder='Search users by name or email...'
+            value={pendingFilters.search}
             onChange={e => handleSearchChange(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                handleApplyFilters();
+              }
+            }}
             className='pl-10 pr-10'
           />
         </div>
@@ -256,13 +188,13 @@ export function UsersFilters() {
             <div className='space-y-2'>
               <h4 className='font-medium leading-none'>Filter by Role</h4>
               <div className='space-y-2'>
-                {['admin', 'instructor', 'user'].map(role => (
+                {['admin', 'user'].map(role => (
                   <div key={role} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`role-${role}`}
                       checked={
-                        Array.isArray(filters.role) &&
-                        filters.role.includes(role)
+                        Array.isArray(pendingFilters.role) &&
+                        pendingFilters.role.includes(role)
                       }
                       onCheckedChange={checked =>
                         handleRoleChange(role, checked)
@@ -298,13 +230,13 @@ export function UsersFilters() {
             <div className='space-y-2'>
               <h4 className='font-medium leading-none'>Filter by Gender</h4>
               <div className='space-y-2'>
-                {['male', 'female', 'other'].map(gender => (
+                {['male', 'female'].map(gender => (
                   <div key={gender} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`gender-${gender}`}
                       checked={
-                        Array.isArray(filters.gender) &&
-                        filters.gender.includes(gender)
+                        Array.isArray(pendingFilters.gender) &&
+                        pendingFilters.gender.includes(gender)
                       }
                       onCheckedChange={checked =>
                         handleGenderChange(gender, checked)
@@ -323,11 +255,37 @@ export function UsersFilters() {
           </PopoverContent>
         </Popover>
 
-        {/* Clear Filters */}
+        {/* Apply Button */}
+        <Button
+          onClick={handleApplyFilters}
+          disabled={loading || !hasUnsavedChanges}
+          className='relative'
+        >
+          {loading ? (
+            <>
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              Applying...
+            </>
+          ) : (
+            <>
+              <Search className='mr-2 h-4 w-4' />
+              Apply
+              {hasUnsavedChanges && (
+                <span className='absolute -top-1 -right-1 h-2 w-2 bg-blue-500 rounded-full' />
+              )}
+            </>
+          )}
+        </Button>
+
+        {/* Reset Button */}
         {hasActiveFilters && (
-          <Button variant='ghost' onClick={handleClearFilters}>
-            <X className='mr-2 h-4 w-4' />
-            Clear
+          <Button
+            variant='ghost'
+            onClick={handleResetFilters}
+            disabled={loading}
+          >
+            <RotateCcw className='mr-2 h-4 w-4' />
+            Reset
           </Button>
         )}
       </div>
@@ -337,10 +295,13 @@ export function UsersFilters() {
         <div className='flex flex-wrap gap-2'>
           {filters.search && (
             <Badge variant='secondary' className='flex items-center gap-1'>
-              Search: {filters.search}
+              Search: "{filters.search}"
               <X
                 className='h-3 w-3 cursor-pointer hover:bg-muted-foreground/20 rounded'
-                onClick={() => handleSearchChange('')}
+                onClick={() => {
+                  setPendingFilters(prev => ({ ...prev, search: '' }));
+                  dispatch(setFilters({ ...filters, search: '' }));
+                }}
               />
             </Badge>
           )}
@@ -354,7 +315,7 @@ export function UsersFilters() {
                 Role: {role}
                 <X
                   className='h-3 w-3 cursor-pointer hover:bg-muted-foreground/20 rounded'
-                  onClick={() => handleRoleChange(role, false)}
+                  onClick={() => handleRemoveRoleFilter(role)}
                 />
               </Badge>
             ))}
@@ -368,7 +329,7 @@ export function UsersFilters() {
                 Gender: {gender}
                 <X
                   className='h-3 w-3 cursor-pointer hover:bg-muted-foreground/20 rounded'
-                  onClick={() => handleGenderChange(gender, false)}
+                  onClick={() => handleRemoveGenderFilter(gender)}
                 />
               </Badge>
             ))}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 
 import Banner from '~/components/banner';
 import CategoryBanner from '~/components/category-banner';
@@ -9,6 +9,13 @@ import IntroSection from '~/components/intro-section';
 import PlanCourses from '~/components/plan-courses';
 
 function Page() {
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, []);
+
   return (
     <div>
       <Banner />

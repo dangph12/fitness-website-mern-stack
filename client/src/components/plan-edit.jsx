@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FaBook, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 
+import { fetchExerciseById } from '~/store/features/exercise-slice';
 import { fetchPlanById, updatePlan } from '~/store/features/plan-slice';
 
 import ExerciseLibrary from './exercise-library';
@@ -12,52 +13,118 @@ const EditPlan = () => {
   const { planId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { currentPlan, loading } = useSelector(state => state.plans);
+  const { exercises: exerciseList = [] } = useSelector(
+    state => state.exercises
+  );
   const userId = useSelector(state => state.auth.user.id);
 
-  const [days, setDays] = useState([]);
+  const [days, setDays] = useState([{ dayName: 'Day 1', workouts: [] }]);
   const [selectedDay, setSelectedDay] = useState(0);
   const [planImage, setPlanImage] = useState(null);
   const [planTitle, setPlanTitle] = useState('');
   const [planDescription, setPlanDescription] = useState('');
+
+  const exerciseMap = useMemo(() => {
+    const m = new Map();
+    exerciseList.forEach(ex => m.set(ex._id?.toString(), ex));
+    return m;
+  }, [exerciseList]);
+
+  const getExerciseMeta = exOrId => {
+    if (typeof exOrId === 'object' && exOrId?._id) return exOrId;
+    const id = exOrId?.toString?.() || exOrId;
+    const found = exerciseMap.get(id);
+    if (found) return found;
+    return { _id: id, title: 'Loading...', tutorial: '' };
+  };
 
   useEffect(() => {
     if (planId) dispatch(fetchPlanById(planId));
   }, [dispatch, planId]);
 
   useEffect(() => {
-    if (currentPlan) {
-      setPlanTitle(currentPlan.title || '');
-      setPlanDescription(currentPlan.description || '');
-      setPlanImage(currentPlan.image || null);
+    if (!currentPlan) return;
+    const ids = new Set();
+    (currentPlan.workouts || []).forEach(w => {
+      (w.exercises || []).forEach(ex => {
+        const id = (
+          typeof ex.exercise === 'object' ? ex.exercise?._id : ex.exercise
+        )?.toString();
+        if (id) ids.add(id);
+      });
+    });
+    ids.forEach(id => {
+      if (!exerciseMap.has(id)) dispatch(fetchExerciseById(id));
+    });
+  }, [currentPlan, exerciseMap, dispatch]);
 
-      const mappedDays = currentPlan.workouts.map(workout => ({
-        dayName: workout.title,
-        workouts: [
-          {
-            ...workout,
-            exercises: workout.exercises.map(ex => ({
-              ...ex,
-              sets: [...ex.sets]
-            }))
-          }
-        ]
-      }));
+  useEffect(() => {
+    if (!currentPlan) return;
 
-      setDays(
-        mappedDays.length ? mappedDays : [{ dayName: 'Day 1', workouts: [] }]
-      );
-    }
-  }, [currentPlan]);
+    setPlanTitle(currentPlan.title || '');
+    setPlanDescription(currentPlan.description || '');
+    setPlanImage(currentPlan.image || null);
+
+    const mappedDays = (currentPlan.workouts || []).map(workout => ({
+      dayName: workout.title,
+      workouts: [
+        {
+          title: workout.title,
+          image: workout.image || null,
+          user: workout.user || userId,
+          exercises: (workout.exercises || []).map(ex => {
+            const meta = getExerciseMeta(
+              typeof ex.exercise === 'object' ? ex.exercise : ex.exercise
+            );
+            return {
+              exercise: {
+                _id: meta._id,
+                title: meta.title,
+                tutorial: meta.tutorial
+              },
+              sets: Array.isArray(ex.sets) ? [...ex.sets] : [1]
+            };
+          })
+        }
+      ]
+    }));
+
+    setDays(
+      mappedDays.length ? mappedDays : [{ dayName: 'Day 1', workouts: [] }]
+    );
+    setSelectedDay(0);
+  }, [currentPlan, userId, exerciseMap]);
+
+  const dayStats = useMemo(
+    () =>
+      days.map(d => {
+        const w = d.workouts?.length || 0;
+        const e =
+          d.workouts?.reduce((acc, w) => acc + (w.exercises?.length || 0), 0) ||
+          0;
+        return { workouts: w, exercises: e };
+      }),
+    [days]
+  );
 
   const addDay = () =>
-    setDays([...days, { dayName: `Day ${days.length + 1}`, workouts: [] }]);
+    setDays(prev => [
+      ...prev,
+      { dayName: `Day ${prev.length + 1}`, workouts: [] }
+    ]);
 
   const removeDay = index => {
     const updated = [...days];
     updated.splice(index, 1);
     setDays(updated);
-    if (selectedDay >= updated.length) setSelectedDay(updated.length - 1);
+    if (updated.length === 0) {
+      setSelectedDay(0);
+      return;
+    }
+    if (selectedDay >= updated.length)
+      setSelectedDay(Math.max(0, updated.length - 1));
   };
 
   const handleDayTitleChange = (index, value) => {
@@ -68,23 +135,54 @@ const EditPlan = () => {
 
   const handleAddExercise = (dayIndex, exercise) => {
     const updated = [...days];
-    updated[dayIndex].workouts.push({
-      title: exercise.title,
-      image: null,
-      user: userId,
-      exercises: [
-        {
-          exercise: exercise._id,
-          sets: [1]
-        }
-      ]
-    });
+    const day = updated[dayIndex];
+
+    if (day.workouts.length === 0) {
+      day.workouts.push({
+        title: `Workout ${dayIndex + 1}`,
+        image: null,
+        user: userId,
+        exercises: []
+      });
+    }
+
+    const workout = day.workouts[0];
+
+    const exists = workout.exercises.some(
+      ex =>
+        (typeof ex.exercise === 'object' &&
+          ex.exercise?._id === exercise._id) ||
+        ex.exercise === exercise._id
+    );
+    if (!exists) {
+      workout.exercises.push({
+        exercise: {
+          _id: exercise._id,
+          title: exercise.title,
+          tutorial: exercise.tutorial
+        },
+        sets: [1]
+      });
+    }
+
     setDays(updated);
   };
 
-  const handleRemoveExercise = (dayIndex, workoutIndex) => {
+  const handleRemoveWorkout = (dayIndex, workoutIndex) => {
     const updated = [...days];
     updated[dayIndex].workouts.splice(workoutIndex, 1);
+    setDays(updated);
+  };
+
+  const handleWorkoutTitleChange = (dayIndex, workoutIndex, value) => {
+    const updated = [...days];
+    updated[dayIndex].workouts[workoutIndex].title = value;
+    setDays(updated);
+  };
+
+  const handleWorkoutImageChange = (dayIndex, workoutIndex, file) => {
+    const updated = [...days];
+    updated[dayIndex].workouts[workoutIndex].image = file;
     setDays(updated);
   };
 
@@ -96,8 +194,9 @@ const EditPlan = () => {
     value
   ) => {
     const updated = [...days];
+    const v = Math.max(1, Number(value) || 1);
     updated[dayIndex].workouts[workoutIndex].exercises[exIndex].sets[setIndex] =
-      Number(value);
+      v;
     setDays(updated);
   };
 
@@ -109,10 +208,9 @@ const EditPlan = () => {
 
   const handleRemoveSet = (dayIndex, workoutIndex, exIndex, setIndex) => {
     const updated = [...days];
-    updated[dayIndex].workouts[workoutIndex].exercises[exIndex].sets.splice(
-      setIndex,
-      1
-    );
+    const arr =
+      updated[dayIndex].workouts[workoutIndex].exercises[exIndex].sets;
+    if (arr.length > 1) arr.splice(setIndex, 1);
     setDays(updated);
   };
 
@@ -125,28 +223,33 @@ const EditPlan = () => {
     const formData = new FormData();
     formData.append('title', planTitle);
     formData.append('description', planDescription);
-    if (planImage) formData.append('image', planImage);
+    if (planImage && typeof planImage !== 'string') {
+      formData.append('image', planImage);
+    }
     formData.append('isPublic', 'true');
     formData.append('user', userId);
 
     let workoutIndex = 0;
-    days.forEach(day => {
-      day.workouts.forEach(workout => {
+    (days || []).forEach(day => {
+      (day.workouts || []).forEach(workout => {
         formData.append(`workouts[${workoutIndex}][title]`, workout.title);
         formData.append(`workouts[${workoutIndex}][isPublic]`, 'false');
         formData.append(
           `workouts[${workoutIndex}][user]`,
           workout.user || userId
         );
-        if (workout.image)
+        if (workout.image && typeof workout.image !== 'string') {
           formData.append(`workouts[${workoutIndex}][image]`, workout.image);
+        }
 
-        workout.exercises.forEach((ex, exIndex) => {
+        (workout.exercises || []).forEach((ex, exIndex) => {
+          const exId =
+            typeof ex.exercise === 'object' ? ex.exercise._id : ex.exercise;
           formData.append(
             `workouts[${workoutIndex}][exercises][${exIndex}][exercise]`,
-            ex.exercise
+            exId
           );
-          ex.sets.forEach((set, setIndex) => {
+          (ex.sets || [1]).forEach((set, setIndex) => {
             formData.append(
               `workouts[${workoutIndex}][exercises][${exIndex}][sets][${setIndex}]`,
               String(set)
@@ -159,6 +262,7 @@ const EditPlan = () => {
     });
 
     dispatch(updatePlan({ id: planId, updateData: formData }))
+      .unwrap?.()
       .then(() => {
         toast.success('Plan updated successfully!');
         navigate('/plans/plan-list');
@@ -166,218 +270,380 @@ const EditPlan = () => {
       .catch(() => toast.error('Failed to update plan'));
   };
 
-  if (!currentPlan)
+  if (!currentPlan) {
     return <p className='text-center text-gray-500'>Loading plan...</p>;
+  }
 
   return (
-    <div className='flex gap-6 p-6 bg-gray-50 rounded-lg shadow-md'>
-      <div className='w-2/3 p-4 bg-white rounded-lg border border-gray-200'>
-        <div className='mb-6 grid grid-cols-2 gap-6'>
-          <div>
-            <label className='block font-medium mb-1 text-gray-700'>
-              Plan Title
-            </label>
-            <input
-              type='text'
-              value={planTitle}
-              onChange={e => setPlanTitle(e.target.value)}
-              placeholder='Enter plan title...'
-              className='w-full border p-2 rounded-md mb-3'
-            />
-            <label className='block font-medium mb-1 text-gray-700'>
-              Description
-            </label>
-            <textarea
-              value={planDescription}
-              onChange={e => setPlanDescription(e.target.value)}
-              placeholder='Enter plan description...'
-              className='w-full border p-2 rounded-md'
-              rows='4'
-            />
-          </div>
-
-          <div>
-            <label className='block font-medium mb-2 text-gray-700'>
-              Plan Image
-            </label>
-            <div className='relative border-2 border-dashed border-gray-300 rounded-xl h-48 flex items-center justify-center cursor-pointer hover:border-blue-400 transition group overflow-hidden'>
-              <input
-                type='file'
-                accept='image/*'
-                onChange={e => setPlanImage(e.target.files[0])}
-                className='absolute inset-0 opacity-0 cursor-pointer z-10'
-              />
-              {planImage ? (
-                <img
-                  src={
-                    typeof planImage === 'string'
-                      ? planImage
-                      : URL.createObjectURL(planImage)
-                  }
-                  alt='Plan'
-                  className='w-full h-full object-cover rounded-xl'
-                />
-              ) : (
-                <p className='text-gray-500'>No Image Selected</p>
-              )}
+    <div className='grid grid-cols-1 xl:grid-cols-[13fr_7fr] gap-6 p-6'>
+      <div className='space-y-6'>
+        <div className='rounded-2xl border border-slate-200 bg-white shadow-sm'>
+          <div className='flex items-center justify-between border-b border-slate-200 px-6 py-4'>
+            <div>
+              <h2 className='text-xl font-semibold tracking-tight'>
+                Edit Plan
+              </h2>
+              <p className='text-xs text-slate-500'>
+                Update content, then save your changes.
+              </p>
             </div>
-            {planImage && (
-              <button
-                onClick={() => setPlanImage(null)}
-                className='mt-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'
-              >
-                Remove
-              </button>
-            )}
+            <span className='rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700'>
+              {days.length} day{days.length > 1 ? 's' : ''}
+            </span>
           </div>
-        </div>
 
-        <div className='flex justify-between mb-4'>
-          <button
-            onClick={addDay}
-            className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700'
-          >
-            + Add Day
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className='bg-green-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-green-700'
-          >
-            <FaBook className='mr-2' />{' '}
-            {loading ? 'Updating...' : 'Update Plan'}
-          </button>
-        </div>
-
-        {days.map((day, dayIndex) => (
-          <div
-            key={dayIndex}
-            className={`mb-6 p-4 rounded-lg shadow-sm border ${
-              selectedDay === dayIndex ? 'border-blue-500' : 'border-gray-300'
-            }`}
-          >
-            <div className='flex justify-between items-center mb-3'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6 p-6'>
+            <div>
+              <label className='mb-1 block text-sm font-medium text-slate-700'>
+                Plan Title
+              </label>
               <input
                 type='text'
-                value={day.dayName}
-                onChange={e => handleDayTitleChange(dayIndex, e.target.value)}
-                onClick={() => setSelectedDay(dayIndex)}
-                className={`text-lg font-semibold border rounded-md p-2 focus:outline-none ${
-                  selectedDay === dayIndex
-                    ? 'border-blue-500 font-bold'
-                    : 'border-gray-300'
-                }`}
+                value={planTitle}
+                onChange={e => setPlanTitle(e.target.value)}
+                placeholder='e.g. Push/Pull/Legs – 6 Weeks'
+                className='w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
               />
-              <button
-                onClick={() => removeDay(dayIndex)}
-                className='bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 flex items-center'
-              >
-                <FaTrash className='mr-1' /> Delete Day
-              </button>
+
+              <label className='mb-1 mt-4 block text-sm font-medium text-slate-700'>
+                Description
+              </label>
+              <textarea
+                value={planDescription}
+                onChange={e => setPlanDescription(e.target.value)}
+                placeholder='Short blurb about goals, split, gear, etc.'
+                rows={5}
+                className='w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+              />
             </div>
 
-            {day.workouts.length === 0 ? (
-              <p className='text-gray-400'>
-                No workouts yet. Add exercises from library.
-              </p>
-            ) : (
-              <div className='grid gap-4'>
-                {day.workouts.map((workout, workoutIndex) => (
-                  <div
-                    key={workoutIndex}
-                    className='bg-gray-100 p-4 rounded-lg relative flex flex-col gap-3'
-                  >
-                    <button
-                      onClick={() =>
-                        handleRemoveExercise(dayIndex, workoutIndex)
+            <div>
+              <label className='mb-2 block text-sm font-medium text-slate-700'>
+                Plan Image
+              </label>
+              <div className='relative h-48 overflow-hidden rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 group'>
+                <input
+                  type='file'
+                  accept='image/*'
+                  className='absolute inset-0 z-10 cursor-pointer opacity-0'
+                  onChange={e => {
+                    const file = e.target.files?.[0] || null;
+                    setPlanImage(file || planImage);
+                  }}
+                />
+                {planImage ? (
+                  <>
+                    <img
+                      src={
+                        typeof planImage === 'string'
+                          ? planImage
+                          : URL.createObjectURL(planImage)
                       }
-                      className='absolute top-2 right-2 bg-red-400 text-white px-2 py-1 rounded-md hover:bg-red-600'
-                    >
-                      <FaTrash />
-                    </button>
+                      alt='Plan'
+                      className='absolute inset-0 h-full w-full object-cover'
+                    />
+                    <div className='absolute inset-0 hidden items-center justify-center bg-black/40 text-white backdrop-blur-[1px] group-hover:flex'>
+                      Replace Image
+                    </div>
+                  </>
+                ) : (
+                  <div className='grid h-full place-items-center text-center text-slate-500'>
+                    <div>
+                      <p className='font-medium'>Drop or click to upload</p>
+                      <p className='text-xs'>PNG, JPG (max 5MB)</p>
+                    </div>
+                  </div>
+                )}
+              </div>
 
+              {planImage && typeof planImage !== 'string' && (
+                <button
+                  onClick={() => setPlanImage(null)}
+                  className='mt-3 rounded-md bg-red-500 px-3 py-1.5 text-white hover:bg-red-600'
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className='sticky bottom-0 flex flex-col gap-3 items-center justify-between border-t border-slate-200 bg-white/80 px-6 py-4 backdrop-blur sm:flex-row'>
+            <div className='flex items-center gap-2 text-xs text-slate-500'>
+              <span className='rounded-full bg-slate-100 px-2 py-1'>
+                Total workouts: {dayStats.reduce((a, b) => a + b.workouts, 0)}
+              </span>
+              <span className='rounded-full bg-slate-100 px-2 py-1'>
+                Total exercises: {dayStats.reduce((a, b) => a + b.exercises, 0)}
+              </span>
+            </div>
+
+            <div className='flex gap-2'>
+              <button
+                onClick={addDay}
+                className='rounded-lg bg-blue-600 px-4 py-2 text-white shadow-sm transition hover:bg-blue-700'
+              >
+                + Add Day
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className={`rounded-lg px-4 py-2 text-white shadow-sm transition ${
+                  loading
+                    ? 'cursor-not-allowed bg-slate-400'
+                    : 'bg-emerald-600 hover:bg-emerald-700'
+                } flex items-center gap-2`}
+              >
+                <FaBook />
+                {loading ? 'Updating...' : 'Update Plan'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className='rounded-2xl border border-slate-200 bg-white shadow-sm'>
+          <div className='flex w-full gap-2 overflow-x-auto border-b border-slate-200 p-3'>
+            {days.map((day, i) => {
+              const isActive = i === selectedDay;
+              const stats = dayStats[i];
+              return (
+                <button
+                  key={i}
+                  onClick={() => setSelectedDay(i)}
+                  className={`group inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm transition ${
+                    isActive
+                      ? 'bg-blue-600 text-white shadow'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  <span className='font-medium'>Day {i + 1}</span>
+                  <span
+                    className={`rounded-full border px-2 py-0.5 text-xs ${
+                      isActive
+                        ? 'border-white/30 bg-white/20 text-white'
+                        : 'border-slate-300 bg-white text-slate-600'
+                    }`}
+                    title={`${stats.workouts} workout(s), ${stats.exercises} exercise(s)`}
+                  >
+                    {stats.exercises}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className='p-6'>
+            {days.map((day, dayIndex) => {
+              if (selectedDay !== dayIndex) return null;
+
+              return (
+                <div key={dayIndex} className='space-y-5'>
+                  <div className='flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center'>
                     <input
                       type='text'
-                      value={workout.title}
-                      readOnly
-                      className='flex-1 p-2 border rounded-md bg-gray-200 text-gray-700 cursor-not-allowed'
+                      value={day.dayName}
+                      onChange={e =>
+                        handleDayTitleChange(dayIndex, e.target.value)
+                      }
+                      className='w-full max-w-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg font-semibold outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
                     />
+                    <button
+                      onClick={() => removeDay(dayIndex)}
+                      className='inline-flex items-center gap-2 rounded-md bg-red-500 px-3 py-2 text-white transition hover:bg-red-600'
+                    >
+                      <FaTrash /> Delete Day
+                    </button>
+                  </div>
 
-                    {workout.exercises.map((exercise, exIndex) => (
-                      <div
-                        key={exIndex}
-                        className='border p-3 rounded-md flex flex-col gap-2 bg-white'
-                      >
-                        <div className='grid grid-cols-2 gap-20 mb-3'>
-                          <span className='font-semibold text-center mr-30'>
-                            Set
-                          </span>
-                          <span className='font-semibold text-left'>Reps</span>
-                        </div>
-
-                        {exercise.sets.map((set, setIndex) => (
-                          <div
-                            key={setIndex}
-                            className='flex items-center gap-2'
+                  {day.workouts.length === 0 ? (
+                    <div className='rounded-xl border border-dashed border-slate-300 p-10 text-center text-slate-500'>
+                      No workouts yet. Use the library on the right to add an
+                      exercise.
+                    </div>
+                  ) : (
+                    <div className='grid gap-4'>
+                      {day.workouts.map((workout, workoutIndex) => (
+                        <div
+                          key={workoutIndex}
+                          className='relative rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm'
+                        >
+                          <button
+                            onClick={() =>
+                              handleRemoveWorkout(dayIndex, workoutIndex)
+                            }
+                            className='absolute right-3 top-3 rounded-md bg-red-500 p-2 text-white hover:bg-red-600'
+                            title='Remove workout'
                           >
-                            <span className='p-2 border rounded-md w-100 text-center'>
-                              {setIndex + 1}
-                            </span>
+                            <FaTrash />
+                          </button>
+
+                          <div className='mb-3 flex flex-col gap-3 sm:flex-row sm:items-center'>
                             <input
-                              type='number'
-                              value={set}
+                              type='text'
+                              value={workout.title}
                               onChange={e =>
-                                handleRepsChange(
+                                handleWorkoutTitleChange(
                                   dayIndex,
                                   workoutIndex,
-                                  exIndex,
-                                  setIndex,
                                   e.target.value
                                 )
                               }
-                              className='p-2 border rounded-md w-100 text-center'
-                              min={1}
+                              className='flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 font-medium outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
                             />
-                            <button
-                              onClick={() =>
-                                handleRemoveSet(
-                                  dayIndex,
-                                  workoutIndex,
-                                  exIndex,
-                                  setIndex
-                                )
-                              }
-                              className='text-red-500 ml-2'
-                            >
-                              <FaTrash />
-                            </button>
+
+                            <label className='inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50'>
+                              <input
+                                type='file'
+                                accept='image/*'
+                                className='hidden'
+                                onChange={e =>
+                                  handleWorkoutImageChange(
+                                    dayIndex,
+                                    workoutIndex,
+                                    e.target.files?.[0] || null
+                                  )
+                                }
+                              />
+                              Upload Image
+                            </label>
                           </div>
-                        ))}
-                        <button
-                          onClick={() =>
-                            handleAddSet(dayIndex, workoutIndex, exIndex)
-                          }
-                          className='text-blue-600 mt-1 text-left'
-                        >
-                          + Add Set
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            )}
+
+                          <div className='space-y-3'>
+                            {workout.exercises.map((exercise, exIndex) => (
+                              <div
+                                key={exIndex}
+                                className='rounded-xl border border-slate-200 bg-white p-3'
+                              >
+                                <div className='mb-2 flex items-center gap-3'>
+                                  <div className='relative h-12 w-12 overflow-hidden rounded-md ring-1 ring-slate-200'>
+                                    <img
+                                      src={
+                                        exercise.exercise?.tutorial?.endsWith?.(
+                                          '.gif'
+                                        )
+                                          ? exercise.exercise.tutorial.replace(
+                                              '/upload/',
+                                              '/upload/f_jpg/so_0/'
+                                            )
+                                          : exercise.exercise?.tutorial
+                                      }
+                                      alt={
+                                        exercise.exercise?.title || 'Exercise'
+                                      }
+                                      className='absolute inset-0 h-full w-full object-cover'
+                                      onMouseEnter={e => {
+                                        const t = exercise.exercise?.tutorial;
+                                        if (t && t.endsWith('.gif'))
+                                          e.currentTarget.src = t;
+                                      }}
+                                      onMouseLeave={e => {
+                                        const t = exercise.exercise?.tutorial;
+                                        if (t && t.endsWith('.gif'))
+                                          e.currentTarget.src = t.replace(
+                                            '/upload/',
+                                            '/upload/f_jpg/so_0/'
+                                          );
+                                      }}
+                                    />
+                                  </div>
+                                  <div className='min-w-0'>
+                                    <p className='truncate font-semibold'>
+                                      {exercise.exercise?.title || 'Exercise'}
+                                    </p>
+                                    <p className='text-xs text-slate-500'>
+                                      {exercise.sets.length} set(s)
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className='mb-2 grid grid-cols-[80px_1fr_42px] items-center gap-2 px-1 text-sm font-medium text-slate-600'>
+                                  <span className='text-center'>Set</span>
+                                  <span>Reps</span>
+                                  <span />
+                                </div>
+
+                                {exercise.sets.map((set, setIndex) => (
+                                  <div
+                                    key={setIndex}
+                                    className='mb-2 grid grid-cols-[80px_1fr_42px] items-center gap-2'
+                                  >
+                                    <span className='rounded-md border border-slate-300 bg-white py-2 text-center'>
+                                      {setIndex + 1}
+                                    </span>
+                                    <input
+                                      type='number'
+                                      min={1}
+                                      value={set}
+                                      onChange={e =>
+                                        handleRepsChange(
+                                          dayIndex,
+                                          workoutIndex,
+                                          exIndex,
+                                          setIndex,
+                                          e.target.value
+                                        )
+                                      }
+                                      className='rounded-md border border-slate-300 bg-white px-3 py-2 text-center outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+                                    />
+                                    <button
+                                      onClick={() =>
+                                        handleRemoveSet(
+                                          dayIndex,
+                                          workoutIndex,
+                                          exIndex,
+                                          setIndex
+                                        )
+                                      }
+                                      className='rounded-md p-2 text-red-500 hover:bg-red-50'
+                                      title='Remove set'
+                                    >
+                                      <FaTrash />
+                                    </button>
+                                  </div>
+                                ))}
+
+                                <button
+                                  onClick={() =>
+                                    handleAddSet(
+                                      dayIndex,
+                                      workoutIndex,
+                                      exIndex
+                                    )
+                                  }
+                                  className='mt-1 text-left text-blue-600 hover:underline'
+                                >
+                                  + Add Set
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        ))}
+        </div>
       </div>
 
-      <div className='w-1/3 border-l p-4 rounded-lg shadow-lg'>
-        <ExerciseLibrary
-          handleAddExercise={exercise =>
-            handleAddExercise(selectedDay, exercise)
-          }
-        />
-      </div>
+      <aside className='xl:sticky xl:top-6 h-fit'>
+        <div className='rounded-2xl border border-slate-200 bg-white shadow-sm'>
+          <div className='border-b border-slate-100 px-6 py-4'>
+            <h3 className='text-lg font-semibold'>Exercise Library</h3>
+            <p className='text-xs text-slate-500'>
+              Chọn bài tập để thêm vào ngày đang chọn.
+            </p>
+          </div>
+          <div className='p-5 h-[82vh] overflow-auto'>
+            <ExerciseLibrary
+              handleAddExercise={exercise =>
+                handleAddExercise(selectedDay, exercise)
+              }
+            />
+          </div>
+        </div>
+      </aside>
     </div>
   );
 };
