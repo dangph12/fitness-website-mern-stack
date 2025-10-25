@@ -1,13 +1,13 @@
 import createHttpError from 'http-errors';
+import { Types } from 'mongoose';
+import type { z } from 'zod';
 
 import mealPrompt from '~/modules/ai/ai-prompt';
 import BodyRecordService from '~/modules/body-records/body-record-service';
 import { IBodyRecord } from '~/modules/body-records/body-record-type';
-import FoodService from '~/modules/foods/food-service';
-import { IFood } from '~/modules/foods/food-type';
 import GoalService from '~/modules/goals/goal-service';
 import { IGoal } from '~/modules/goals/goal-type';
-import { IMeal, MealType } from '~/modules/meals/meal-type';
+import { MealType } from '~/modules/meals/meal-type';
 import UserService from '~/modules/users/user-service';
 import { IUser } from '~/modules/users/user-type';
 import { generateByOpenAI } from '~/utils/openai';
@@ -15,80 +15,148 @@ import { generateByOpenAI } from '~/utils/openai';
 import { IGenerateMeal, IInputGenerateMeal } from './ai-type';
 import MealOutputSchema from './ai-validation';
 
-const extractJson = (raw: unknown): string => {
-  const s = typeof raw === 'string' ? raw : JSON.stringify(raw);
-  const match = s.match(/\{[\s\S]*\}/);
-  if (match) return match[0];
-  return s;
+type MealContext = {
+  user: IUser;
+  goal: IGoal;
+  bodyRecord: IBodyRecord;
 };
 
-const normalizeMealType = (v: any): any => {
-  try {
-    if (
-      v &&
-      typeof v === 'object' &&
-      'mealType' in v &&
-      typeof v.mealType === 'string'
-    ) {
-      const map = Object.values(MealType).reduce<Record<string, MealType>>(
-        (acc, mt) => {
-          acc[String(mt).toLowerCase()] = mt;
-          return acc;
-        },
-        {}
-      );
-      const key = v.mealType.toLowerCase();
-      if (map[key]) v.mealType = map[key];
+const DEFAULT_INPUT: IInputGenerateMeal = {
+  age: 30,
+  height: 170,
+  weight: 70,
+  targetWeight: 65,
+  fitnessGoal: 'Lose weight',
+  diet: 'No dairy'
+};
+
+const MEAL_TYPE_LOOKUP = Object.values(MealType).reduce<
+  Record<string, MealType>
+>((acc, mt) => {
+  acc[String(mt).toLowerCase()] = mt;
+  return acc;
+}, {});
+
+const extractJsonObject = (raw: unknown): string => {
+  const serialized = typeof raw === 'string' ? raw : JSON.stringify(raw);
+  const match = serialized.match(/\{[\s\S]*\}/);
+  return match ? match[0] : serialized;
+};
+
+const normalizeMealType = <T extends { mealType?: string }>(value: T): T => {
+  if (value?.mealType) {
+    const key = value.mealType.toLowerCase();
+    if (MEAL_TYPE_LOOKUP[key]) {
+      value.mealType = MEAL_TYPE_LOOKUP[key];
     }
-  } catch {
-    throw createHttpError(400, 'Invalid Object');
   }
-  return v;
+  return value;
+};
+
+type MealSchemaOutput = z.infer<typeof MealOutputSchema>;
+
+const parseMealFromAI = (raw: unknown): IGenerateMeal => {
+  const jsonText = extractJsonObject(raw);
+  let candidate: unknown;
+
+  try {
+    candidate = JSON.parse(jsonText);
+  } catch {
+    throw createHttpError(502, 'AI output is not valid JSON');
+  }
+
+  const normalized = normalizeMealType(candidate as { mealType?: string });
+  const result = MealOutputSchema.safeParse(normalized);
+
+  if (!result.success) {
+    throw createHttpError(
+      502,
+      `AI validation failed: ${result.error.message ?? 'Unknown schema error'}`
+    );
+  }
+
+  return toGenerateMeal(result.data);
+};
+
+const toGenerateMeal = (meal: MealSchemaOutput): IGenerateMeal => {
+  const foods = meal.foods.map(item => {
+    if (!Types.ObjectId.isValid(item.food)) {
+      throw createHttpError(
+        400,
+        `Invalid food id received from AI: ${item.food}`
+      );
+    }
+    return {
+      food: new Types.ObjectId(item.food),
+      quantity: item.quantity
+    };
+  });
+
+  return { ...meal, foods };
+};
+
+const calculateAge = (dob?: string | Date | null): number => {
+  if (!dob) return DEFAULT_INPUT.age;
+  const date = new Date(dob);
+  if (Number.isNaN(date.getTime())) return DEFAULT_INPUT.age;
+
+  const today = new Date();
+  let age = today.getFullYear() - date.getFullYear();
+  const monthDiff = today.getMonth() - date.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate())) {
+    age -= 1;
+  }
+  return age;
+};
+
+const buildMealInput = ({
+  user,
+  goal,
+  bodyRecord
+}: MealContext): IInputGenerateMeal => ({
+  age: calculateAge(user.dob),
+  height: bodyRecord.height ?? DEFAULT_INPUT.height,
+  weight: bodyRecord.weight ?? DEFAULT_INPUT.weight,
+  targetWeight: goal.targetWeight ?? DEFAULT_INPUT.targetWeight,
+  fitnessGoal: goal.fitnessGoal ?? DEFAULT_INPUT.fitnessGoal,
+  diet: goal.diet ?? DEFAULT_INPUT.diet
+});
+
+const buildPrompt = (input: IInputGenerateMeal, query?: string): string => {
+  const basePrompt = mealPrompt(input);
+  if (!query?.trim()) return basePrompt;
+  return `${basePrompt}
+
+User additional request: ${query.trim()}`;
+};
+
+const loadMealContext = async (userId: string): Promise<MealContext> => {
+  const [user, goal, bodyRecords] = await Promise.all([
+    UserService.findById(userId),
+    GoalService.findByUser(userId),
+    BodyRecordService.findByUser(userId)
+  ]);
+
+  if (!user) throw createHttpError(404, 'User not found');
+  if (!goal) throw createHttpError(404, 'Goal data is missing');
+  const bodyRecord = bodyRecords?.[0];
+  if (!bodyRecord) throw createHttpError(404, 'Body record data is missing');
+
+  return { user, goal, bodyRecord };
 };
 
 const AIService = {
-  generateMealByAI: async (query: string, userId: string) => {
-    const user: IUser = await UserService.findById(userId);
-    const goal: IGoal = await GoalService.findByUser(userId);
-    const bodyRecordData = await BodyRecordService.findByUser(userId);
-    const bodyRecord: IBodyRecord = bodyRecordData[0];
-
-    const foodDataResponse = await FoodService.find({ page: 1, limit: 50 });
-    const food: IFood[] = foodDataResponse.foods;
-
-    if (!user || !bodyRecord || !goal) {
-      throw new Error('User, BodyRecord, or Goal data is missing.');
-    }
-
-    const input: IInputGenerateMeal = {
-      age: user.dob
-        ? new Date().getFullYear() - new Date(user.dob).getFullYear()
-        : 30,
-      height: bodyRecord.height || 170,
-      weight: bodyRecord.weight || 70,
-      targetWeight: goal.targetWeight || 65,
-      fitnessGoal: goal.fitnessGoal || 'Lose weight',
-      diet: goal.diet || 'No dairy'
-    };
-
-    const prompt = mealPrompt(input);
+  generateMealByAI: async (
+    query: string,
+    userId: string
+  ): Promise<IGenerateMeal> => {
+    const context = await loadMealContext(userId);
+    const input = buildMealInput(context);
+    const prompt = buildPrompt(input, query);
     const mealRaw = await generateByOpenAI(prompt);
 
-    const jsonText = extractJson(mealRaw);
-    let candidate: unknown;
-    try {
-      candidate = JSON.parse(jsonText);
-    } catch (e) {
-      throw new Error('AI output is not valid JSON');
-    }
-
-    candidate = normalizeMealType(candidate);
-
-    const result = MealOutputSchema.safeParse(candidate);
-    if (!result.success) {
-      throw new Error(`AI validation failed: ${result.error.message}`);
-    }
-
-    return result.data;
+    return parseMealFromAI(mealRaw);
   }
 };
+
+export default AIService;
