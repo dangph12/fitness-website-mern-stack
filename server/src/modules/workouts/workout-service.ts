@@ -28,7 +28,7 @@ const WorkoutService = {
         ) {
           filterRecord[key] = value === true || value === 'true';
         } else {
-          // options for case-insensitive search cho string
+          // options for case-insensitive search for string
           filterRecord[key] = { $regex: value, $options: 'i' };
         }
       }
@@ -102,7 +102,7 @@ const WorkoutService = {
         ) {
           filterRecord[key] = value === true || value === 'true';
         } else {
-          // options for case-insensitive search cho string
+          // options for case-insensitive search for string
           filterRecord[key] = { $regex: value, $options: 'i' };
         }
       }
