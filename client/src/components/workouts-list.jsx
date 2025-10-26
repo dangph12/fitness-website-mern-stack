@@ -48,7 +48,9 @@ const WorkoutList = () => {
   const formatDate = iso => {
     const d = new Date(iso);
     const pad = n => String(n).padStart(2, '0');
-    return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(
+      d.getSeconds()
+    )} ${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
   };
 
   const filteredWorkouts = useMemo(() => {
@@ -93,16 +95,6 @@ const WorkoutList = () => {
                   <FiHome className='h-4 w-4' /> Back to home
                 </Link>
               </div>
-
-              <p className='mt-4 text-xs text-slate-500'>
-                Don’t have an account?{' '}
-                <Link
-                  to='/register'
-                  className='font-medium text-emerald-700 hover:underline'
-                >
-                  Create one
-                </Link>
-              </p>
             </div>
           </div>
         </div>
@@ -118,8 +110,7 @@ const WorkoutList = () => {
             My Workout List
           </h4>
           <p className='mt-2 max-w-2xl text-slate-600'>
-            Filter and refine your search to find the perfect workout plan for
-            your fitness goals
+            Your created workout routines, sorted from newest to oldest.
           </p>
         </div>
 
@@ -159,12 +150,12 @@ const WorkoutList = () => {
                   <Th>Image</Th>
                   <Th>Workout Name</Th>
                   <Th>Exercises</Th>
-                  <Th>Muscles</Th>
-                  <Th>Equipment</Th>
+                  <Th>Visibility</Th>
                   <Th>Created At</Th>
                   <Th>Action</Th>
                 </tr>
               </thead>
+
               <tbody className='divide-y divide-slate-100'>
                 {loading &&
                   Array.from({ length: 6 }).map((_, i) => (
@@ -179,19 +170,13 @@ const WorkoutList = () => {
                         <Skeleton className='h-6 w-28 rounded-full' />
                       </Td>
                       <Td>
-                        <Skeleton className='h-6 w-56 rounded-md' />
-                      </Td>
-                      <Td>
-                        <Skeleton className='h-6 w-56 rounded-md' />
+                        <Skeleton className='h-6 w-24 rounded-md' />
                       </Td>
                       <Td>
                         <Skeleton className='h-6 w-36 rounded-md' />
                       </Td>
                       <Td>
-                        <div className='flex gap-3'>
-                          <Skeleton className='h-10 w-10 rounded-full' />
-                          <Skeleton className='h-10 w-10 rounded-full' />
-                        </div>
+                        <Skeleton className='h-10 w-10 rounded-full' />
                       </Td>
                     </tr>
                   ))}
@@ -205,88 +190,72 @@ const WorkoutList = () => {
                 )}
 
                 {!loading &&
-                  filteredWorkouts.map(workout => {
-                    const uniqueMuscles = Array.from(
-                      new Map(
-                        workout.exercises
-                          ?.flatMap(row => row.exercise?.muscles || [])
-                          .map(m => [m._id, m])
-                      ).values()
-                    );
+                  filteredWorkouts.map(workout => (
+                    <tr key={workout._id} className='hover:bg-slate-50'>
+                      <Td
+                        onClick={() => handleViewDetails(workout._id)}
+                        className='cursor-pointer'
+                      >
+                        <div className='relative h-24 w-24 overflow-hidden rounded-xl ring-2 ring-slate-200'>
+                          <img
+                            src={workout.image || logo}
+                            alt={workout.title}
+                            className='absolute inset-0 h-full w-full object-cover'
+                          />
+                        </div>
+                      </Td>
 
-                    const uniqueEquipments = Array.from(
-                      new Map(
-                        workout.exercises
-                          ?.flatMap(row => row.exercise?.equipments || [])
-                          .map(eq => [eq._id, eq])
-                      ).values()
-                    );
+                      <Td>
+                        <span className='inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 ring-1 ring-blue-200'>
+                          {workout.title}
+                        </span>
+                      </Td>
 
-                    return (
-                      <tr key={workout._id} className='hover:bg-slate-50'>
-                        <Td
-                          onClick={() => handleViewDetails(workout._id)}
-                          className='cursor-pointer'
-                        >
-                          <div className='relative h-24 w-24 overflow-hidden rounded-xl ring-2 ring-slate-200'>
-                            <img
-                              src={workout.image || logo}
-                              alt={workout.title}
-                              className='absolute inset-0 h-full w-full object-cover'
-                            />
-                          </div>
-                        </Td>
-                        <Td>
-                          <span className='inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 ring-1 ring-blue-200'>
-                            {workout.title}
+                      <Td>
+                        <span className='inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 ring-1 ring-emerald-200'>
+                          {workout.exercises?.length || 0} exercises
+                        </span>
+                      </Td>
+
+                      <Td>
+                        {workout.isPublic ? (
+                          <span className='rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200'>
+                            Public
                           </span>
-                        </Td>
-                        <Td>
-                          <span className='inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 ring-1 ring-emerald-200'>
-                            {workout.exercises?.length || 0} exercises
+                        ) : (
+                          <span className='rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200'>
+                            Private
                           </span>
-                        </Td>
-                        <Td>
-                          <div className='flex flex-wrap gap-2 max-w-xl'>
-                            {uniqueMuscles.map(m => (
-                              <Badge key={m._id}>{m.title}</Badge>
-                            ))}
-                          </div>
-                        </Td>
-                        <Td>
-                          <div className='flex flex-wrap gap-2 max-w-xl'>
-                            {uniqueEquipments.map(eq => (
-                              <Badge key={eq._id}>{eq.title}</Badge>
-                            ))}
-                          </div>
-                        </Td>
-                        <Td>
-                          <span className='text-sm text-slate-700'>
-                            {formatDate(workout.createdAt)}
-                          </span>
-                        </Td>
-                        <Td>
-                          <div className='flex items-center gap-3'>
-                            <Link
-                              to={`/workout/edit-workout/${workout._id}`}
-                              title='Edit workout'
-                            >
-                              <button className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-700 ring-1 ring-amber-200 hover:bg-amber-200'>
-                                <FaEdit />
-                              </button>
-                            </Link>
-                            <button
-                              onClick={() => handleDelete(workout._id)}
-                              title='Delete workout'
-                              className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 text-rose-700 ring-1 ring-rose-200 hover:bg-rose-200'
-                            >
-                              <FaTrash />
+                        )}
+                      </Td>
+
+                      <Td>
+                        <span className='text-sm text-slate-700'>
+                          {formatDate(workout.createdAt)}
+                        </span>
+                      </Td>
+
+                      <Td>
+                        <div className='flex items-center gap-3'>
+                          <Link
+                            to={`/workout/edit-workout/${workout._id}`}
+                            title='Edit'
+                          >
+                            <button className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-700 ring-1 ring-amber-200 hover:bg-amber-200'>
+                              <FaEdit />
                             </button>
-                          </div>
-                        </Td>
-                      </tr>
-                    );
-                  })}
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(workout._id)}
+                            title='Delete'
+                            className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 text-rose-700 ring-1 ring-rose-200 hover:bg-rose-200'
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </Td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -315,15 +284,8 @@ function Td({ children, className = '', onClick }) {
     </td>
   );
 }
-function Badge({ children }) {
-  return (
-    <span className='inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200'>
-      {children}
-    </span>
-  );
-}
 function Skeleton({ className = '' }) {
-  return <div className={`bg-slate-200/70 ${className}`} />;
+  return <div className={`bg-slate-200/70 animate-pulse ${className}`} />;
 }
 function SearchIcon() {
   return (
@@ -336,7 +298,6 @@ function SearchIcon() {
       <path
         fillRule='evenodd'
         d='M10.5 3.75a6.75 6.75 0 104.22 12.03l3.25 3.25a.75.75 0 101.06-1.06l-3.25-3.25A6.75 6.75 0 0010.5 3.75zm-5.25 6.75a5.25 5.25 0 1110.5 0 5.25 5.25 0 01-10.5 0z'
-        clipRule='evenodd'
       />
     </svg>
   );
