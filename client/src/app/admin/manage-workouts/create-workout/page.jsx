@@ -1,15 +1,23 @@
-import { ArrowLeft, Minus, Plus, Trash2, Upload, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  Minus,
+  Plus,
+  Search,
+  Trash2,
+  Upload,
+  X
+} from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
-import ExerciseLibrary from '~/components/exercise-library';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
+import { fetchExercises } from '~/store/features/exercise-slice';
 import { createWorkout } from '~/store/features/workout-slice';
 
 const CreateWorkout = () => {
@@ -18,15 +26,47 @@ const CreateWorkout = () => {
 
   const userId = useSelector(state => state.auth.user.id);
   const { loading } = useSelector(state => state.workouts);
+  const {
+    exercises: allExercises,
+    loading: loadingExercises,
+    totalPages,
+    totalExercises
+  } = useSelector(state => state.exercises);
 
   const [exercises, setExercises] = useState([]);
   const [title, setTitle] = useState('');
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
 
+  // Exercise library state
+  const [searchText, setSearchText] = useState('');
+  const [query, setQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
+
+  // Debounce search - auto apply after 300ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentPage(1);
+      setQuery(searchText.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchText]);
+
+  // Fetch exercises when query or page changes
+  useEffect(() => {
+    dispatch(
+      fetchExercises({
+        page: currentPage,
+        limit,
+        filterParams: { title: query || undefined }
+      })
+    );
+  }, [dispatch, currentPage, query]);
 
   // Calculate totals
   const totalSets = exercises.reduce(
@@ -167,6 +207,33 @@ const CreateWorkout = () => {
 
   const handleGoBack = () => {
     navigate('/admin/manage-workouts');
+  };
+
+  const handleSearchChange = e => {
+    setSearchText(e.target.value);
+  };
+
+  const handleApplySearch = () => {
+    setQuery(searchText.trim());
+    setCurrentPage(1);
+  };
+
+  const handleClearSearch = () => {
+    setSearchText('');
+    setQuery('');
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = newPage => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handleSearchKeyPress = e => {
+    if (e.key === 'Enter') {
+      handleApplySearch();
+    }
   };
 
   return (
@@ -456,13 +523,172 @@ const CreateWorkout = () => {
         <aside className='xl:sticky xl:top-6 h-fit'>
           <Card className='max-h-[calc(100vh-8rem)]'>
             <CardHeader>
-              <CardTitle>Exercise Library</CardTitle>
-              <p className='text-sm text-muted-foreground'>
-                Click to add exercises to your workout
-              </p>
+              <div className='space-y-4'>
+                <div className='flex items-center justify-between'>
+                  <CardTitle>Exercise Library</CardTitle>
+                  <p className='text-sm text-muted-foreground'>
+                    Page {currentPage} of {totalPages} • Total {totalExercises}
+                  </p>
+                </div>
+
+                {/* Search */}
+                <div className='relative'>
+                  <Input
+                    type='text'
+                    placeholder='Search exercise name...'
+                    value={searchText}
+                    onChange={handleSearchChange}
+                    onKeyDown={handleSearchKeyPress}
+                    className='pr-8'
+                  />
+                  {searchText && (
+                    <button
+                      onClick={handleClearSearch}
+                      className='absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600'
+                      title='Clear'
+                    >
+                      <X className='h-4 w-4' />
+                    </button>
+                  )}
+                </div>
+
+                {query && (
+                  <div className='flex items-center gap-2'>
+                    <Badge variant='secondary' className='text-xs'>
+                      Searching: "{query}"
+                    </Badge>
+                  </div>
+                )}
+              </div>
             </CardHeader>
-            <CardContent className='h-[calc(100vh-16rem)] overflow-y-auto'>
-              <ExerciseLibrary handleAddExercise={handleAddExercise} />
+            <CardContent className='h-[calc(100vh-22rem)] overflow-y-auto space-y-4'>
+              {/* Exercise List */}
+              {loadingExercises ? (
+                <div className='text-center py-8 text-muted-foreground'>
+                  Loading exercises...
+                </div>
+              ) : allExercises.length === 0 ? (
+                <div className='text-center py-8 text-muted-foreground'>
+                  No exercises found
+                </div>
+              ) : (
+                <div className='space-y-3'>
+                  {allExercises.map(exercise => (
+                    <div
+                      key={exercise._id}
+                      className='flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer'
+                      onClick={() => handleAddExercise(exercise)}
+                    >
+                      {/* Exercise Image */}
+                      <div className='relative h-16 w-16 overflow-hidden rounded-md border flex-shrink-0'>
+                        <img
+                          src={
+                            exercise.tutorial?.endsWith?.('.gif')
+                              ? exercise.tutorial.replace(
+                                  '/upload/',
+                                  '/upload/f_jpg/so_0/'
+                                )
+                              : exercise.tutorial
+                          }
+                          alt={exercise.title}
+                          className='h-full w-full object-cover'
+                          onMouseEnter={e => {
+                            if (exercise.tutorial?.endsWith('.gif')) {
+                              e.currentTarget.src = exercise.tutorial;
+                            }
+                          }}
+                          onMouseLeave={e => {
+                            if (exercise.tutorial?.endsWith('.gif')) {
+                              e.currentTarget.src = exercise.tutorial.replace(
+                                '/upload/',
+                                '/upload/f_jpg/so_0/'
+                              );
+                            }
+                          }}
+                        />
+                      </div>
+
+                      {/* Exercise Info */}
+                      <div className='flex-1 min-w-0'>
+                        <h4 className='font-semibold text-sm truncate'>
+                          {exercise.title}
+                        </h4>
+                        <div className='flex items-center gap-2 mt-1'>
+                          <Badge variant='secondary' className='text-xs'>
+                            {exercise.level}
+                          </Badge>
+                          <Badge variant='outline' className='text-xs'>
+                            {exercise.type}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {/* Add Button */}
+                      <Button
+                        size='sm'
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleAddExercise(exercise);
+                        }}
+                        className='flex-shrink-0'
+                      >
+                        <Plus className='h-4 w-4' />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className='flex items-center justify-center gap-2 pt-4 border-t'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1 || loadingExercises}
+                  >
+                    Previous
+                  </Button>
+
+                  <div className='flex items-center gap-1'>
+                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                      let page;
+                      if (totalPages <= 5) {
+                        page = i + 1;
+                      } else if (currentPage <= 3) {
+                        page = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        page = totalPages - 4 + i;
+                      } else {
+                        page = currentPage - 2 + i;
+                      }
+
+                      return (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? 'default' : 'outline'}
+                          size='sm'
+                          onClick={() => handlePageChange(page)}
+                          disabled={loadingExercises}
+                          className='w-8 h-8 p-0'
+                        >
+                          {page}
+                        </Button>
+                      );
+                    })}
+                  </div>
+
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages || loadingExercises}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </aside>
