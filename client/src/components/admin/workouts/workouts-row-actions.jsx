@@ -1,5 +1,6 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Edit, Eye, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
 import { Button } from '~/components/ui/button';
 import {
@@ -14,7 +15,12 @@ import { useWorkouts } from './workouts-provider';
 
 export function WorkoutsRowActions({ row }) {
   const workout = row.original;
-  const { openEditDialog, openDeleteDialog, openDetailsDialog } = useWorkouts();
+  const navigate = useNavigate();
+  const { openDeleteDialog, openDetailsDialog } = useWorkouts();
+
+  const handleEdit = () => {
+    navigate(`/admin/manage-workouts/update/${workout._id}`);
+  };
 
   return (
     <DropdownMenu>
@@ -32,7 +38,7 @@ export function WorkoutsRowActions({ row }) {
           <Eye className='mr-2 h-4 w-4' />
           View Details
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => openEditDialog(workout)}>
+        <DropdownMenuItem onClick={handleEdit}>
           <Edit className='mr-2 h-4 w-4' />
           Edit
         </DropdownMenuItem>
