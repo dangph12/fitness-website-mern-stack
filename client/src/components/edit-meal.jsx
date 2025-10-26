@@ -63,32 +63,29 @@ const EditMeal = () => {
   const handleImageChange = e => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type?.startsWith('image/')) {
-      toast.warning('Please select a valid image file.');
-      return;
-    }
+    if (!file.type?.startsWith('image/'))
+      return toast.warning('Must be an image file.');
     setImage(file);
   };
 
-  const totals = useMemo(() => {
-    return selectedFoods.reduce(
-      (acc, item) => {
-        const qty = Number(item.quantity) || 0;
-        acc.calories += (Number(item.calories) || 0) * qty;
-        acc.fat += (Number(item.fat) || 0) * qty;
-        acc.carbohydrates += (Number(item.carbohydrate) || 0) * qty;
-        acc.protein += (Number(item.protein) || 0) * qty;
-        return acc;
-      },
-      { calories: 0, fat: 0, carbohydrates: 0, protein: 0 }
-    );
-  }, [selectedFoods]);
+  const totals = useMemo(
+    () =>
+      selectedFoods.reduce(
+        (acc, item) => {
+          const qty = Number(item.quantity) || 0;
+          acc.calories += item.calories * qty;
+          acc.fat += item.fat * qty;
+          acc.carbohydrates += item.carbohydrate * qty;
+          acc.protein += item.protein * qty;
+          return acc;
+        },
+        { calories: 0, fat: 0, carbohydrates: 0, protein: 0 }
+      ),
+    [selectedFoods]
+  );
 
   const handleUpdateMeal = async () => {
-    if (!title.trim()) {
-      toast.error('Meal title is required.');
-      return;
-    }
+    if (!title.trim()) return toast.error('Meal title is required.');
 
     setSubmitting(true);
     try {
@@ -97,9 +94,7 @@ const EditMeal = () => {
       formData.append('mealType', mealType);
       formData.append('user', userId);
 
-      if (image instanceof File) {
-        formData.append('image', image);
-      }
+      if (image instanceof File) formData.append('image', image);
 
       selectedFoods.forEach((f, i) => {
         formData.append(`foods[${i}][food]`, f.food);
@@ -112,48 +107,34 @@ const EditMeal = () => {
       await dispatch(updateMeal({ id, updateData: formData }));
       toast.success('Meal updated successfully!');
       navigate('/nutrition');
-    } catch (err) {
-      console.error('Error updating meal:', err);
-      toast.error('Failed to update meal!');
+    } catch {
+      toast.error('Failed to update meal.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (mealLoading) {
+  if (mealLoading)
     return (
-      <div className='max-w-6xl mx-auto p-8'>
-        <div className='animate-pulse space-y-6'>
-          <div className='h-10 bg-slate-200 rounded w-1/3'></div>
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-            <div className='h-80 bg-slate-200 rounded-xl'></div>
-            <div className='space-y-4'>
-              <div className='h-12 bg-slate-200 rounded'></div>
-              <div className='h-12 bg-slate-200 rounded'></div>
-              <div className='h-20 bg-slate-200 rounded'></div>
-            </div>
-          </div>
-          <div className='h-48 bg-slate-200 rounded-xl'></div>
-          <div className='h-12 bg-slate-200 rounded'></div>
-        </div>
+      <div className='p-10 text-center text-slate-500 animate-pulse'>
+        Loading meal...
       </div>
     );
-  }
-
   if (error)
-    return <div className='max-w-6xl mx-auto p-8 text-red-500'>{error}</div>;
+    return <div className='p-10 text-center text-red-500'>{error}</div>;
 
   return (
     <div className='max-w-6xl mx-auto p-6 sm:p-8 bg-white rounded-2xl shadow-lg'>
-      <h1 className='text-3xl sm:text-4xl font-semibold text-center text-slate-900 mb-8'>
-        Edit Meal
+      <h1 className='text-4xl font-bold text-center text-slate-900 mb-12 flex items-center justify-center gap-3'>
+        <FaLeaf className='text-emerald-600' />
+        Refine Your Meal
       </h1>
 
-      <div className='flex flex-col lg:flex-row-reverse gap-8 lg:gap-10'>
+      <div className='flex flex-col lg:flex-row-reverse gap-10'>
         <div className='w-full lg:w-1/2'>
           <div className='rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm'>
             <h2 className='text-base font-semibold text-slate-700 mb-3 text-center'>
-              Current Meal Image
+              Meal Image
             </h2>
 
             <div className='overflow-hidden rounded-xl border border-slate-200 shadow-sm'>
@@ -180,7 +161,7 @@ const EditMeal = () => {
 
             <label className='block text-sm font-medium text-slate-700 mt-5 mb-2'>
               <span className='inline-flex items-center gap-2'>
-                <MdFileUpload className='text-green-600 text-lg' /> Upload New
+                <MdFileUpload className='text-emerald-600 text-lg' /> Change
                 Image
               </span>
             </label>
@@ -188,8 +169,8 @@ const EditMeal = () => {
               type='file'
               accept='image/*'
               onChange={handleImageChange}
-              className='w-full file:mr-4 file:rounded-md file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-blue-700
-                         rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+              className='w-full file:mr-4 file:rounded-md file:border-0 file:bg-emerald-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-emerald-700
+                       rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200'
             />
           </div>
         </div>
@@ -198,15 +179,15 @@ const EditMeal = () => {
           <div>
             <label className='block text-sm font-medium text-slate-700 mb-2'>
               <span className='inline-flex items-center gap-2'>
-                <FaClipboardList className='text-blue-600' /> Meal Title
+                <FaClipboardList className='text-blue-600' /> Meal Name
               </span>
             </label>
             <input
               type='text'
               value={title}
               onChange={e => setTitle(e.target.value)}
-              placeholder='Enter meal title...'
-              className='w-full rounded-md border border-slate-300 bg-white px-4 py-3 text-base shadow-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+              placeholder='Ex: High Protein Breakfast Bowl'
+              className='w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base shadow-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200'
             />
           </div>
 
@@ -219,113 +200,76 @@ const EditMeal = () => {
             <select
               value={mealType}
               onChange={e => setMealType(e.target.value)}
-              className='w-full rounded-md border border-slate-300 bg-white px-4 py-3 text-base shadow-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+              className='w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base shadow-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200'
             >
-              <option value='Breakfast'>Breakfast</option>
-              <option value='Lunch'>Lunch</option>
-              <option value='Dinner'>Dinner</option>
-              <option value='Snack'>Snack</option>
-              <option value='Brunch'>Brunch</option>
-              <option value='Dessert'>Dessert</option>
+              <option>Breakfast</option>
+              <option>Lunch</option>
+              <option>Dinner</option>
+              <option>Snack</option>
+              <option>Brunch</option>
+              <option>Dessert</option>
             </select>
           </div>
 
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-            <div className='rounded-xl border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-4'>
-              <div className='flex items-center gap-3'>
-                <div className='grid place-items-center rounded-lg bg-orange-100 h-10 w-10'>
-                  <FaFire className='text-orange-600' />
-                </div>
-                <div>
-                  <p className='text-xs font-medium text-orange-800/80'>
-                    Total Calories
-                  </p>
-                  <p className='text-2xl font-bold text-orange-700'>
-                    {Math.round(totals.calories)}{' '}
-                    <span className='text-sm font-medium'>kcal</span>
-                  </p>
-                </div>
-              </div>
+          <div className='grid grid-cols-2 sm:grid-cols-4 gap-4'>
+            <div className='rounded-xl bg-orange-50 border border-orange-200 p-4 text-center'>
+              <FaFire className='text-orange-600 text-2xl mx-auto mb-1' />
+              <p className='text-xs text-slate-600'>Calories</p>
+              <p className='text-xl font-bold text-slate-800'>
+                {Math.round(totals.calories)}{' '}
+                <span className='text-sm'>kcal</span>
+              </p>
             </div>
 
-            <div className='rounded-xl border border-green-200 bg-gradient-to-br from-green-50 to-white p-4'>
-              <div className='flex items-center gap-3'>
-                <div className='grid place-items-center rounded-lg bg-green-100 h-10 w-10'>
-                  <FaDrumstickBite className='text-green-600' />
-                </div>
-                <div>
-                  <p className='text-xs font-medium text-green-800/80'>
-                    Total Fat
-                  </p>
-                  <p className='text-2xl font-bold text-green-700'>
-                    {totals.fat.toFixed(1)}{' '}
-                    <span className='text-sm font-medium'>g</span>
-                  </p>
-                </div>
-              </div>
+            <div className='rounded-xl bg-yellow-50 border border-yellow-200 p-4 text-center'>
+              <FaLeaf className='text-yellow-600 text-2xl mx-auto mb-1' />
+              <p className='text-xs text-slate-600'>Protein</p>
+              <p className='text-xl font-bold text-slate-800'>
+                {totals.protein.toFixed(1)} <span className='text-sm'>g</span>
+              </p>
             </div>
 
-            <div className='rounded-xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-4'>
-              <div className='flex items-center gap-3'>
-                <div className='grid place-items-center rounded-lg bg-teal-100 h-10 w-10'>
-                  <FaDrumstickBite className='text-teal-600' />
-                </div>
-                <div>
-                  <p className='text-xs font-medium text-teal-800/80'>
-                    Total Carbohydrates
-                  </p>
-                  <p className='text-2xl font-bold text-teal-700'>
-                    {totals.carbohydrates.toFixed(1)}{' '}
-                    <span className='text-sm font-medium'>g</span>
-                  </p>
-                </div>
-              </div>
+            <div className='rounded-xl bg-green-50 border border-green-200 p-4 text-center'>
+              <FaDrumstickBite className='text-green-600 text-2xl mx-auto mb-1' />
+              <p className='text-xs text-slate-600'>Fat</p>
+              <p className='text-xl font-bold text-slate-800'>
+                {totals.fat.toFixed(1)} <span className='text-sm'>g</span>
+              </p>
             </div>
 
-            <div className='rounded-xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-white p-4'>
-              <div className='flex items-center gap-3'>
-                <div className='grid place-items-center rounded-lg bg-yellow-100 h-10 w-10'>
-                  <FaLeaf className='text-yellow-600' />
-                </div>
-                <div>
-                  <p className='text-xs font-medium text-yellow-800/80'>
-                    Total Protein
-                  </p>
-                  <p className='text-2xl font-bold text-yellow-700'>
-                    {totals.protein.toFixed(1)}{' '}
-                    <span className='text-sm font-medium'>g</span>
-                  </p>
-                </div>
-              </div>
+            <div className='rounded-xl bg-teal-50 border border-teal-200 p-4 text-center'>
+              <FaDrumstickBite className='text-teal-600 text-2xl mx-auto mb-1' />
+              <p className='text-xs text-slate-600'>Carbs</p>
+              <p className='text-xl font-bold text-slate-800'>
+                {totals.carbohydrates.toFixed(1)}{' '}
+                <span className='text-sm'>g</span>
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       <div className='mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm'>
-        <h3 className='text-xl sm:text-2xl font-semibold text-slate-900 mb-4 text-center'>
+        <h3 className='text-2xl font-semibold text-slate-900 mb-4 text-center'>
           Foods in this Meal
         </h3>
-
         <FoodList
           selectedFoods={selectedFoods}
           setSelectedFoods={setSelectedFoods}
         />
         <p className='mt-3 text-xs text-center text-slate-500'>
-          *Total calories, fat, carbohydrates, and protein change based on the{' '}
-          <b>quantity</b> of each food.
+          *Adjust quantities to update nutrition values.
         </p>
       </div>
 
       <div className='mt-6'>
         <button
-          type='button'
           onClick={handleUpdateMeal}
           disabled={submitting}
-          className={`w-full rounded-lg px-4 py-3 text-white shadow transition
-          ${submitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+          className={`w-full rounded-lg px-4 py-3 text-white text-lg font-medium shadow transition
+        ${submitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'}`}
         >
-          {submitting ? 'Updating Meal...' : 'Update Meal'}
+          {submitting ? 'Saving Changes...' : 'Save Meal Changes'}
         </button>
       </div>
     </div>
