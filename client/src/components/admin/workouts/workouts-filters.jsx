@@ -43,7 +43,7 @@ export function WorkoutsFilters() {
           className='h-8 w-full sm:w-[200px]'
         />
 
-        <Select
+        {/* <Select
           value={pendingFilters.isPublic || 'all'}
           onValueChange={value =>
             onPendingFiltersChange({ isPublic: value === 'all' ? '' : value })
@@ -57,7 +57,7 @@ export function WorkoutsFilters() {
             <SelectItem value='true'>Public</SelectItem>
             <SelectItem value='false'>Private</SelectItem>
           </SelectContent>
-        </Select>
+        </Select> */}
 
         <div className='flex gap-2'>
           <Button
