@@ -52,7 +52,10 @@ const Onboarding = () => {
       gender: '',
       dob: '',
       height: '',
-      weight: ''
+      weight: '',
+      targetWeight: '',
+      diet: '',
+      fitnessGoal: ''
     },
     mode: 'onChange'
   });
@@ -82,7 +85,10 @@ const Onboarding = () => {
         gender: data.gender,
         height: parseFloat(data.height),
         weight: parseFloat(data.weight),
-        bmi: finalBMI
+        bmi: finalBMI,
+        targetWeight: parseFloat(data.targetWeight),
+        diet: data.diet,
+        fitnessGoal: data.fitnessGoal
       });
 
       const { accessToken } = response.data.data;
@@ -103,10 +109,21 @@ const Onboarding = () => {
     }
   };
 
+  const handleSkip = () => {
+    navigate('/');
+  };
+
   const handleNext = async () => {
-    const isValid = await form.trigger(
-      step === 1 ? ['gender', 'dob'] : ['height', 'weight']
-    );
+    let fieldsToValidate;
+    if (step === 1) {
+      fieldsToValidate = ['gender', 'dob'];
+    } else if (step === 2) {
+      fieldsToValidate = ['height', 'weight'];
+    } else if (step === 3) {
+      fieldsToValidate = ['targetWeight', 'diet', 'fitnessGoal'];
+    }
+
+    const isValid = await form.trigger(fieldsToValidate);
     if (isValid) {
       setStep(step + 1);
     }
@@ -118,28 +135,107 @@ const Onboarding = () => {
     }
   };
 
-  const progressPercentage = (step / 3) * 100;
+  const progressPercentage = (step / 4) * 100;
   const bmiClassification = getBMIClassification(bmi);
+
+  const getBMIIndicatorColor = () => {
+    const colorMap = {
+      'text-red-600': 'bg-red-600',
+      'text-red-700': 'bg-red-700',
+      'text-orange-600': 'bg-orange-600',
+      'text-green-600': 'bg-green-600',
+      'text-yellow-600': 'bg-yellow-600'
+    };
+    return colorMap[bmiClassification.color] || 'bg-primary';
+  };
+
+  const dietOptions = [
+    {
+      value: 'Mediterranean',
+      label: 'Mediterranean',
+      description: 'Heart-healthy with fish, olive oil, and fresh produce'
+    },
+    {
+      value: 'Ketogenic (Keto)',
+      label: 'Ketogenic (Keto)',
+      description: 'Low-carb, high-fat for weight loss'
+    },
+    {
+      value: 'Paleo',
+      label: 'Paleo',
+      description: 'Whole foods, no processed items'
+    },
+    {
+      value: 'Vegetarian',
+      label: 'Vegetarian',
+      description: 'Plant-based with dairy and eggs'
+    },
+    { value: 'Vegan', label: 'Vegan', description: 'Completely plant-based' },
+    {
+      value: 'Gluten-Free',
+      label: 'Gluten-Free',
+      description: 'No wheat, barley, or rye'
+    },
+    {
+      value: 'Low-Carb',
+      label: 'Low-Carb',
+      description: 'Reduced carbohydrate intake'
+    }
+  ];
+
+  const fitnessGoalOptions = [
+    {
+      value: 'Lose Weight',
+      label: 'Lose Weight',
+      icon: '🔥',
+      description: 'Shed extra pounds and get lean'
+    },
+    {
+      value: 'Build Muscle',
+      label: 'Build Muscle',
+      icon: '💪',
+      description: 'Gain strength and muscle mass'
+    },
+    {
+      value: 'To be Healthy',
+      label: 'Stay Healthy',
+      icon: '❤️',
+      description: 'Maintain overall wellness'
+    }
+  ];
 
   return (
     <div className='flex min-h-screen items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100'>
       <Card className='w-full max-w-2xl'>
         <CardHeader>
-          <div className='mb-4'>
-            <Progress value={progressPercentage} className='h-2' />
-            <p className='text-sm text-muted-foreground mt-2'>
-              Step {step} of 3
-            </p>
+          <div className='flex justify-between items-center mb-4'>
+            <div className='flex-1'>
+              <Progress value={progressPercentage} className='h-2' />
+              <p className='text-sm text-muted-foreground mt-2'>
+                Step {step} of 4
+              </p>
+            </div>
+            <Button
+              type='button'
+              variant='ghost'
+              onClick={handleSkip}
+              className='ml-4'
+            >
+              Skip
+            </Button>
           </div>
           <CardTitle className='text-2xl'>
             {step === 1 && "Let's get to know you"}
             {step === 2 && 'Your body metrics'}
-            {step === 3 && 'Your fitness profile is ready!'}
+            {step === 3 && 'Your fitness goals'}
+            {step === 4 && 'Your fitness profile is ready!'}
           </CardTitle>
           <CardDescription>
             {step === 1 && 'Help us personalize your fitness journey'}
             {step === 2 && "We'll calculate your BMI and recommend goals"}
-            {step === 3 && 'Start your journey to a healthier you'}
+            {step === 3 &&
+              'Tell us about your fitness goals and diet preferences'}
+            {step === 4 && 'Start your journey to a healthier you'}
           </CardDescription>
         </CardHeader>
 
@@ -321,12 +417,11 @@ const Onboarding = () => {
                           {bmi}
                         </span>
                       </div>
-                      <div className='w-full bg-gray-200 rounded-full h-2 mb-2'>
-                        <div
-                          className={`h-2 rounded-full ${bmiClassification.color.replace('text-', 'bg-')}`}
-                          style={{ width: `${getBMIPosition(bmi)}%` }}
-                        />
-                      </div>
+                      <Progress
+                        value={getBMIPosition(bmi)}
+                        className={`h-2 mb-2 ${bmiClassification.bgColor}`}
+                        indicatorClassName={getBMIIndicatorColor()}
+                      />
                       <p
                         className={`text-sm font-medium ${bmiClassification.color}`}
                       >
@@ -341,6 +436,106 @@ const Onboarding = () => {
               )}
 
               {step === 3 && (
+                <div className='space-y-6'>
+                  <FormField
+                    control={form.control}
+                    name='targetWeight'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Target Weight (kg)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='number'
+                            placeholder='Enter your target weight'
+                            {...field}
+                            min='20'
+                            max='500'
+                            step='0.1'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='fitnessGoal'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>What's your fitness goal?</FormLabel>
+                        <FormControl>
+                          <div className='grid grid-cols-1 gap-3'>
+                            {fitnessGoalOptions.map(option => (
+                              <button
+                                key={option.value}
+                                type='button'
+                                onClick={() => field.onChange(option.value)}
+                                className={`p-4 rounded-lg border-2 transition-all text-left ${
+                                  field.value === option.value
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-gray-200 hover:border-gray-300'
+                                }`}
+                              >
+                                <div className='flex items-center gap-3'>
+                                  <span className='text-3xl'>
+                                    {option.icon}
+                                  </span>
+                                  <div>
+                                    <div className='text-base font-semibold'>
+                                      {option.label}
+                                    </div>
+                                    <div className='text-sm text-muted-foreground'>
+                                      {option.description}
+                                    </div>
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='diet'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Preferred Diet</FormLabel>
+                        <FormControl>
+                          <div className='grid grid-cols-1 gap-2'>
+                            {dietOptions.map(option => (
+                              <button
+                                key={option.value}
+                                type='button'
+                                onClick={() => field.onChange(option.value)}
+                                className={`p-3 rounded-lg border-2 transition-all text-left ${
+                                  field.value === option.value
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-gray-200 hover:border-gray-300'
+                                }`}
+                              >
+                                <div className='text-sm font-semibold'>
+                                  {option.label}
+                                </div>
+                                <div className='text-xs text-muted-foreground'>
+                                  {option.description}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
+              {step === 4 && (
                 <div className='space-y-6'>
                   <div className='text-center p-8 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg border-2 border-green-200'>
                     <div className='flex justify-center mb-4'>
@@ -382,12 +577,11 @@ const Onboarding = () => {
                       BMI: {bmi}
                     </p>
 
-                    <div className='w-full bg-gray-200 rounded-full h-3 mb-4'>
-                      <div
-                        className={`h-3 rounded-full ${bmiClassification.color.replace('text-', 'bg-')}`}
-                        style={{ width: `${getBMIPosition(bmi)}%` }}
-                      />
-                    </div>
+                    <Progress
+                      value={getBMIPosition(bmi)}
+                      className={`h-3 mb-4 ${bmiClassification.bgColor}`}
+                      indicatorClassName={getBMIIndicatorColor()}
+                    />
 
                     <p className='text-muted-foreground mb-6'>
                       {bmiClassification.description}
@@ -424,6 +618,28 @@ const Onboarding = () => {
                             {form.getValues('weight')} kg
                           </p>
                         </div>
+                        <div>
+                          <p className='text-muted-foreground'>
+                            Target Weight:
+                          </p>
+                          <p className='font-medium'>
+                            {form.getValues('targetWeight')} kg
+                          </p>
+                        </div>
+                        <div>
+                          <p className='text-muted-foreground'>Fitness Goal:</p>
+                          <p className='font-medium'>
+                            {form.getValues('fitnessGoal')}
+                          </p>
+                        </div>
+                        <div className='col-span-2'>
+                          <p className='text-muted-foreground'>
+                            Diet Preference:
+                          </p>
+                          <p className='font-medium'>
+                            {form.getValues('diet')}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -431,12 +647,12 @@ const Onboarding = () => {
               )}
 
               <div className='flex justify-between pt-4'>
-                {step > 1 && step < 3 && (
+                {step > 1 && step < 4 && (
                   <Button type='button' variant='outline' onClick={handleBack}>
                     Back
                   </Button>
                 )}
-                {step < 2 && (
+                {step < 3 && (
                   <Button
                     type='button'
                     onClick={handleNext}
@@ -445,17 +661,16 @@ const Onboarding = () => {
                     Continue
                   </Button>
                 )}
-                {step === 2 && (
+                {step === 3 && (
                   <Button
                     type='button'
                     onClick={handleNext}
                     className='ml-auto'
-                    disabled={!bmi || bmi === 0}
                   >
                     Review Profile
                   </Button>
                 )}
-                {step === 3 && (
+                {step === 4 && (
                   <Button
                     type='submit'
                     className='w-full'

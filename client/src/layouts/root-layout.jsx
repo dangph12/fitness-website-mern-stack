@@ -28,12 +28,6 @@ const RootLayout = () => {
       }
       return;
     }
-
-    if (user.profileCompleted === false) {
-      if (location.pathname !== '/onboarding') {
-        navigate('/onboarding', { replace: true });
-      }
-    }
   }, [user, location.pathname, navigate]);
 
   return (
