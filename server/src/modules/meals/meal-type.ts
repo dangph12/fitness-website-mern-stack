@@ -7,4 +7,5 @@ export interface IMeal {
   quantity: number;
   user: Types.ObjectId;
   foods: { food: Types.ObjectId; quantity: number }[];
+  scheduleAt: Date;
 }
