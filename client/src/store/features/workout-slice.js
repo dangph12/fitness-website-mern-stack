@@ -7,14 +7,28 @@ export const fetchWorkouts = createAsyncThunk(
   'workouts/fetchWorkouts',
   async ({
     page = 1,
-    limit = 4,
+    limit = 10,
     sortBy = 'createdAt',
     sortOrder = 'desc',
-    title = ''
+    title = '',
+    isPublic = ''
   }) => {
-    const res = await axiosInstance.get('/api/workouts/filter', {
-      params: { page, limit, sortBy, sortOrder, title }
-    });
+    const params = {
+      page,
+      limit,
+      sortBy,
+      sortOrder
+    };
+
+    if (title && title.trim()) {
+      params.title = title.trim();
+    }
+
+    if (isPublic !== '') {
+      params.isPublic = isPublic;
+    }
+
+    const res = await axiosInstance.get('/api/workouts', { params });
     return res.data.data;
   }
 );
