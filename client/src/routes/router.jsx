@@ -143,12 +143,11 @@ const router = createBrowserRouter([
       },
       {
         path: '',
-        // Component: () => (
-        //   <PrivateRoute allowedRoles={['admin']}>
-        //     <AdminLayout />
-        //   </PrivateRoute>
-        // ),
-        Component: AdminLayout,
+        Component: () => (
+          <PrivateRoute allowedRoles={['admin']}>
+            <AdminLayout />
+          </PrivateRoute>
+        ),
 
         children: [
           {
@@ -267,6 +266,22 @@ const router = createBrowserRouter([
             path: 'manage-plans/update/:id',
             Component: lazy(
               () => import('~/app/admin/manage-plans/update-plan/page')
+            )
+          },
+          {
+            path: 'manage-meals',
+            Component: lazy(() => import('~/app/admin/manage-meals/page'))
+          },
+          {
+            path: 'manage-meals/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-meals/create-meal/page')
+            )
+          },
+          {
+            path: 'manage-meals/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-meals/update-meal/page')
             )
           }
         ]
