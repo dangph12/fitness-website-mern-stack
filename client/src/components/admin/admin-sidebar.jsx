@@ -3,6 +3,7 @@ import {
   BicepsFlexed,
   Dumbbell,
   Ham,
+  HeartPulse,
   Home,
   LogOut,
   Users,
@@ -84,6 +85,11 @@ export function AdminSidebar({ ...props }) {
           title: 'Equipments Management',
           url: '/admin/manage-equipments',
           icon: Dumbbell
+        },
+        {
+          title: 'Workouts Management',
+          url: '/admin/manage-workouts',
+          icon: HeartPulse
         }
       ]
     }
