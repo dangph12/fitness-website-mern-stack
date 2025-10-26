@@ -13,7 +13,7 @@ import UserService from '~/modules/users/user-service';
 import { IUser } from '~/modules/users/user-type';
 import { generateByOpenAI } from '~/utils/gemini-ai';
 
-import { IInputGenerateMeal } from './ai-type';
+import { IInputGenerateMeal, IMealGenerationOptions } from './ai-type';
 
 type MealContext = {
   user: IUser;
@@ -22,6 +22,12 @@ type MealContext = {
 };
 
 type FoodWithId = IFood & { _id?: unknown };
+
+const FALLBACK_MEAL_TYPES: MealType[] = [
+  MealType.Breakfast,
+  MealType.Lunch,
+  MealType.Dinner
+];
 
 const DEFAULT_INPUT: IInputGenerateMeal = {
   age: 30,
@@ -59,6 +65,67 @@ const buildMealInput = ({
   diet: goal.diet ?? DEFAULT_INPUT.diet
 });
 
+const formatScheduledDate = (date: Date): string => {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${month}/${day}/${year}`;
+};
+
+const parseDateInput = (value?: string | null): Date | null => {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  parsed.setHours(0, 0, 0, 0);
+  return parsed;
+};
+
+const resolveScheduledDates = (options?: IMealGenerationOptions): string[] => {
+  const start = parseDateInput(options?.startDate ?? null);
+  const end = parseDateInput(options?.endDate ?? null);
+
+  if (!start && !end) {
+    return [formatScheduledDate(new Date())];
+  }
+
+  let rangeStart = start ?? end!;
+  let rangeEnd = end ?? start ?? rangeStart;
+
+  if (rangeEnd < rangeStart) {
+    [rangeStart, rangeEnd] = [rangeEnd, rangeStart];
+  }
+
+  const dates: string[] = [];
+  const cursor = new Date(rangeStart);
+
+  while (cursor <= rangeEnd) {
+    dates.push(formatScheduledDate(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return dates.length ? dates : [formatScheduledDate(new Date())];
+};
+
+const buildMetricsSummary = (
+  options?: IMealGenerationOptions
+): string | undefined => {
+  if (!options) return undefined;
+
+  const entries: string[] = [];
+  const pushMetric = (label: string, value?: number, suffix = '') => {
+    if (value === null || value === undefined) return;
+    entries.push(`       - ${label}: ${value}${suffix}`);
+  };
+
+  pushMetric('Body fat percentage (PBF)', options.bodyFatPercentage, '%');
+  pushMetric('Skeletal muscle mass (SMM)', options.skeletalMuscleMass, ' kg');
+  pushMetric('ECW ratio', options.ecwRatio);
+  pushMetric('Body fat mass', options.bodyFatMass, ' kg');
+  pushMetric('Visceral fat area', options.visceralFatArea, ' cm^2');
+
+  return entries.length ? entries.join('\n') : undefined;
+};
+
 const getFoodIdentifier = (food?: FoodWithId): string => {
   if (!food) return '';
   const rawId = (food as { _id?: unknown })?._id;
@@ -83,9 +150,15 @@ const formatFoodCatalog = (foods: FoodWithId[]): string => {
 const buildPrompt = (
   input: IInputGenerateMeal,
   foods: FoodWithId[],
+  scheduledDates: string[],
+  options?: IMealGenerationOptions,
   query?: string
 ): string => {
-  const basePrompt = mealPrompt(input);
+  const metricsSummary = buildMetricsSummary(options);
+  const basePrompt = mealPrompt(input, {
+    scheduledDates,
+    metricsSummary
+  });
   const catalog = formatFoodCatalog(foods);
   const sections = [
     basePrompt,
@@ -139,37 +212,51 @@ const isQuotaOrRateLimitError = (error: unknown): boolean => {
 
 const fallbackMealString = async (
   context: MealContext,
-  foods: FoodWithId[]
+  foods: FoodWithId[],
+  scheduledDates: string[]
 ): Promise<string> => {
-  const meal = {
-    title: `${context.goal.fitnessGoal ?? 'Balanced'} Meal`,
-    mealType: MealType.Lunch,
-    foods: foods.slice(0, 3).map(food => ({
-      food: getFoodIdentifier(food) || 'SAMPLE_FOOD_ID',
-      quantity: 1
-    }))
-  };
+  const foodIds = foods.map(food => getFoodIdentifier(food)).filter(Boolean);
 
-  if (!meal.foods.length) {
-    meal.foods.push({ food: 'SAMPLE_FOOD_ID', quantity: 1 });
+  if (!foodIds.length) {
+    foodIds.push('SAMPLE_FOOD_ID');
   }
 
-  return JSON.stringify(meal);
+  while (foodIds.length < 3) {
+    foodIds.push(foodIds[foodIds.length - 1]);
+  }
+
+  const meals = scheduledDates.map((date, index) => ({
+    title: `${context.goal.fitnessGoal ?? 'Balanced'} Meal ${index + 1}`,
+    mealType: FALLBACK_MEAL_TYPES[index % FALLBACK_MEAL_TYPES.length],
+    scheduledAt: date,
+    foods: foodIds.slice(0, 3).map(foodId => ({
+      food: foodId,
+      quantity: 1
+    }))
+  }));
+
+  return JSON.stringify(meals);
 };
 
 const AIService = {
-  generateMealByAI: async (query: string, userId: string): Promise<string> => {
+  generateMealByAI: async (
+    query: string,
+    userId: string,
+    options?: IMealGenerationOptions
+  ): Promise<string> => {
     const context = await loadMealContext(userId);
     const input = buildMealInput(context);
     const foods = (await FoodService.findAll()) as FoodWithId[];
-    const prompt = buildPrompt(input, foods, query);
+    const scheduledDates = resolveScheduledDates(options);
+    const prompt = buildPrompt(input, foods, scheduledDates, options, query);
     console.log(prompt);
+
     try {
       const mealRaw = await generateByOpenAI(prompt);
       return mealRaw;
     } catch (error) {
       if (isQuotaOrRateLimitError(error)) {
-        return fallbackMealString(context, foods);
+        return fallbackMealString(context, foods, scheduledDates);
       }
       throw error;
     }
