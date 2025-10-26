@@ -36,13 +36,6 @@ export function WorkoutsFilters() {
           className='h-8 w-full sm:w-[200px]'
         />
 
-        <Input
-          placeholder='Search by user name...'
-          value={pendingFilters.userName}
-          onChange={e => onPendingFiltersChange({ userName: e.target.value })}
-          className='h-8 w-full sm:w-[200px]'
-        />
-
         {/* <Select
           value={pendingFilters.isPublic || 'all'}
           onValueChange={value =>
