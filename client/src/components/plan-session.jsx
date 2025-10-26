@@ -36,7 +36,6 @@ const PlanSession = () => {
   const navigate = useNavigate();
 
   const { currentPlan, loading } = useSelector(state => state.plans);
-  const { exercises } = useSelector(state => state.exercises);
   const userId = useSelector(state => state.auth.user.id);
 
   const [completedSets, setCompletedSets] = useState({});
@@ -80,13 +79,25 @@ const PlanSession = () => {
 
   const handleFinishPlan = () => {
     const timeSec = hours * 3600 + minutes * 60 + seconds;
-    const historyData = {
-      user: userId,
-      workout: currentPlan._id,
-      plan: currentPlan._id,
-      time: timeSec
-    };
-    dispatch(addHistory(historyData));
+
+    const workoutIds = (currentPlan?.workouts || []).map(w => w._id);
+
+    if (workoutIds.length === 0) {
+      toast.error('No workouts found in this plan.');
+      return;
+    }
+
+    workoutIds.forEach(workoutId => {
+      const historyData = {
+        user: userId,
+        workout: workoutId,
+        plan: currentPlan._id,
+        time: timeSec
+      };
+
+      dispatch(addHistory(historyData));
+    });
+
     toast.success('Great job! Your session has been saved.');
     navigate('/history');
   };
