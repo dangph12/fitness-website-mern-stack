@@ -19,9 +19,14 @@ const WorkoutService = {
     const filterRecord: Record<string, any> = {};
 
     for (const [key, value] of Object.entries(filterParams)) {
-      if (value && value !== '') {
-        // options for case-insensitive
-        filterRecord[key] = { $regex: value, $options: 'i' };
+      if (value !== undefined && value !== '') {
+        // handling for boolean field
+        if (key === 'isPublic') {
+          filterRecord[key] = value === 'true' ? true : false;
+        } else {
+          // options for case-insensitive search cho string
+          filterRecord[key] = { $regex: value, $options: 'i' };
+        }
       }
     }
 
