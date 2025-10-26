@@ -41,7 +41,10 @@ const AdminLayout = () => {
       'create-muscle': 'Create Muscle',
       'manage-equipments': 'Equipment Management',
       'create-equipment': 'Create Equipment',
-      'update-equipment': 'Update Equipment'
+      'update-equipment': 'Update Equipment',
+      'manage-workouts': 'Workouts Management',
+      'create-workout': 'Create Workout',
+      'update-workout': 'Update Workout'
     };
 
     const items = [];
