@@ -94,6 +94,10 @@ const router = createBrowserRouter([
       {
         path: 'history',
         Component: lazy(() => import('~/app/history/page'))
+      },
+      {
+        path: 'about',
+        Component: lazy(() => import('~/app/about/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
