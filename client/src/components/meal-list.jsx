@@ -1,5 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FaFireAlt, FaLeaf } from 'react-icons/fa';
+import {
+  FaDrumstickBite,
+  FaEdit,
+  FaFireAlt,
+  FaLeaf,
+  FaTrash,
+  FaUtensils
+} from 'react-icons/fa';
+import { GiAvocado, GiBreadSlice } from 'react-icons/gi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -44,7 +52,6 @@ const MealsList = () => {
       { calories: 0, fat: 0, carbohydrates: 0, protein: 0 }
     ) ?? { calories: 0, fat: 0, carbohydrates: 0, protein: 0 };
 
-  const cardTotals = foods => getTotals(foods);
   const liveTotals = useMemo(
     () => getTotals(selectedMeal?.foods || []),
     [selectedMeal]
@@ -64,195 +71,129 @@ const MealsList = () => {
 
   if (!userId) {
     return (
-      <div className='flex justify-center px-6 py-16'>
-        <div className='w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm'>
-          <div className='mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-rose-50 text-rose-600'>
-            <svg
-              viewBox='0 0 24 24'
-              className='h-6 w-6'
-              fill='currentColor'
-              aria-hidden='true'
-            >
-              <path d='M12 2a10 10 0 1 0 10 10A10.012 10.012 0 0 0 12 2Zm1 14h-2v-2h2Zm0-4h-2V6h2Z' />
-            </svg>
-          </div>
-          <h3 className='text-2xl font-bold text-slate-900'>
+      <div className='flex justify-center px-6 py-20 text-center'>
+        <div className='max-w-md bg-white border border-slate-200 rounded-2xl p-10 shadow'>
+          <h2 className='text-2xl font-semibold text-slate-900'>
             You are not logged in
-          </h3>
+          </h2>
           <p className='mt-2 text-slate-600'>
-            Please log in to view and manage your{' '}
-            <span className='font-semibold'>Meals</span>.
+            Please sign in to view your meals.
           </p>
 
-          <div className='mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row'>
+          <div className='mt-6 flex flex-col gap-3'>
             <button
               onClick={() => navigate('/auth/login')}
-              className='inline-flex items-center justify-center rounded-xl bg-[#3067B6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#275397]'
+              className='px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition'
             >
-              Log in to view Meals
+              Log in
             </button>
-            <button
-              onClick={() => navigate('/')}
-              className='inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
-            >
-              Back to home page
-            </button>
-          </div>
 
-          <p className='mt-4 text-sm text-slate-500'>
-            Don't have an account?{' '}
             <button
               onClick={() => navigate('/auth/sign-up')}
-              className='font-semibold text-[#3067B6] hover:underline'
+              className='px-5 py-2.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition'
             >
-              Sign up now
+              Create an account
             </button>
-          </p>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (loading) {
+  if (loading)
     return (
-      <div className='max-w-7xl mx-auto p-6'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse'>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className='rounded-lg border border-slate-200 overflow-hidden'
-            >
-              <div className='h-48 bg-slate-200' />
-              <div className='p-4 space-y-3'>
-                <div className='h-5 bg-slate-200 rounded w-2/3' />
-                <div className='h-4 bg-slate-200 rounded w-1/3' />
-                <div className='h-16 bg-slate-200 rounded' />
-                <div className='h-10 bg-slate-200 rounded' />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <div className='text-center p-10 text-slate-500'>Loading meals...</div>
     );
-  }
+  if (error) return <p className='text-center text-red-500'>{error}</p>;
 
-  if (error) return <div className='text-center text-red-500'>{error}</div>;
   if (!meals.length) {
     return (
-      <div className='max-w-7xl mx-auto p-6'>
-        <h1 className='text-3xl font-semibold mb-4'>Meals List</h1>
-        <div className='rounded-xl border border-dashed border-slate-300 p-10 text-center text-slate-600'>
-          No meals found. Create your first meal!
-        </div>
+      <div className='text-center p-20 text-slate-600'>
+        <h2 className='text-2xl font-semibold mb-2'>No meals yet</h2>
+        <p>Create your first meal to start tracking nutrition!</p>
       </div>
     );
   }
 
   return (
     <div className='max-w-7xl mx-auto p-6'>
-      <div className='mb-8 flex items-end justify-between flex-wrap gap-3'>
-        <h1 className='text-3xl font-semibold'>Meals List</h1>
-        <div className='text-sm text-slate-500'>
-          Total meals: <span className='font-medium'>{meals.length}</span>
-        </div>
+      <div className='mb-12 text-center'>
+        <h1 className='text-4xl font-bold text-slate-900 flex items-center justify-center gap-3'>
+          <FaLeaf className='text-emerald-600' />
+          Your Meals
+        </h1>
+        <p className='mt-2 text-slate-600'>
+          Track, refine, and customize your daily nutrition.
+        </p>
+        <p className='mt-2 text-sm text-slate-500'>
+          Total meals: <span className='font-semibold'>{meals.length}</span>
+        </p>
       </div>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
         {meals.map(meal => {
-          const totals = cardTotals(meal.foods || []);
+          const totals = getTotals(meal.foods);
+
           return (
             <div
               key={meal._id}
-              className='bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition'
+              className='group bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden'
             >
               <button
-                type='button'
-                className='block w-full'
                 onClick={() => handleSelectMeal(meal)}
-                title='View details'
+                className='block w-full'
               >
                 <img
                   src={meal.image}
                   alt={meal.title}
-                  className='w-full h-48 object-cover'
+                  className='w-full h-48 object-cover group-hover:scale-[1.05] transition duration-300'
                 />
               </button>
 
-              <div className='p-4'>
-                <div className='flex items-center justify-between'>
-                  <h2 className='text-lg font-semibold text-slate-900'>
+              <div className='p-5'>
+                <div className='flex justify-between items-center'>
+                  <h2 className='text-lg font-semibold text-slate-900 flex items-center gap-2'>
+                    <FaUtensils className='text-indigo-500' />
                     {meal.title}
                   </h2>
-                  <span className='text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200'>
+                  <span className='text-xs px-2 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200'>
                     {meal.mealType}
                   </span>
                 </div>
 
-                <div className='mt-4 grid grid-cols-2 gap-3'>
-                  <div className='rounded-lg border border-orange-200 bg-orange-50 p-3'>
-                    <div className='flex items-center gap-2 text-sm font-semibold text-orange-800'>
-                      <FaFireAlt className='text-orange-500 text-lg' />
-                      <span>
-                        Calories:{' '}
-                        <span className='text-orange-600'>
-                          {fmt1(totals.calories)}
-                        </span>{' '}
-                        kcal
-                      </span>
-                    </div>
+                <div className='mt-4 grid grid-cols-2 gap-3 text-sm font-medium'>
+                  <div className='flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50 shadow-sm'>
+                    <FaFireAlt className='text-orange-500' />
+                    {fmt1(totals.calories)} kcal
                   </div>
-
-                  <div className='rounded-lg border border-green-200 bg-green-50 p-3'>
-                    <div className='flex items-center gap-2 text-sm font-semibold text-green-800'>
-                      <FaLeaf className='text-green-600 text-lg' />
-                      <span>
-                        Fat:{' '}
-                        <span className='text-green-700'>
-                          {fmt1(totals.fat)}
-                        </span>{' '}
-                        g
-                      </span>
-                    </div>
+                  <div className='flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50 shadow-sm'>
+                    <FaLeaf className='text-green-600' />
+                    {fmt1(totals.protein)} g Protein
                   </div>
-
-                  <div className='rounded-lg border border-teal-200 bg-teal-50 p-3'>
-                    <div className='flex items-center gap-2 text-sm font-semibold text-teal-800'>
-                      <FaLeaf className='text-teal-600 text-lg' />
-                      <span>
-                        Carbohydrates:{' '}
-                        <span className='text-teal-600'>
-                          {fmt1(totals.carbohydrates)}
-                        </span>{' '}
-                        g
-                      </span>
-                    </div>
+                  <div className='flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50 shadow-sm'>
+                    <FaLeaf className='text-teal-600' />
+                    {fmt1(totals.carbohydrates)} g Carbs
                   </div>
-
-                  <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-3'>
-                    <div className='flex items-center gap-2 text-sm font-semibold text-yellow-800'>
-                      <FaLeaf className='text-yellow-600 text-lg' />
-                      <span>
-                        Protein:{' '}
-                        <span className='text-yellow-600'>
-                          {fmt1(totals.protein)}
-                        </span>{' '}
-                        g
-                      </span>
-                    </div>
+                  <div className='flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-slate-50 shadow-sm'>
+                    <FaLeaf className='text-yellow-600' />
+                    {fmt1(totals.fat)} g Fat
                   </div>
                 </div>
 
-                <div className='mt-4 grid grid-cols-2 gap-3'>
+                <div className='mt-6 grid grid-cols-2 gap-3'>
                   <button
-                    className='w-full bg-gradient-to-r from-yellow-300 to-yellow-400 text-white px-4 py-2 rounded-lg shadow hover:shadow-md transition'
                     onClick={() => navigate(`/nutrition/edit-meal/${meal._id}`)}
+                    className='py-2.5 flex items-center justify-center gap-2 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 shadow-sm hover:shadow-md transition'
                   >
+                    <FaEdit />
                     Edit
                   </button>
+
                   <button
-                    className='w-full bg-gradient-to-r from-red-400 to-red-500 text-white px-4 py-2 rounded-lg shadow hover:shadow-md transition'
                     onClick={() => handleDeleteMeal(meal._id)}
+                    className='py-2.5 flex items-center justify-center gap-2 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 shadow-sm hover:shadow-md transition'
                   >
+                    <FaTrash />
                     Delete
                   </button>
                 </div>
@@ -263,160 +204,153 @@ const MealsList = () => {
       </div>
 
       {selectedMeal && (
-        <div className='fixed inset-0 bg-black/20 backdrop-blur-[1px] flex justify-center items-center z-50 p-4'>
-          <div className='bg-white rounded-2xl shadow-xl w-full max-w-4xl relative max-h-[85vh] overflow-auto'>
+        <div className='fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center p-6 animate-fadeIn'>
+          <div className='bg-white w-full max-w-[1100px] rounded-[32px] shadow-2xl border border-slate-200 overflow-hidden max-h-[94vh] flex flex-col'>
             <button
               onClick={handleCloseDetails}
-              className='absolute top-3 right-3 text-2xl text-slate-600 hover:text-slate-800 leading-none'
-              aria-label='Close'
+              className='absolute top-5 right-5 w-11 h-11 flex items-center justify-center rounded-full bg-white/90 hover:bg-white border border-slate-200 hover:border-slate-300 text-slate-700 hover:text-slate-900 shadow-sm transition'
             >
-              &times;
+              ✕
             </button>
 
-            <div className='p-6'>
-              <div className='flex flex-col md:flex-row gap-5'>
-                <div className='md:w-2/5'>
-                  <img
-                    src={selectedMeal.image}
-                    alt={selectedMeal.title}
-                    className='w-full h-94 object-cover rounded-xl border border-slate-200'
-                  />
-                </div>
-
-                <div className='md:flex-1'>
-                  <h2 className='text-2xl font-semibold text-slate-900'>
-                    {selectedMeal.title}
-                  </h2>
-                  <p className='text-sm text-slate-600 mt-1'>
-                    {selectedMeal.mealType}
-                  </p>
-
-                  <div className='mt-4 grid grid-cols-2 gap-4'>
-                    <div className='rounded-xl bg-gradient-to-br from-orange-400 to-orange-500 text-white p-4 shadow'>
-                      <p className='text-sm opacity-90'>Total Calories</p>
-                      <p className='text-2xl font-bold'>
-                        {fmt1(liveTotals.calories)} kcal
-                      </p>
-                    </div>
-                    <div className='rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-white p-4 shadow'>
-                      <p className='text-sm opacity-90'>Total Fat</p>
-                      <p className='text-2xl font-bold'>
-                        {fmt1(liveTotals.fat)} g
-                      </p>
-                    </div>
-                    <div className='rounded-xl bg-gradient-to-br from-teal-400 to-teal-500 text-white p-4 shadow'>
-                      <p className='text-sm opacity-90'>Total Carbohydrates</p>
-                      <p className='text-2xl font-bold'>
-                        {fmt1(liveTotals.carbohydrates)} g
-                      </p>
-                    </div>
-                    <div className='rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-500 text-white p-4 shadow'>
-                      <p className='text-sm opacity-90'>Total Protein</p>
-                      <p className='text-2xl font-bold'>
-                        {fmt1(liveTotals.protein)} g
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className='mt-4'>
-                    <UserCard user={selectedMeal.user} />
-                  </div>
-                </div>
+            <div className='flex flex-col md:flex-row gap-8 p-8'>
+              <div className='md:w-[42%] w-full'>
+                <img
+                  src={selectedMeal.image}
+                  alt={selectedMeal.title}
+                  className='w-full h-[340px] object-cover rounded-2xl border shadow-sm'
+                />
               </div>
 
-              {/* Foods (read-only quantities) */}
-              <div className='mt-7'>
-                <h3 className='text-xl font-semibold mb-3'>
-                  Foods in this Meal
-                </h3>
-                <ul className='space-y-3'>
-                  {selectedMeal.foods.map((item, idx) => {
-                    const f = item.food || {};
-                    const unit = f.unit || 1;
-                    const qty = Number(item.quantity) || 0;
-                    const cal = Number(f.calories) || 0;
-                    const fat = Number(f.fat) || 0;
-                    const carb = Number(f.carbohydrate) || 0;
-                    const prot = Number(f.protein) || 0;
+              <div className='flex-1'>
+                <h2 className='text-3xl font-bold text-slate-900 flex items-center gap-3 leading-tight'>
+                  <FaUtensils className='text-indigo-500' />
+                  {selectedMeal.title}
+                </h2>
+                <p className='text-sm text-slate-600 mt-1 capitalize'>
+                  {selectedMeal.mealType}
+                </p>
 
-                    return (
-                      <li
-                        key={item._id || `${f._id}-${idx}`}
-                        className='flex items-center gap-4 border border-slate-200 p-4 rounded-xl hover:shadow-sm transition'
+                <div className='mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4'>
+                  {[
+                    {
+                      label: 'Calories',
+                      value: liveTotals.calories,
+                      unit: 'kcal',
+                      icon: <FaFireAlt className='text-orange-500' />,
+                      bg: 'bg-orange-50',
+                      border: 'border-orange-200',
+                      text: 'text-orange-800'
+                    },
+                    {
+                      label: 'Protein',
+                      value: liveTotals.protein,
+                      unit: 'g',
+                      icon: <FaDrumstickBite className='text-green-600' />,
+                      bg: 'bg-green-50',
+                      border: 'border-green-200',
+                      text: 'text-green-800'
+                    },
+                    {
+                      label: 'Carbs',
+                      value: liveTotals.carbohydrates,
+                      unit: 'g',
+                      icon: <GiBreadSlice className='text-teal-600' />,
+                      bg: 'bg-teal-50',
+                      border: 'border-teal-200',
+                      text: 'text-teal-800'
+                    },
+                    {
+                      label: 'Fat',
+                      value: liveTotals.fat,
+                      unit: 'g',
+                      icon: <GiAvocado className='text-yellow-600' />,
+                      bg: 'bg-yellow-50',
+                      border: 'border-yellow-200',
+                      text: 'text-yellow-800'
+                    }
+                  ].map(stat => (
+                    <div
+                      key={stat.label}
+                      className={`rounded-2xl ${stat.bg} border ${stat.border} p-4 shadow-sm text-center transition hover:shadow-md`}
+                    >
+                      <div className='flex items-center justify-center gap-2 text-sm font-semibold opacity-90'>
+                        {stat.icon}{' '}
+                        <span className={stat.text}>{stat.label}</span>
+                      </div>
+
+                      <p
+                        className={`text-xl font-bold mt-1 ${stat.text} whitespace-nowrap leading-tight tracking-tight`}
                       >
-                        <button
-                          type='button'
-                          onClick={() => handleSelectFood(f._id)}
-                          className='relative size-16 overflow-hidden rounded-full ring-1 ring-slate-200 shrink-0'
-                          title='View food details'
-                        >
-                          <img
-                            src={f.image}
-                            alt={f.title}
-                            className='absolute inset-0 h-full w-full object-cover'
-                          />
-                        </button>
-
-                        <div className='flex-1 min-w-0'>
-                          <p className='font-medium text-slate-900 truncate'>
-                            {f.title}
-                          </p>
-                          <p className='text-xs text-slate-500 mt-0.5'>
-                            Per {unit}{' '}
-                            {f.category?.toLowerCase() === 'meat'
-                              ? 'g'
-                              : 'unit'}{' '}
-                            • {fmt1(cal)} kcal • {fmt1(fat)} g fat •{' '}
-                            {fmt1(carb)} g carbs • {fmt1(prot)} g protein
-                          </p>
-                          <div className='mt-2'>
-                            <span className='inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-200'>
-                              Quantity: {qty} units
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className='text-right shrink-0'>
-                          <p className='text-sm text-slate-600'>Calories</p>
-                          <p className='font-semibold'>
-                            {fmt1(cal * qty)} kcal
-                          </p>
-                          <p className='mt-1 text-sm text-slate-600'>Fat</p>
-                          <p className='font-semibold'>{fmt1(fat * qty)} g</p>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-
-              <div className='text-center my-6'>
-                <div className='inline-flex gap-8 bg-white border border-slate-200 p-4 rounded-2xl shadow-sm'>
-                  <div className='text-slate-800'>
-                    <p className='text-sm'>Total Calories</p>
-                    <p className='text-2xl font-bold'>
-                      {fmt1(liveTotals.calories)} kcal
-                    </p>
-                  </div>
-                  <div className='text-slate-800'>
-                    <p className='text-sm'>Total Fat</p>
-                    <p className='text-2xl font-bold'>
-                      {fmt1(liveTotals.fat)} g
-                    </p>
-                  </div>
-                  <div className='text-slate-800'>
-                    <p className='text-sm'>Total Carbohydrates</p>
-                    <p className='text-2xl font-bold'>
-                      {fmt1(liveTotals.carbohydrates)} g
-                    </p>
-                  </div>
-                  <div className='text-slate-800'>
-                    <p className='text-sm'>Total Protein</p>
-                    <p className='text-2xl font-bold'>
-                      {fmt1(liveTotals.protein)} g
-                    </p>
-                  </div>
+                        {fmt1(stat.value)} {stat.unit}
+                      </p>
+                    </div>
+                  ))}
                 </div>
+
+                <div className='mt-8'>
+                  <UserCard user={selectedMeal.user} />
+                </div>
+              </div>
+            </div>
+
+            <div className='px-8 pb-8 overflow-y-auto pr-3'>
+              <h3 className='flex items-center gap-2 text-lg font-medium text-slate-700 mb-5 tracking-wide'>
+                <FaUtensils className='text-slate-500 text-base' />
+                Foods in this meal
+              </h3>
+
+              <div className='space-y-4'>
+                {selectedMeal.foods.map((item, idx) => {
+                  const f = item.food || {};
+                  const qty = Number(item.quantity) || 0;
+
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => handleSelectFood(f._id)}
+                      className='flex items-center gap-5 p-5 border border-slate-200 rounded-2xl bg-white hover:shadow-lg transition cursor-pointer'
+                    >
+                      <img
+                        src={f.image}
+                        alt={f.title}
+                        className='w-20 h-20 rounded-xl object-cover border shadow-sm'
+                      />
+
+                      <div className='flex-1 min-w-0'>
+                        <p className='font-semibold text-slate-900 truncate text-lg'>
+                          {f.title}
+                        </p>
+
+                        <div className='flex flex-wrap gap-2 mt-2'>
+                          <span className='flex items-center gap-1 text-orange-700 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200 text-xs font-medium'>
+                            <FaFireAlt className='text-orange-500' />{' '}
+                            {fmt1(f.calories)} kcal
+                          </span>
+
+                          <span className='flex items-center gap-1 text-green-700 bg-green-50 px-2.5 py-1 rounded-lg border border-green-200 text-xs font-medium'>
+                            <FaDrumstickBite className='text-green-600' />{' '}
+                            {fmt1(f.protein)} g Protein
+                          </span>
+
+                          <span className='flex items-center gap-1 text-teal-700 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200 text-xs font-medium'>
+                            <GiBreadSlice className='text-teal-600' />{' '}
+                            {fmt1(f.carbohydrate)} g Carbs
+                          </span>
+
+                          <span className='flex items-center gap-1 text-yellow-700 bg-yellow-50 px-2.5 py-1 rounded-lg border border-yellow-200 text-xs font-medium'>
+                            <GiAvocado className='text-yellow-600' />{' '}
+                            {fmt1(f.fat)} g Fat
+                          </span>
+                        </div>
+                      </div>
+
+                      <span className='text-sm font-semibold text-slate-800 bg-slate-100 px-4 py-1.5 rounded-full shadow-sm'>
+                        × {qty}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
