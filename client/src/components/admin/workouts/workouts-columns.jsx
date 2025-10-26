@@ -32,7 +32,7 @@ export const useWorkoutsColumns = () => {
         const image = row.getValue('image');
         const title = row.getValue('title');
         return (
-          <div className='w-16 h-16 rounded-md overflow-hidden bg-muted'>
+          <div className='w-20 h-20 rounded-md overflow-hidden bg-muted'>
             {image ? (
               <img
                 src={image}
