@@ -11,7 +11,7 @@ import { IGoal } from '~/modules/goals/goal-type';
 import { MealType } from '~/modules/meals/meal-type';
 import UserService from '~/modules/users/user-service';
 import { IUser } from '~/modules/users/user-type';
-import { generateByOpenAI } from '~/utils/openai';
+import { generateByOpenAI } from '~/utils/gemini-ai';
 
 import { IInputGenerateMeal } from './ai-type';
 
@@ -20,6 +20,8 @@ type MealContext = {
   goal: IGoal;
   bodyRecord: IBodyRecord;
 };
+
+type FoodWithId = IFood & { _id?: unknown };
 
 const DEFAULT_INPUT: IInputGenerateMeal = {
   age: 30,
@@ -57,12 +59,44 @@ const buildMealInput = ({
   diet: goal.diet ?? DEFAULT_INPUT.diet
 });
 
-const buildPrompt = (input: IInputGenerateMeal, query?: string): string => {
-  const basePrompt = mealPrompt(input);
-  if (!query?.trim()) return basePrompt;
-  return `${basePrompt}
+const getFoodIdentifier = (food?: FoodWithId): string => {
+  if (!food) return '';
+  const rawId = (food as { _id?: unknown })?._id;
+  if (typeof rawId === 'string') return rawId;
+  if (rawId instanceof Types.ObjectId) return rawId.toString();
+  return '';
+};
 
-User additional request: ${query.trim()}`;
+const formatFoodCatalog = (foods: FoodWithId[]): string => {
+  if (!foods?.length) {
+    return 'No foods available. Use SAMPLE_FOOD_ID as needed.';
+  }
+
+  return foods
+    .map(food => {
+      const id = getFoodIdentifier(food) || 'UNKNOWN_ID';
+      return `- ${food.title} | id: ${id} | category: ${food.category} | unit: ${food.unit} | calories: ${food.calories} | protein: ${food.protein} | fat: ${food.fat} | carbs: ${food.carbohydrate}`;
+    })
+    .join('\n');
+};
+
+const buildPrompt = (
+  input: IInputGenerateMeal,
+  foods: FoodWithId[],
+  query?: string
+): string => {
+  const basePrompt = mealPrompt(input);
+  const catalog = formatFoodCatalog(foods);
+  const sections = [
+    basePrompt,
+    `Available foods catalog (use these ids in the "food" field):\n${catalog}`
+  ];
+
+  if (query?.trim()) {
+    sections.push(`User additional request: ${query.trim()}`);
+  }
+
+  return sections.join('\n\n');
 };
 
 const loadMealContext = async (userId: string): Promise<MealContext> => {
@@ -103,16 +137,15 @@ const isQuotaOrRateLimitError = (error: unknown): boolean => {
   );
 };
 
-const fallbackMealString = async (context: MealContext): Promise<string> => {
-  const { foods } = await FoodService.find({ page: 1, limit: 5 });
-
+const fallbackMealString = async (
+  context: MealContext,
+  foods: FoodWithId[]
+): Promise<string> => {
   const meal = {
     title: `${context.goal.fitnessGoal ?? 'Balanced'} Meal`,
     mealType: MealType.Lunch,
-    foods: foods.slice(0, 3).map((food: IFood & { _id?: unknown }) => ({
-      food:
-        (food?._id instanceof Types.ObjectId && food._id.toString()) ||
-        (typeof food?._id === 'string' ? food._id : 'SAMPLE_FOOD_ID'),
+    foods: foods.slice(0, 3).map(food => ({
+      food: getFoodIdentifier(food) || 'SAMPLE_FOOD_ID',
       quantity: 1
     }))
   };
@@ -128,13 +161,15 @@ const AIService = {
   generateMealByAI: async (query: string, userId: string): Promise<string> => {
     const context = await loadMealContext(userId);
     const input = buildMealInput(context);
-    const prompt = buildPrompt(input, query);
+    const foods = (await FoodService.findAll()) as FoodWithId[];
+    const prompt = buildPrompt(input, foods, query);
+    console.log(prompt);
     try {
       const mealRaw = await generateByOpenAI(prompt);
       return mealRaw;
     } catch (error) {
       if (isQuotaOrRateLimitError(error)) {
-        return fallbackMealString(context);
+        return fallbackMealString(context, foods);
       }
       throw error;
     }

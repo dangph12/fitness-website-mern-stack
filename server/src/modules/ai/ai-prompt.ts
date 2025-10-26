@@ -24,6 +24,11 @@ const mealPrompt = ({
      - Create a balanced meal plan with proper macronutrient distribution
      - Include a variety of nutrient-dense foods while respecting dietary restrictions
      - "mealType" MUST be EXACTLY one of: ${MEAL_TYPES_LIST}
+     - ONLY choose foods from the catalog provided below and reference them by their exact "id" values
+     - Generate exactly ONE meal entry total; do not create arrays of meals or multiple objects
+     - Each meal must contain between 3 and 6 foods, no more and no less
+     - Keep each food quantity realistic: use small positive integers (1-5, no decimals) instead of large numbers like 100 or 200
+     - The ONLY allowed top-level fields are "title", "mealType", and "foods". Do NOT output "dailyCalories", "macros", "notes", or any other field
      - Consider meal timing around workouts for optimal performance and recovery
      
      CRITICAL SCHEMA INSTRUCTIONS:
@@ -33,7 +38,7 @@ const mealPrompt = ({
      - ONLY include the EXACT fields shown in the example below
      - Each meal should include ONLY a "name" and "foods" array
 
-     Return a JSON object with this EXACT structure and no other fields:
+     Return a JSON object with this EXACT structure and no other fields (absolutely no "dailyCalories" or anything else):
        {
          "title": "Healthy Breakfast",
          "mealType": "Breakfast",
