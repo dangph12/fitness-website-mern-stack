@@ -9,7 +9,7 @@ export const fetchMeals = createAsyncThunk(
     const response = await axiosInstance.get('/api/meals', {
       params: { page, limit, sortBy, sortOrder, ...filterParams }
     });
-    return response.data.data;
+    return response.data.data.meals;
   }
 );
 
@@ -27,7 +27,7 @@ export const createMeal = createAsyncThunk(
   'meals/createMeal',
   async mealData => {
     try {
-      const response = await axiosInstance.post('/api/meals', mealData, {});
+      const response = await axiosInstance.post('/api/meals', mealData);
       return response.data.data;
     } catch (error) {
       console.error(
@@ -85,7 +85,7 @@ export const mealSlice = createSlice({
       })
       .addCase(fetchMeals.fulfilled, (state, action) => {
         state.loading = false;
-        state.meals = action.payload;
+        state.meals = action.payload || [];
       })
       .addCase(fetchMeals.rejected, (state, action) => {
         state.loading = false;

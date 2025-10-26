@@ -35,5 +35,33 @@ export const onboardingSchema = yup.object().shape({
     .positive('Weight must be positive')
     .min(20, 'Weight must be at least 20 kg')
     .max(500, 'Weight must be less than 500 kg')
-    .required('Weight is required')
+    .required('Weight is required'),
+  targetWeight: yup
+    .number()
+    .positive('Target weight must be positive')
+    .min(20, 'Target weight must be at least 20 kg')
+    .max(500, 'Target weight must be less than 500 kg')
+    .required('Target weight is required'),
+  diet: yup
+    .string()
+    .oneOf(
+      [
+        'Mediterranean',
+        'Ketogenic (Keto)',
+        'Paleo',
+        'Vegetarian',
+        'Vegan',
+        'Gluten-Free',
+        'Low-Carb'
+      ],
+      'Please select a valid diet'
+    )
+    .required('Diet preference is required'),
+  fitnessGoal: yup
+    .string()
+    .oneOf(
+      ['Lose Weight', 'Build Muscle', 'To be Healthy'],
+      'Please select a valid fitness goal'
+    )
+    .required('Fitness goal is required')
 });
