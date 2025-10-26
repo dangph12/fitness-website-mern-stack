@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FaBook, FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
+import {
+  FaBook,
+  FaGlobeAmericas,
+  FaLock,
+  FaMinus,
+  FaPlus,
+  FaTrash
+} from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -27,6 +34,7 @@ const EditWorkout = () => {
   const [title, setTitle] = useState('');
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
+  const [isPublic, setIsPublic] = useState(true);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -42,6 +50,7 @@ const EditWorkout = () => {
     setTitle(currentWorkout.title || '');
     setImage(null);
     setImageUrl(currentWorkout.image || '');
+    setIsPublic(currentWorkout.isPublic ?? true);
 
     const mapped =
       (currentWorkout.exercises || []).map(it => ({
@@ -111,6 +120,7 @@ const EditWorkout = () => {
       )
     );
   };
+
   const handleRemoveSet = (exerciseIndex, setIndex) => {
     setExercises(prev =>
       prev.map((ex, i) => {
@@ -153,7 +163,7 @@ const EditWorkout = () => {
 
     if (image) updateData.append('image', image);
     updateData.append('user', userId);
-    updateData.append('isPublic', 'true');
+    updateData.append('isPublic', String(isPublic));
 
     exercises.forEach((item, index) => {
       updateData.append(
@@ -203,7 +213,7 @@ const EditWorkout = () => {
                 Edit Workout
               </h2>
               <p className='text-xs text-slate-500'>
-                Update title, image and exercise sets/reps.
+                Update title, image and exercises.
               </p>
             </div>
             <div className='flex items-center gap-2 text-xs text-slate-600'>
@@ -257,12 +267,37 @@ const EditWorkout = () => {
                   </>
                 ) : (
                   <div className='grid h-full place-items-center text-center text-slate-500'>
-                    <div>
-                      <p className='font-medium'>Drop or click to upload</p>
-                      <p className='text-xs'>PNG, JPG (max 5MB)</p>
-                    </div>
+                    <p className='font-medium'>Drop or click to upload</p>
+                    <p className='text-xs'>PNG, JPG (max 5MB)</p>
                   </div>
                 )}
+              </div>
+
+              <div className='mt-5'>
+                <label className='mb-2 block text-sm font-medium text-slate-700'>
+                  Visibility
+                </label>
+                <button
+                  onClick={() => setIsPublic(!isPublic)}
+                  className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition
+                    ${
+                      isPublic
+                        ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                        : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                    }
+                  `}
+                >
+                  {isPublic ? (
+                    <>
+                      <FaGlobeAmericas className='h-4 w-4' /> Public (Anyone can
+                      view)
+                    </>
+                  ) : (
+                    <>
+                      <FaLock className='h-4 w-4' /> Private (Only you)
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
@@ -301,7 +336,6 @@ const EditWorkout = () => {
                   <button
                     onClick={() => handleRemoveExercise(exerciseIndex)}
                     className='absolute right-3 top-3 rounded-md bg-red-500 p-2 text-white hover:bg-red-600'
-                    title='Remove exercise'
                   >
                     <FaTrash />
                   </button>
@@ -317,7 +351,7 @@ const EditWorkout = () => {
                               )
                             : ex.exercise?.tutorial
                         }
-                        alt={ex.exercise?.title || 'Exercise'}
+                        alt={ex.exercise?.title}
                         className='absolute inset-0 h-full w-full object-cover'
                         onMouseEnter={e => {
                           const t = ex.exercise?.tutorial;
@@ -334,9 +368,7 @@ const EditWorkout = () => {
                       />
                     </div>
                     <div>
-                      <p className='font-semibold'>
-                        {ex.exercise?.title || 'Exercise'}
-                      </p>
+                      <p className='font-semibold'>{ex.exercise?.title}</p>
                       <p className='text-xs text-slate-500'>
                         {ex.sets.length} set(s) •{' '}
                         {ex.sets.reduce((a, b) => a + (Number(b) || 0), 0)} reps
@@ -384,7 +416,6 @@ const EditWorkout = () => {
                           )
                         }
                         className='rounded-md p-2 text-red-600 ring-1 ring-slate-300 hover:bg-red-50'
-                        title='Decrease reps'
                       >
                         <FaMinus />
                       </button>
@@ -398,7 +429,6 @@ const EditWorkout = () => {
                           )
                         }
                         className='rounded-md p-2 text-emerald-600 ring-1 ring-slate-300 hover:bg-emerald-50'
-                        title='Increase reps'
                       >
                         <FaPlus />
                       </button>
@@ -411,7 +441,6 @@ const EditWorkout = () => {
                             ? 'cursor-not-allowed text-slate-300 ring-1 ring-slate-200'
                             : 'text-red-500 hover:bg-red-50 ring-1 ring-slate-300'
                         }`}
-                        title='Remove set'
                       >
                         <FaTrash />
                       </button>
