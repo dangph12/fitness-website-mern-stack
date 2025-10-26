@@ -49,7 +49,7 @@ const EquipmentList = () => {
             Select Equipment
           </h3>
           <p className='mt-1 text-sm text-slate-500'>
-            Chọn thiết bị để lọc bài tập nhanh chóng
+            Tap a equipment to start training
           </p>
         </div>
 

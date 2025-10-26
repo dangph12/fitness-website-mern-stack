@@ -101,9 +101,9 @@ const ProfilePage = () => {
       .unwrap()
       .then(updated => {
         setUserData(updated);
-        toast.success('Cập nhật hồ sơ thành công!');
+        toast.success('Profile updated successfully!');
       })
-      .catch(err => toast.error(err || 'Cập nhật hồ sơ thất bại'));
+      .catch(err => toast.error(err || 'Profile update failed'));
   };
 
   const handleLogout = () => {
@@ -122,12 +122,12 @@ const ProfilePage = () => {
     return a;
   }, [userData?.dob]);
 
-  const formatDateTime = v => (v ? new Date(v).toLocaleString('vi-VN') : '—');
+  const formatDateTime = v => (v ? new Date(v).toLocaleString('en-US') : '—');
 
   if (authLoading || fetching) {
     return (
       <div className='min-h-screen grid place-items-center text-slate-600'>
-        Đang tải…
+        Loading…
       </div>
     );
   }
@@ -137,13 +137,13 @@ const ProfilePage = () => {
       <div className='min-h-screen grid place-items-center p-6'>
         <div className='rounded-xl border p-6 text-center'>
           <p className='text-slate-700 mb-3'>
-            Hãy đăng nhập để xem trang hồ sơ.
+            Please log in to view your profile.
           </p>
           <button
             onClick={() => navigate('/login')}
             className='px-4 py-2 rounded-lg bg-blue-600 text-white'
           >
-            Đăng nhập
+            Log In
           </button>
         </div>
       </div>
@@ -154,16 +154,16 @@ const ProfilePage = () => {
     <div className='mx-auto max-w-4xl p-6 space-y-6'>
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-2xl font-bold text-slate-900'>Hồ sơ</h1>
+          <h1 className='text-2xl font-bold text-slate-900'>Profile</h1>
           <p className='text-sm text-slate-600'>
-            Cập nhật ảnh đại diện & thông tin cá nhân
+            Update your avatar & personal information
           </p>
         </div>
         <button
           onClick={handleLogout}
           className='inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800'
         >
-          <LogOut size={18} /> Đăng xuất
+          <LogOut size={18} /> Log Out
         </button>
       </div>
 
@@ -175,7 +175,9 @@ const ProfilePage = () => {
                 uploading ? 'opacity-60 cursor-not-allowed' : 'hover:opacity-90'
               }`}
               onClick={() => !uploading && fileInputRef.current?.click()}
-              title={uploading ? 'Đang tải ảnh...' : 'Nhấn để thay ảnh'}
+              title={
+                uploading ? 'Uploading image...' : 'Click to change avatar'
+              }
             >
               <img
                 className='h-full w-full object-cover'
@@ -188,12 +190,12 @@ const ProfilePage = () => {
               />
               {!uploading && (
                 <div className='pointer-events-none absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/40 to-transparent'>
-                  <span className='mb-2 text-xs text-white'>Thay ảnh</span>
+                  <span className='mb-2 text-xs text-white'>Change</span>
                 </div>
               )}
               {uploading && (
                 <div className='absolute inset-0 grid place-items-center bg-black/40 text-white text-sm'>
-                  Đang tải…
+                  Uploading…
                 </div>
               )}
             </div>
@@ -216,15 +218,15 @@ const ProfilePage = () => {
                 {userData?.profileCompleted ? (
                   <Chip color='green'>
                     <CheckCheck size={14} className='mr-1' />
-                    Hoàn tất hồ sơ
+                    Profile Completed
                   </Chip>
                 ) : (
-                  <Chip color='amber'>Chưa hoàn tất</Chip>
+                  <Chip color='amber'>Profile Incomplete</Chip>
                 )}
                 {userData?.gender && (
-                  <Chip color='slate'>Giới tính: {userData.gender}</Chip>
+                  <Chip color='slate'>Gender: {userData.gender}</Chip>
                 )}
-                {userData?.dob && <Chip color='slate'>Tuổi: {age ?? '—'}</Chip>}
+                {userData?.dob && <Chip color='slate'>Age: {age ?? '—'}</Chip>}
               </div>
             </div>
           </div>
@@ -251,39 +253,39 @@ const ProfilePage = () => {
       <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
         <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
           <h3 className='mb-3 text-sm font-semibold uppercase text-slate-500'>
-            Tài khoản
+            Account Information
           </h3>
           <IconRow
             icon={<User2 size={18} />}
-            label='Email hiện tại'
+            label='Email'
             value={userData?.email || '—'}
           />
           <IconRow
             icon={<CalendarDays size={18} />}
-            label='Ngày tạo'
+            label='Created At'
             value={formatDateTime(userData?.createdAt)}
           />
           <IconRow
             icon={<Clock4 size={18} />}
-            label='Cập nhật'
+            label='Last Updated'
             value={formatDateTime(userData?.updatedAt)}
           />
         </div>
 
         <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
           <h3 className='mb-3 text-sm font-semibold uppercase text-slate-500'>
-            Chỉnh sửa thông tin
+            Edit Profile
           </h3>
 
           <form onSubmit={handleSubmit(onSubmitProfile)} className='space-y-3'>
             <div>
               <label className='mb-1 block text-sm font-medium text-slate-700'>
-                Họ và tên
+                Full Name
               </label>
               <input
-                {...register('name', { required: 'Vui lòng nhập tên' })}
+                {...register('name', { required: 'Please enter your name' })}
                 className='w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
-                placeholder='Nhập tên'
+                placeholder='Enter your name'
               />
               {errors?.name && (
                 <p className='mt-1 text-xs text-rose-600'>
@@ -302,10 +304,10 @@ const ProfilePage = () => {
                 </span>
                 <input
                   {...register('email', {
-                    required: 'Vui lòng nhập email',
+                    required: 'Please enter your email',
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
-                      message: 'Email không hợp lệ'
+                      message: 'Invalid email format'
                     }
                   })}
                   className='w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 py-2 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
@@ -321,22 +323,22 @@ const ProfilePage = () => {
 
             <div>
               <label className='mb-1 block text-sm font-medium text-slate-700'>
-                Giới tính
+                Gender
               </label>
               <select
                 {...register('gender')}
                 className='w-full rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
               >
-                <option value=''>— Chọn giới tính —</option>
-                <option value='male'>Nam</option>
-                <option value='female'>Nữ</option>
-                <option value='other'>Khác</option>
+                <option value=''>— Select gender —</option>
+                <option value='male'>Male</option>
+                <option value='female'>Female</option>
+                <option value='other'>Other</option>
               </select>
             </div>
 
             <div>
               <label className='mb-1 block text-sm font-medium text-slate-700'>
-                Ngày sinh
+                Date of Birth
               </label>
               <input
                 type='date'
@@ -347,7 +349,7 @@ const ProfilePage = () => {
 
             {updateError && (
               <p className='text-sm text-rose-600'>
-                Lỗi: {String(updateError)}
+                Error: {String(updateError)}
               </p>
             )}
 
@@ -362,7 +364,7 @@ const ProfilePage = () => {
                 }`}
               >
                 <Save size={18} />
-                {updateLoading ? 'Đang lưu…' : 'Lưu thay đổi'}
+                {updateLoading ? 'Saving…' : 'Save Changes'}
               </button>
             </div>
           </form>
