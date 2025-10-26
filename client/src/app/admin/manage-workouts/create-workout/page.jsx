@@ -1,22 +1,18 @@
-import {
-  ArrowLeft,
-  Minus,
-  Plus,
-  Search,
-  Trash2,
-  Upload,
-  X
-} from 'lucide-react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { ArrowLeft, Minus, Plus, Trash2, Upload, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
+import { workoutValidationSchema } from '~/app/admin/manage-workouts/validations/workout-validation';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
+import { Switch } from '~/components/ui/switch';
 import { fetchExercises } from '~/store/features/exercise-slice';
 import { createWorkout } from '~/store/features/workout-slice';
 
@@ -33,9 +29,26 @@ const CreateWorkout = () => {
     totalExercises
   } = useSelector(state => state.exercises);
 
-  const [exercises, setExercises] = useState([]);
-  const [title, setTitle] = useState('');
-  const [image, setImage] = useState(null);
+  // React Hook Form
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors }
+  } = useForm({
+    resolver: yupResolver(workoutValidationSchema),
+    defaultValues: {
+      title: '',
+      isPublic: true,
+      image: null,
+      exercises: []
+    }
+  });
+
+  const exercises = watch('exercises') || [];
+  const title = watch('title');
+  const isPublic = watch('isPublic');
   const [imageUrl, setImageUrl] = useState('');
 
   // Exercise library state
@@ -48,7 +61,7 @@ const CreateWorkout = () => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
-  // Debounce search - auto apply after 300ms
+  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setCurrentPage(1);
@@ -57,7 +70,7 @@ const CreateWorkout = () => {
     return () => clearTimeout(timer);
   }, [searchText]);
 
-  // Fetch exercises when query or page changes
+  // Fetch exercises
   useEffect(() => {
     dispatch(
       fetchExercises({
@@ -85,8 +98,8 @@ const CreateWorkout = () => {
       toast.info('Exercise already added');
       return;
     }
-    setExercises(prev => [
-      ...prev,
+    setValue('exercises', [
+      ...exercises,
       {
         exercise: {
           _id: exercise._id,
@@ -100,56 +113,41 @@ const CreateWorkout = () => {
   };
 
   const handleRemoveExercise = exerciseIndex => {
-    setExercises(prev => prev.filter((_, i) => i !== exerciseIndex));
+    setValue(
+      'exercises',
+      exercises.filter((_, i) => i !== exerciseIndex)
+    );
     toast.success('Exercise removed');
   };
 
   const handleInputChange = (exerciseIndex, setIndex, value) => {
-    setExercises(prev =>
-      prev.map((ex, i) => {
-        if (i !== exerciseIndex) return ex;
-        const next = [...ex.sets];
-        next[setIndex] = Math.max(1, Number(value) || 1);
-        return { ...ex, sets: next };
-      })
+    const newExercises = [...exercises];
+    newExercises[exerciseIndex].sets[setIndex] = Math.max(
+      1,
+      Number(value) || 1
     );
+    setValue('exercises', newExercises);
   };
 
   const handleAddSet = exerciseIndex => {
-    setExercises(prev =>
-      prev.map((ex, i) =>
-        i === exerciseIndex ? { ...ex, sets: [...ex.sets, 1] } : ex
-      )
-    );
+    const newExercises = [...exercises];
+    newExercises[exerciseIndex].sets.push(1);
+    setValue('exercises', newExercises);
   };
 
   const handleRemoveSet = (exerciseIndex, setIndex) => {
-    setExercises(prev =>
-      prev.map((ex, i) => {
-        if (i !== exerciseIndex) return ex;
-        if (ex.sets.length <= 1) return ex;
-        const next = [...ex.sets];
-        next.splice(setIndex, 1);
-        return { ...ex, sets: next };
-      })
-    );
+    const newExercises = [...exercises];
+    if (newExercises[exerciseIndex].sets.length > 1) {
+      newExercises[exerciseIndex].sets.splice(setIndex, 1);
+      setValue('exercises', newExercises);
+    }
   };
 
   const handleImageChange = e => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please choose an image file');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image must be <= 10MB');
-      return;
-    }
-
-    setImage(file);
+    setValue('image', file);
     const reader = new FileReader();
     reader.onloadend = () => {
       setImageUrl(reader.result);
@@ -158,27 +156,18 @@ const CreateWorkout = () => {
   };
 
   const removeImage = () => {
-    setImage(null);
+    setValue('image', null);
     setImageUrl('');
   };
 
-  const handleSubmitWorkout = async () => {
-    if (!title.trim()) {
-      toast.error('Please fill in workout title!');
-      return;
-    }
-    if (!exercises.length) {
-      toast.error('Please add at least one exercise!');
-      return;
-    }
-
+  const onSubmit = async data => {
     const workoutData = new FormData();
-    workoutData.append('title', title.trim());
-    if (image) workoutData.append('image', image);
-    workoutData.append('isPublic', 'true');
+    workoutData.append('title', data.title.trim());
+    workoutData.append('isPublic', String(data.isPublic));
+    if (data.image) workoutData.append('image', data.image);
     workoutData.append('user', userId);
 
-    exercises.forEach((exercise, index) => {
+    data.exercises.forEach((exercise, index) => {
       workoutData.append(
         `exercises[${index}][exercise]`,
         exercise.exercise._id
@@ -213,11 +202,6 @@ const CreateWorkout = () => {
     setSearchText(e.target.value);
   };
 
-  const handleApplySearch = () => {
-    setQuery(searchText.trim());
-    setCurrentPage(1);
-  };
-
   const handleClearSearch = () => {
     setSearchText('');
     setQuery('');
@@ -227,12 +211,6 @@ const CreateWorkout = () => {
   const handlePageChange = newPage => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
-    }
-  };
-
-  const handleSearchKeyPress = e => {
-    if (e.key === 'Enter') {
-      handleApplySearch();
     }
   };
 
@@ -250,449 +228,504 @@ const CreateWorkout = () => {
         </Button>
       </div>
 
-      <div className='grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6'>
-        {/* Left Column - Workout Details */}
-        <div className='space-y-6'>
-          {/* Basic Info Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className='flex items-center justify-between'>
-                <div>
-                  <h2 className='text-2xl font-bold'>Create Workout</h2>
-                  <p className='text-sm text-muted-foreground mt-1'>
-                    Name your workout, add an image, and select exercises
-                  </p>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className='grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6'>
+          {/* Left Column - Workout Details */}
+          <div className='space-y-6'>
+            {/* Basic Info Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center justify-between'>
+                  <div>
+                    <h2 className='text-2xl font-bold'>Create Workout</h2>
+                    <p className='text-sm text-muted-foreground mt-1'>
+                      Name your workout, add an image, and select exercises
+                    </p>
+                  </div>
+                  <div className='flex items-center gap-2 text-sm'>
+                    <Badge variant='secondary'>
+                      {exercises.length} exercises
+                    </Badge>
+                    <Badge variant='secondary'>{totalSets} sets</Badge>
+                    <Badge variant='secondary'>{totalReps} reps</Badge>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className='space-y-4'>
+                {/* Workout Title */}
+                <div className='space-y-2'>
+                  <Label htmlFor='title'>
+                    Workout Title <span className='text-red-500'>*</span>
+                  </Label>
+                  <Input
+                    id='title'
+                    {...register('title')}
+                    placeholder='e.g. Upper Body Strength Training'
+                    className={errors.title ? 'border-red-500' : ''}
+                  />
+                  {errors.title && (
+                    <p className='text-sm text-red-500'>
+                      {errors.title.message}
+                    </p>
+                  )}
                 </div>
-                <div className='flex items-center gap-2 text-sm'>
-                  <Badge variant='secondary'>
-                    {exercises.length} exercises
-                  </Badge>
-                  <Badge variant='secondary'>{totalSets} sets</Badge>
-                  <Badge variant='secondary'>{totalReps} reps</Badge>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-4'>
-              {/* Workout Title */}
-              <div className='space-y-2'>
-                <Label htmlFor='title'>
-                  Workout Title <span className='text-red-500'>*</span>
-                </Label>
-                <Input
-                  id='title'
-                  value={title}
-                  onChange={e => setTitle(e.target.value)}
-                  placeholder='e.g. Upper Body Strength Training'
-                />
-              </div>
 
-              {/* Workout Image */}
-              <div className='space-y-2'>
-                <Label htmlFor='image'>Workout Image (Optional)</Label>
-                {!imageUrl ? (
-                  <div className='border-2 border-dashed rounded-lg p-6 text-center hover:border-gray-400 transition-colors'>
-                    <input
-                      id='image'
-                      type='file'
-                      accept='image/*'
-                      onChange={handleImageChange}
-                      className='hidden'
-                    />
-                    <label
-                      htmlFor='image'
-                      className='cursor-pointer flex flex-col items-center space-y-2'
-                    >
-                      <Upload className='h-10 w-10 text-gray-400' />
-                      <span className='text-sm text-gray-600'>
-                        Click to upload workout image
-                      </span>
-                      <span className='text-xs text-gray-500'>
-                        PNG, JPG, WEBP (max 10MB)
-                      </span>
-                    </label>
+                {/* Status (isPublic) */}
+                <div className='space-y-2'>
+                  <div className='flex items-center justify-between'>
+                    <div className='space-y-0.5'>
+                      <Label htmlFor='isPublic'>
+                        Workout Status <span className='text-red-500'>*</span>
+                      </Label>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <Switch
+                        id='isPublic'
+                        checked={isPublic}
+                        onCheckedChange={checked =>
+                          setValue('isPublic', checked)
+                        }
+                      />
+                      <Badge
+                        variant={isPublic ? 'default' : 'secondary'}
+                        className={
+                          isPublic ? 'bg-green-100 text-green-800' : ''
+                        }
+                      >
+                        {isPublic ? 'Public' : 'Private'}
+                      </Badge>
+                    </div>
+                  </div>
+                  {errors.isPublic && (
+                    <p className='text-sm text-red-500'>
+                      {errors.isPublic.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Workout Image */}
+                <div className='space-y-2'>
+                  <Label htmlFor='image'>Workout Image (Optional)</Label>
+                  {!imageUrl ? (
+                    <div className='border-2 border-dashed rounded-lg p-6 text-center hover:border-gray-400 transition-colors'>
+                      <input
+                        id='image'
+                        type='file'
+                        accept='image/*'
+                        onChange={handleImageChange}
+                        className='hidden'
+                      />
+                      <label
+                        htmlFor='image'
+                        className='cursor-pointer flex flex-col items-center space-y-2'
+                      >
+                        <Upload className='h-10 w-10 text-gray-400' />
+                        <span className='text-sm text-gray-600'>
+                          Click to upload workout image
+                        </span>
+                        <span className='text-xs text-gray-500'>
+                          PNG, JPG, WEBP (max 10MB)
+                        </span>
+                      </label>
+                    </div>
+                  ) : (
+                    <div className='relative border rounded-lg p-4'>
+                      <button
+                        type='button'
+                        onClick={removeImage}
+                        className='absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600'
+                      >
+                        <X className='h-4 w-4' />
+                      </button>
+                      <img
+                        src={imageUrl}
+                        alt='Workout preview'
+                        className='w-full max-h-64 object-cover rounded'
+                      />
+                    </div>
+                  )}
+                  {errors.image && (
+                    <p className='text-sm text-red-500'>
+                      {errors.image.message}
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Exercises List Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  Exercises
+                  {exercises.length === 0 && (
+                    <span className='text-sm font-normal text-muted-foreground ml-2'>
+                      - Use the library on the right to add exercises
+                    </span>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {exercises.length === 0 ? (
+                  <div className='border-2 border-dashed rounded-lg p-10 text-center text-muted-foreground'>
+                    <p>No exercises added yet</p>
+                    <p className='text-sm mt-2'>
+                      Select exercises from the library to get started
+                    </p>
                   </div>
                 ) : (
-                  <div className='relative border rounded-lg p-4'>
-                    <button
-                      type='button'
-                      onClick={removeImage}
-                      className='absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600'
-                    >
-                      <X className='h-4 w-4' />
-                    </button>
-                    <img
-                      src={imageUrl}
-                      alt='Workout preview'
-                      className='w-full max-h-64 object-cover rounded'
-                    />
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Exercises List Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                Exercises
-                {exercises.length === 0 && (
-                  <span className='text-sm font-normal text-muted-foreground ml-2'>
-                    - Use the library on the right to add exercises
-                  </span>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {exercises.length === 0 ? (
-                <div className='border-2 border-dashed rounded-lg p-10 text-center text-muted-foreground'>
-                  <p>No exercises added yet</p>
-                  <p className='text-sm mt-2'>
-                    Select exercises from the library to get started
-                  </p>
-                </div>
-              ) : (
-                <div className='space-y-4'>
-                  {exercises.map((ex, exerciseIndex) => (
-                    <div
-                      key={`${ex.exercise._id}-${exerciseIndex}`}
-                      className='border rounded-lg p-4 space-y-3'
-                    >
-                      {/* Exercise Header */}
-                      <div className='flex items-start justify-between'>
-                        <div className='flex items-center gap-3'>
-                          <div className='relative h-16 w-16 overflow-hidden rounded-md border'>
-                            <img
-                              src={
-                                ex.exercise?.tutorial?.endsWith?.('.gif')
-                                  ? ex.exercise.tutorial.replace(
+                  <div className='space-y-4'>
+                    {exercises.map((ex, exerciseIndex) => (
+                      <div
+                        key={`${ex.exercise._id}-${exerciseIndex}`}
+                        className='border rounded-lg p-4 space-y-3'
+                      >
+                        {/* Exercise Header */}
+                        <div className='flex items-start justify-between'>
+                          <div className='flex items-center gap-3'>
+                            <div className='relative h-16 w-16 overflow-hidden rounded-md border'>
+                              <img
+                                src={
+                                  ex.exercise?.tutorial?.endsWith?.('.gif')
+                                    ? ex.exercise.tutorial.replace(
+                                        '/upload/',
+                                        '/upload/f_jpg/so_0/'
+                                      )
+                                    : ex.exercise?.tutorial
+                                }
+                                alt={ex.exercise?.title || 'Exercise'}
+                                className='h-full w-full object-cover'
+                                onMouseEnter={e => {
+                                  const t = ex.exercise?.tutorial;
+                                  if (t && t.endsWith('.gif'))
+                                    e.currentTarget.src = t;
+                                }}
+                                onMouseLeave={e => {
+                                  const t = ex.exercise?.tutorial;
+                                  if (t && t.endsWith('.gif'))
+                                    e.currentTarget.src = t.replace(
                                       '/upload/',
                                       '/upload/f_jpg/so_0/'
-                                    )
-                                  : ex.exercise?.tutorial
-                              }
-                              alt={ex.exercise?.title || 'Exercise'}
-                              className='h-full w-full object-cover'
-                              onMouseEnter={e => {
-                                const t = ex.exercise?.tutorial;
-                                if (t && t.endsWith('.gif'))
-                                  e.currentTarget.src = t;
-                              }}
-                              onMouseLeave={e => {
-                                const t = ex.exercise?.tutorial;
-                                if (t && t.endsWith('.gif'))
-                                  e.currentTarget.src = t.replace(
-                                    '/upload/',
-                                    '/upload/f_jpg/so_0/'
-                                  );
-                              }}
-                            />
+                                    );
+                                }}
+                              />
+                            </div>
+                            <div>
+                              <h4 className='font-semibold'>
+                                {ex.exercise?.title || 'Exercise'}
+                              </h4>
+                              <p className='text-sm text-muted-foreground'>
+                                {ex.sets.length} set(s) •{' '}
+                                {ex.sets.reduce(
+                                  (a, b) => a + (Number(b) || 0),
+                                  0
+                                )}{' '}
+                                reps total
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className='font-semibold'>
-                              {ex.exercise?.title || 'Exercise'}
-                            </h4>
-                            <p className='text-sm text-muted-foreground'>
-                              {ex.sets.length} set(s) •{' '}
-                              {ex.sets.reduce(
-                                (a, b) => a + (Number(b) || 0),
-                                0
-                              )}{' '}
-                              reps total
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          onClick={() => handleRemoveExercise(exerciseIndex)}
-                          className='text-red-500 hover:text-red-700 hover:bg-red-50'
-                        >
-                          <Trash2 className='h-4 w-4' />
-                        </Button>
-                      </div>
-
-                      {/* Sets Grid Header */}
-                      <div className='grid grid-cols-[60px_1fr_60px_60px_60px] gap-2 text-sm font-medium text-muted-foreground px-1'>
-                        <span className='text-center'>Set</span>
-                        <span>Reps</span>
-                        <span className='text-center'>-</span>
-                        <span className='text-center'>+</span>
-                        <span className='text-center'>Del</span>
-                      </div>
-
-                      {/* Sets Rows */}
-                      {ex.sets.map((set, setIndex) => (
-                        <div
-                          key={setIndex}
-                          className='grid grid-cols-[60px_1fr_60px_60px_60px] gap-2 items-center'
-                        >
-                          <Badge variant='outline' className='justify-center'>
-                            {setIndex + 1}
-                          </Badge>
-
-                          <Input
-                            type='number'
-                            min={1}
-                            value={set}
-                            onChange={e =>
-                              handleInputChange(
-                                exerciseIndex,
-                                setIndex,
-                                e.target.value
-                              )
-                            }
-                            className='text-center'
-                          />
-
                           <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={() =>
-                              handleInputChange(
-                                exerciseIndex,
-                                setIndex,
-                                Math.max(Number(set) - 1, 1)
-                              )
-                            }
-                          >
-                            <Minus className='h-4 w-4' />
-                          </Button>
-
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={() =>
-                              handleInputChange(
-                                exerciseIndex,
-                                setIndex,
-                                Number(set) + 1
-                              )
-                            }
-                          >
-                            <Plus className='h-4 w-4' />
-                          </Button>
-
-                          <Button
+                            type='button'
                             variant='ghost'
                             size='sm'
-                            onClick={() =>
-                              handleRemoveSet(exerciseIndex, setIndex)
-                            }
-                            disabled={ex.sets.length <= 1}
-                            className='text-red-500 hover:text-red-700 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                            onClick={() => handleRemoveExercise(exerciseIndex)}
+                            className='text-red-500 hover:text-red-700 hover:bg-red-50'
                           >
                             <Trash2 className='h-4 w-4' />
                           </Button>
                         </div>
-                      ))}
 
-                      {/* Add Set Button */}
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        onClick={() => handleAddSet(exerciseIndex)}
-                        className='w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50'
-                      >
-                        <Plus className='h-4 w-4 mr-2' />
-                        Add Set
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                        {/* Sets Grid */}
+                        <div className='grid grid-cols-[60px_1fr_60px_60px_60px] gap-2 text-sm font-medium text-muted-foreground px-1'>
+                          <span className='text-center'>Set</span>
+                          <span>Reps</span>
+                          <span className='text-center'>-</span>
+                          <span className='text-center'>+</span>
+                          <span className='text-center'>Del</span>
+                        </div>
 
-          {/* Action Buttons */}
-          <div className='flex gap-4'>
-            <Button variant='outline' onClick={handleGoBack} disabled={loading}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmitWorkout}
-              disabled={loading}
-              className='flex-1'
-            >
-              {loading ? 'Creating...' : 'Create Workout'}
-            </Button>
-          </div>
-        </div>
+                        {ex.sets.map((set, setIndex) => (
+                          <div
+                            key={setIndex}
+                            className='grid grid-cols-[60px_1fr_60px_60px_60px] gap-2 items-center'
+                          >
+                            <Badge variant='outline' className='justify-center'>
+                              {setIndex + 1}
+                            </Badge>
 
-        {/* Right Column - Exercise Library */}
-        <aside className='xl:sticky xl:top-6 h-fit'>
-          <Card className='max-h-[calc(100vh-8rem)]'>
-            <CardHeader>
-              <div className='space-y-4'>
-                <div className='flex items-center justify-between'>
-                  <CardTitle>Exercise Library</CardTitle>
-                  <p className='text-sm text-muted-foreground'>
-                    Page {currentPage} of {totalPages} • Total {totalExercises}
+                            <Input
+                              type='number'
+                              min={1}
+                              value={set}
+                              onChange={e =>
+                                handleInputChange(
+                                  exerciseIndex,
+                                  setIndex,
+                                  e.target.value
+                                )
+                              }
+                              className='text-center'
+                            />
+
+                            <Button
+                              type='button'
+                              variant='outline'
+                              size='sm'
+                              onClick={() =>
+                                handleInputChange(
+                                  exerciseIndex,
+                                  setIndex,
+                                  Math.max(Number(set) - 1, 1)
+                                )
+                              }
+                            >
+                              <Minus className='h-4 w-4' />
+                            </Button>
+
+                            <Button
+                              type='button'
+                              variant='outline'
+                              size='sm'
+                              onClick={() =>
+                                handleInputChange(
+                                  exerciseIndex,
+                                  setIndex,
+                                  Number(set) + 1
+                                )
+                              }
+                            >
+                              <Plus className='h-4 w-4' />
+                            </Button>
+
+                            <Button
+                              type='button'
+                              variant='ghost'
+                              size='sm'
+                              onClick={() =>
+                                handleRemoveSet(exerciseIndex, setIndex)
+                              }
+                              disabled={ex.sets.length <= 1}
+                              className='text-red-500 hover:text-red-700 hover:bg-red-50 disabled:opacity-50'
+                            >
+                              <Trash2 className='h-4 w-4' />
+                            </Button>
+                          </div>
+                        ))}
+
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='sm'
+                          onClick={() => handleAddSet(exerciseIndex)}
+                          className='w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50'
+                        >
+                          <Plus className='h-4 w-4 mr-2' />
+                          Add Set
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {errors.exercises && (
+                  <p className='text-sm text-red-500 mt-2'>
+                    {errors.exercises.message}
                   </p>
-                </div>
+                )}
+              </CardContent>
+            </Card>
 
-                {/* Search */}
-                <div className='relative'>
-                  <Input
-                    type='text'
-                    placeholder='Search exercise name...'
-                    value={searchText}
-                    onChange={handleSearchChange}
-                    onKeyDown={handleSearchKeyPress}
-                    className='pr-8'
-                  />
-                  {searchText && (
-                    <button
-                      onClick={handleClearSearch}
-                      className='absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600'
-                      title='Clear'
-                    >
-                      <X className='h-4 w-4' />
-                    </button>
-                  )}
-                </div>
+            {/* Action Buttons */}
+            <div className='flex gap-4'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleGoBack}
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' disabled={loading} className='flex-1'>
+                {loading ? 'Creating...' : 'Create Workout'}
+              </Button>
+            </div>
+          </div>
 
-                {query && (
-                  <div className='flex items-center gap-2'>
+          {/* Right Column - Exercise Library */}
+          <aside className='xl:sticky xl:top-6 h-fit'>
+            <Card className='max-h-[calc(100vh-8rem)]'>
+              <CardHeader>
+                <div className='space-y-4'>
+                  <div className='flex items-center justify-between'>
+                    <CardTitle>Exercise Library</CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Page {currentPage} of {totalPages} • Total{' '}
+                      {totalExercises}
+                    </p>
+                  </div>
+
+                  <div className='relative'>
+                    <Input
+                      type='text'
+                      placeholder='Search exercise name...'
+                      value={searchText}
+                      onChange={handleSearchChange}
+                      className='pr-8'
+                    />
+                    {searchText && (
+                      <button
+                        type='button'
+                        onClick={handleClearSearch}
+                        className='absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600'
+                      >
+                        <X className='h-4 w-4' />
+                      </button>
+                    )}
+                  </div>
+
+                  {query && (
                     <Badge variant='secondary' className='text-xs'>
                       Searching: "{query}"
                     </Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className='h-[calc(100vh-22rem)] overflow-y-auto space-y-4'>
+                {loadingExercises ? (
+                  <div className='text-center py-8 text-muted-foreground'>
+                    Loading exercises...
                   </div>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className='h-[calc(100vh-22rem)] overflow-y-auto space-y-4'>
-              {/* Exercise List */}
-              {loadingExercises ? (
-                <div className='text-center py-8 text-muted-foreground'>
-                  Loading exercises...
-                </div>
-              ) : allExercises.length === 0 ? (
-                <div className='text-center py-8 text-muted-foreground'>
-                  No exercises found
-                </div>
-              ) : (
-                <div className='space-y-3'>
-                  {allExercises.map(exercise => (
-                    <div
-                      key={exercise._id}
-                      className='flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer'
-                      onClick={() => handleAddExercise(exercise)}
-                    >
-                      {/* Exercise Image */}
-                      <div className='relative h-16 w-16 overflow-hidden rounded-md border flex-shrink-0'>
-                        <img
-                          src={
-                            exercise.tutorial?.endsWith?.('.gif')
-                              ? exercise.tutorial.replace(
+                ) : allExercises.length === 0 ? (
+                  <div className='text-center py-8 text-muted-foreground'>
+                    No exercises found
+                  </div>
+                ) : (
+                  <div className='space-y-3'>
+                    {allExercises.map(exercise => (
+                      <div
+                        key={exercise._id}
+                        className='flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer'
+                        onClick={() => handleAddExercise(exercise)}
+                      >
+                        <div className='relative h-16 w-16 overflow-hidden rounded-md border flex-shrink-0'>
+                          <img
+                            src={
+                              exercise.tutorial?.endsWith?.('.gif')
+                                ? exercise.tutorial.replace(
+                                    '/upload/',
+                                    '/upload/f_jpg/so_0/'
+                                  )
+                                : exercise.tutorial
+                            }
+                            alt={exercise.title}
+                            className='h-full w-full object-cover'
+                            onMouseEnter={e => {
+                              if (exercise.tutorial?.endsWith('.gif')) {
+                                e.currentTarget.src = exercise.tutorial;
+                              }
+                            }}
+                            onMouseLeave={e => {
+                              if (exercise.tutorial?.endsWith('.gif')) {
+                                e.currentTarget.src = exercise.tutorial.replace(
                                   '/upload/',
                                   '/upload/f_jpg/so_0/'
-                                )
-                              : exercise.tutorial
-                          }
-                          alt={exercise.title}
-                          className='h-full w-full object-cover'
-                          onMouseEnter={e => {
-                            if (exercise.tutorial?.endsWith('.gif')) {
-                              e.currentTarget.src = exercise.tutorial;
-                            }
-                          }}
-                          onMouseLeave={e => {
-                            if (exercise.tutorial?.endsWith('.gif')) {
-                              e.currentTarget.src = exercise.tutorial.replace(
-                                '/upload/',
-                                '/upload/f_jpg/so_0/'
-                              );
-                            }
-                          }}
-                        />
-                      </div>
-
-                      {/* Exercise Info */}
-                      <div className='flex-1 min-w-0'>
-                        <h4 className='font-semibold text-sm truncate'>
-                          {exercise.title}
-                        </h4>
-                        <div className='flex items-center gap-2 mt-1'>
-                          <Badge variant='secondary' className='text-xs'>
-                            {exercise.level}
-                          </Badge>
-                          <Badge variant='outline' className='text-xs'>
-                            {exercise.type}
-                          </Badge>
+                                );
+                              }
+                            }}
+                          />
                         </div>
-                      </div>
 
-                      {/* Add Button */}
-                      <Button
-                        size='sm'
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleAddExercise(exercise);
-                        }}
-                        className='flex-shrink-0'
-                      >
-                        <Plus className='h-4 w-4' />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
+                        <div className='flex-1 min-w-0'>
+                          <h4 className='font-semibold text-sm truncate'>
+                            {exercise.title}
+                          </h4>
+                          <div className='flex items-center gap-2 mt-1'>
+                            <Badge variant='secondary' className='text-xs'>
+                              {exercise.level}
+                            </Badge>
+                            <Badge variant='outline' className='text-xs'>
+                              {exercise.type}
+                            </Badge>
+                          </div>
+                        </div>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className='flex items-center justify-center gap-2 pt-4 border-t'>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1 || loadingExercises}
-                  >
-                    Previous
-                  </Button>
-
-                  <div className='flex items-center gap-1'>
-                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                      let page;
-                      if (totalPages <= 5) {
-                        page = i + 1;
-                      } else if (currentPage <= 3) {
-                        page = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        page = totalPages - 4 + i;
-                      } else {
-                        page = currentPage - 2 + i;
-                      }
-
-                      return (
                         <Button
-                          key={page}
-                          variant={currentPage === page ? 'default' : 'outline'}
+                          type='button'
                           size='sm'
-                          onClick={() => handlePageChange(page)}
-                          disabled={loadingExercises}
-                          className='w-8 h-8 p-0'
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleAddExercise(exercise);
+                          }}
+                          className='flex-shrink-0'
                         >
-                          {page}
+                          <Plus className='h-4 w-4' />
                         </Button>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
+                )}
 
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages || loadingExercises}
-                  >
-                    Next
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </aside>
-      </div>
+                {totalPages > 1 && (
+                  <div className='flex items-center justify-center gap-2 pt-4 border-t'>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1 || loadingExercises}
+                    >
+                      Previous
+                    </Button>
+
+                    <div className='flex items-center gap-1'>
+                      {Array.from(
+                        { length: Math.min(totalPages, 5) },
+                        (_, i) => {
+                          let page;
+                          if (totalPages <= 5) {
+                            page = i + 1;
+                          } else if (currentPage <= 3) {
+                            page = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            page = totalPages - 4 + i;
+                          } else {
+                            page = currentPage - 2 + i;
+                          }
+
+                          return (
+                            <Button
+                              key={page}
+                              type='button'
+                              variant={
+                                currentPage === page ? 'default' : 'outline'
+                              }
+                              size='sm'
+                              onClick={() => handlePageChange(page)}
+                              disabled={loadingExercises}
+                              className='w-8 h-8 p-0'
+                            >
+                              {page}
+                            </Button>
+                          );
+                        }
+                      )}
+                    </div>
+
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages || loadingExercises}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </aside>
+        </div>
+      </form>
     </div>
   );
 };
