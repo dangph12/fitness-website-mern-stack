@@ -47,7 +47,10 @@ const AdminLayout = () => {
       'update-workout': 'Update Workout',
       'manage-plans': 'Plans Management',
       'create-plan': 'Create Plan',
-      'update-plan': 'Update Plan'
+      'update-plan': 'Update Plan',
+      'manage-meals': 'Meals Management',
+      'create-meal': 'Create Meal',
+      'update-meal': 'Update Meal'
     };
 
     const items = [];
