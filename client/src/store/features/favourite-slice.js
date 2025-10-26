@@ -1,15 +1,14 @@
-// src/store/features/favorite-slice.js
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import axiosInstance from '~/lib/axios-instance';
 
-// GET /api/favorites/:userId
+// GET /api/favorites/user/:userId
 export const fetchFavorites = createAsyncThunk(
   'favorites/fetchFavorites',
   async (userId, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get(`/api/favorites/${userId}`);
-      return res.data.data;
+      const res = await axiosInstance.get(`/api/favorites/user/${userId}`);
+      return res.data?.data ?? { favorites: [] };
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || 'Failed to fetch favorites'
@@ -18,50 +17,49 @@ export const fetchFavorites = createAsyncThunk(
   }
 );
 
-// POST /api/favorites/:userId/items  body: { workouts: [id] }
+// POST /api/favorites  body: { user, workout }
 export const addFavoriteItems = createAsyncThunk(
   'favorites/addFavoriteItems',
   async ({ userId, workouts }, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.post(`/api/favorites/${userId}/items`, {
-        workouts
+      const res = await axiosInstance.post(`/api/favorites`, {
+        user: userId,
+        workout: workouts
       });
-      return res.data.data;
+      return res.data?.data ?? null;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || 'Failed to add favorite items'
+        err.response?.data?.message || 'Failed to add favorite item'
       );
     }
   }
 );
 
-// DELETE /api/favorites/:userId/items  body: { workouts: [id] }
+// DELETE /api/favorites/:favoriteId
 export const removeFavoriteItems = createAsyncThunk(
   'favorites/removeFavoriteItems',
-  async ({ userId, workouts }, { rejectWithValue }) => {
+  async ({ favoriteId }, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.delete(`/api/favorites/${userId}/items`, {
-        data: { workouts }
-      });
-      return res.data.data;
+      await axiosInstance.delete(`/api/favorites/${favoriteId}`);
+      return { favoriteId };
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || 'Failed to remove favorite items'
+        err.response?.data?.message || 'Failed to remove favorite item'
       );
     }
   }
 );
 
-const favoriteSlice = createSlice({
+const favouriteSlice = createSlice({
   name: 'favorites',
   initialState: {
-    favorite: { user: null, workouts: [] },
+    favorite: { favorites: [] },
     loading: false,
     error: null
   },
   reducers: {
     clearFavorite: state => {
-      state.favorite = { user: null, workouts: [] };
+      state.favorite = { favorites: [] };
       state.error = null;
       state.loading = false;
     }
@@ -75,7 +73,7 @@ const favoriteSlice = createSlice({
       })
       .addCase(fetchFavorites.fulfilled, (state, action) => {
         state.loading = false;
-        state.favorite = action.payload || { user: null, workouts: [] };
+        state.favorite = action.payload || { favorites: [] };
       })
       .addCase(fetchFavorites.rejected, (state, action) => {
         state.loading = false;
@@ -87,9 +85,8 @@ const favoriteSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(addFavoriteItems.fulfilled, (state, action) => {
+      .addCase(addFavoriteItems.fulfilled, state => {
         state.loading = false;
-        state.favorite = action.payload || state.favorite;
       })
       .addCase(addFavoriteItems.rejected, (state, action) => {
         state.loading = false;
@@ -103,7 +100,15 @@ const favoriteSlice = createSlice({
       })
       .addCase(removeFavoriteItems.fulfilled, (state, action) => {
         state.loading = false;
-        state.favorite = action.payload || state.favorite;
+        const id = action.payload?.favoriteId;
+        if (id) {
+          state.favorite = {
+            ...state.favorite,
+            favorites: (state.favorite?.favorites || []).filter(
+              f => f._id !== id
+            )
+          };
+        }
       })
       .addCase(removeFavoriteItems.rejected, (state, action) => {
         state.loading = false;
@@ -112,5 +117,5 @@ const favoriteSlice = createSlice({
   }
 });
 
-export const { clearFavorite } = favoriteSlice.actions;
-export default favoriteSlice.reducer;
+export const { clearFavorite } = favouriteSlice.actions;
+export default favouriteSlice.reducer;
