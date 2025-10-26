@@ -53,49 +53,69 @@ export function AdminSidebar({ ...props }) {
   }, [authUser?.id, authLoading, userProfile, dispatch]);
 
   // Routes thực tế từ router.jsx
-  const navMain = [
+  const navSections = [
     {
-      title: 'General',
+      title: 'Overview',
       items: [
         {
           title: 'Dashboard',
           url: '/admin',
           icon: Home
-        },
+        }
+      ]
+    },
+    {
+      title: 'User Management',
+      items: [
         {
-          title: 'Users Management',
+          title: 'Users',
           url: '/admin/manage-users',
           icon: Users
-        },
+        }
+      ]
+    },
+    {
+      title: 'Activity & Fitness',
+      items: [
         {
-          title: 'Exercises Management',
+          title: 'Exercises',
           url: '/admin/manage-exercises',
           icon: Activity
         },
         {
-          title: 'Foods Management',
-          url: '/admin/manage-foods',
-          icon: Ham
-        },
-        {
-          title: 'Muscles Management',
+          title: 'Muscles',
           url: '/admin/manage-muscles',
           icon: BicepsFlexed
         },
         {
-          title: 'Equipments Management',
+          title: 'Equipments',
           url: '/admin/manage-equipments',
           icon: Dumbbell
         },
         {
-          title: 'Workouts Management',
+          title: 'Workouts',
           url: '/admin/manage-workouts',
           icon: HeartPulse
         },
         {
-          title: 'Plans Management',
+          title: 'Plans',
           url: '/admin/manage-plans',
           icon: CalendarCheck2
+        }
+      ]
+    },
+    {
+      title: 'Meal Management',
+      items: [
+        {
+          title: 'Foods',
+          url: '/admin/manage-foods',
+          icon: Ham
+        },
+        {
+          title: 'Meals',
+          url: '/admin/manage-meals',
+          icon: Utensils
         }
       ]
     }
@@ -153,7 +173,7 @@ export function AdminSidebar({ ...props }) {
       </SidebarHeader>
 
       <SidebarContent className='transition-all duration-300 ease-in-out'>
-        {navMain.map(group => (
+        {navSections.map(group => (
           <SidebarGroup
             key={group.title}
             className='transition-all duration-300 ease-in-out'
