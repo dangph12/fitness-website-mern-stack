@@ -56,12 +56,10 @@ export const WorkoutsProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // Dialogs state
-  const [actionDialogOpen, setActionDialogOpen] = useState(false);
+  // Dialogs state - removed actionDialogOpen and dialogMode
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [currentWorkout, setCurrentWorkout] = useState(null);
-  const [dialogMode, setDialogMode] = useState('create');
   const [deleteMode, setDeleteMode] = useState({
     isBulk: false,
     workoutIds: [],
@@ -152,13 +150,7 @@ export const WorkoutsProvider = ({ children }) => {
     setCurrentPage(1);
   };
 
-  // Dialog handlers
-
-  const openEditDialog = workout => {
-    setCurrentWorkout(workout);
-    setDialogMode('edit');
-    setActionDialogOpen(true);
-  };
+  // Dialog handlers - removed openEditDialog
 
   const openDeleteDialog = workout => {
     setDeleteMode({
@@ -192,7 +184,6 @@ export const WorkoutsProvider = ({ children }) => {
   };
 
   const closeAllDialogs = () => {
-    setActionDialogOpen(false);
     setDeleteDialogOpen(false);
     setDetailsDialogOpen(false);
     setCurrentWorkout(null);
@@ -205,13 +196,13 @@ export const WorkoutsProvider = ({ children }) => {
   };
 
   const value = {
-    workouts: filteredWorkouts, // Use filtered workouts
+    workouts: filteredWorkouts,
     loading,
     pagination: {
       currentPage,
       pageSize,
       totalPages,
-      totalWorkouts: filteredWorkouts.length // Update count
+      totalWorkouts: filteredWorkouts.length
     },
     selectedWorkouts,
     setSelectedWorkouts,
@@ -222,14 +213,11 @@ export const WorkoutsProvider = ({ children }) => {
     onPendingFiltersChange: handlePendingFiltersChange,
     applyFilters,
     clearFilters,
-    // Dialogs
-    actionDialogOpen,
+    // Dialogs - removed actionDialogOpen and dialogMode
     deleteDialogOpen,
     detailsDialogOpen,
     currentWorkout,
-    dialogMode,
     deleteMode,
-    openEditDialog,
     openDeleteDialog,
     openBulkDeleteDialog,
     openDetailsDialog,
