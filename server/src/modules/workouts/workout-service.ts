@@ -21,8 +21,12 @@ const WorkoutService = {
     for (const [key, value] of Object.entries(filterParams)) {
       if (value !== undefined && value !== '') {
         // handling for boolean field
-        if (key === 'isPublic') {
-          filterRecord[key] = value === 'true' ? true : false;
+        if (
+          typeof value === 'boolean' ||
+          value === 'true' ||
+          value === 'false'
+        ) {
+          filterRecord[key] = value === true || value === 'true';
         } else {
           // options for case-insensitive search cho string
           filterRecord[key] = { $regex: value, $options: 'i' };
@@ -89,8 +93,18 @@ const WorkoutService = {
     const filterRecord: Record<string, any> = { user: userId };
 
     for (const [key, value] of Object.entries(filterParams)) {
-      if (value && value !== '') {
-        filterRecord[key] = { $regex: value, $options: 'i' };
+      if (value !== undefined && value !== '') {
+        // handling for boolean field
+        if (
+          typeof value === 'boolean' ||
+          value === 'true' ||
+          value === 'false'
+        ) {
+          filterRecord[key] = value === true || value === 'true';
+        } else {
+          // options for case-insensitive search cho string
+          filterRecord[key] = { $regex: value, $options: 'i' };
+        }
       }
     }
 
