@@ -11,8 +11,7 @@ import {
   FiTrendingUp
 } from 'react-icons/fi';
 import { IoMaleFemale, IoManSharp, IoWomanSharp } from 'react-icons/io5';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
+import { useDispatch } from 'react-redux';
 import { toast } from 'sonner';
 
 import { Button } from '~/components/ui/button';
@@ -39,12 +38,10 @@ import { calculateBMI, getBMIClassification, getBMIPosition } from '~/lib/bmi';
 import { onboardingSchema } from '~/lib/validations/onboarding';
 import { loadUser } from '~/store/features/auth-slice';
 
-const Onboarding = () => {
+const OnboardingComponent = ({ onSkip }) => {
   const [step, setStep] = useState(1);
   const [bmi, setBmi] = useState(0);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector(state => state.auth);
 
   const form = useForm({
     resolver: yupResolver(onboardingSchema),
@@ -92,13 +89,11 @@ const Onboarding = () => {
       });
 
       const { accessToken } = response.data.data;
-
       const { message } = response.data;
 
       dispatch(loadUser({ accessToken }));
 
       toast.success(message || 'Onboarding completed successfully!');
-      navigate('/');
     } catch (error) {
       console.error('Onboarding error:', error);
       if (error.response?.data?.message) {
@@ -107,10 +102,6 @@ const Onboarding = () => {
         toast.error('Failed to complete onboarding. Please try again.');
       }
     }
-  };
-
-  const handleSkip = () => {
-    navigate('/');
   };
 
   const handleNext = async () => {
@@ -205,24 +196,29 @@ const Onboarding = () => {
   ];
 
   return (
-    <div className='flex min-h-screen items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100'>
+    <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4'>
       <Card className='w-full max-w-2xl'>
         <CardHeader>
-          <div className='flex justify-between items-center mb-4'>
-            <div className='flex-1'>
-              <Progress value={progressPercentage} className='h-2' />
-              <p className='text-sm text-muted-foreground mt-2'>
-                Step {step} of 4
-              </p>
+          <div className='mb-4'>
+            <div className='flex items-center justify-between mb-2'>
+              <div className='flex-1'>
+                <Progress value={progressPercentage} className='h-2' />
+              </div>
+              {onSkip && (
+                <Button
+                  type='button'
+                  variant='ghost'
+                  onClick={onSkip}
+                  className='ml-4'
+                  size='sm'
+                >
+                  Skip
+                </Button>
+              )}
             </div>
-            <Button
-              type='button'
-              variant='ghost'
-              onClick={handleSkip}
-              className='ml-4'
-            >
-              Skip
-            </Button>
+            <p className='text-sm text-muted-foreground mt-2'>
+              Step {step} of 4
+            </p>
           </div>
           <CardTitle className='text-2xl'>
             {step === 1 && "Let's get to know you"}
@@ -320,7 +316,6 @@ const Onboarding = () => {
                           <DateOfBirthPicker
                             value={field.value ? new Date(field.value) : null}
                             onChange={date => {
-                              // Format date as YYYY-MM-DD for form (timezone-safe)
                               if (date) {
                                 const pad = n => n.toString().padStart(2, '0');
                                 const formattedDate = [
@@ -690,4 +685,4 @@ const Onboarding = () => {
   );
 };
 
-export default Onboarding;
+export default OnboardingComponent;

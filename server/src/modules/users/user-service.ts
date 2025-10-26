@@ -270,7 +270,7 @@ const UserService = {
 
     user.dob = onboardingData.dob;
     user.gender = onboardingData.gender;
-    // user.profileCompleted = true;
+    user.profileCompleted = true;
     await user.save();
 
     const bodyRecord = await BodyRecordModel.create({
