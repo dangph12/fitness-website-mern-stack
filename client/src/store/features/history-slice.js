@@ -7,7 +7,7 @@ export const fetchHistoryByUser = createAsyncThunk(
   'history/fetchHistoryByUser',
   async userId => {
     const response = await axiosInstance.get(`/api/histories/user/${userId}`);
-    return response.data.data;
+    return response.data.data.histories;
   }
 );
 

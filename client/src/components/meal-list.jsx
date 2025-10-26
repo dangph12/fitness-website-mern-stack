@@ -31,14 +31,18 @@ const MealsList = () => {
     foods?.reduce(
       (acc, item) => {
         const cal = Number(item?.food?.calories) || 0;
-        const fat = Number(item?.food?.fat) || 0; // dùng 'fat'
+        const fat = Number(item?.food?.fat) || 0;
+        const carb = Number(item?.food?.carbohydrate) || 0;
+        const prot = Number(item?.food?.protein) || 0;
         const qty = Number(item?.quantity) || 0;
         acc.calories += cal * qty;
         acc.fat += fat * qty;
+        acc.carbohydrates += carb * qty;
+        acc.protein += prot * qty;
         return acc;
       },
-      { calories: 0, fat: 0 }
-    ) ?? { calories: 0, fat: 0 };
+      { calories: 0, fat: 0, carbohydrates: 0, protein: 0 }
+    ) ?? { calories: 0, fat: 0, carbohydrates: 0, protein: 0 };
 
   const cardTotals = foods => getTotals(foods);
   const liveTotals = useMemo(
@@ -48,7 +52,7 @@ const MealsList = () => {
 
   const handleDeleteMeal = mealId => {
     if (!userId) {
-      toast.error('Bạn chưa đăng nhập, không thể xóa meal!');
+      toast.error('You are not logged in, cannot delete meal!');
       navigate('/auth/login');
       return;
     }
@@ -73,11 +77,11 @@ const MealsList = () => {
             </svg>
           </div>
           <h3 className='text-2xl font-bold text-slate-900'>
-            Bạn chưa đăng nhập
+            You are not logged in
           </h3>
           <p className='mt-2 text-slate-600'>
-            Vui lòng đăng nhập để xem và quản lý{' '}
-            <span className='font-semibold'>Meals</span> của bạn.
+            Please log in to view and manage your{' '}
+            <span className='font-semibold'>Meals</span>.
           </p>
 
           <div className='mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row'>
@@ -85,23 +89,23 @@ const MealsList = () => {
               onClick={() => navigate('/auth/login')}
               className='inline-flex items-center justify-center rounded-xl bg-[#3067B6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#275397]'
             >
-              Đăng nhập để xem Meals
+              Log in to view Meals
             </button>
             <button
               onClick={() => navigate('/')}
               className='inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50'
             >
-              Quay về trang chủ
+              Back to home page
             </button>
           </div>
 
           <p className='mt-4 text-sm text-slate-500'>
-            Chưa có tài khoản?{' '}
+            Don't have an account?{' '}
             <button
               onClick={() => navigate('/auth/sign-up')}
               className='font-semibold text-[#3067B6] hover:underline'
             >
-              Đăng ký ngay
+              Sign up now
             </button>
           </p>
         </div>
@@ -138,7 +142,7 @@ const MealsList = () => {
       <div className='max-w-7xl mx-auto p-6'>
         <h1 className='text-3xl font-semibold mb-4'>Meals List</h1>
         <div className='rounded-xl border border-dashed border-slate-300 p-10 text-center text-slate-600'>
-          Chưa có meal nào. Hãy tạo meal đầu tiên của bạn!
+          No meals found. Create your first meal!
         </div>
       </div>
     );
@@ -149,7 +153,7 @@ const MealsList = () => {
       <div className='mb-8 flex items-end justify-between flex-wrap gap-3'>
         <h1 className='text-3xl font-semibold'>Meals List</h1>
         <div className='text-sm text-slate-500'>
-          Tổng số meals: <span className='font-medium'>{meals.length}</span>
+          Total meals: <span className='font-medium'>{meals.length}</span>
         </div>
       </div>
 
@@ -165,7 +169,7 @@ const MealsList = () => {
                 type='button'
                 className='block w-full'
                 onClick={() => handleSelectMeal(meal)}
-                title='Xem chi tiết'
+                title='View details'
               >
                 <img
                   src={meal.image}
@@ -210,6 +214,32 @@ const MealsList = () => {
                       </span>
                     </div>
                   </div>
+
+                  <div className='rounded-lg border border-teal-200 bg-teal-50 p-3'>
+                    <div className='flex items-center gap-2 text-sm font-semibold text-teal-800'>
+                      <FaLeaf className='text-teal-600 text-lg' />
+                      <span>
+                        Carbohydrates:{' '}
+                        <span className='text-teal-600'>
+                          {fmt1(totals.carbohydrates)}
+                        </span>{' '}
+                        g
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-3'>
+                    <div className='flex items-center gap-2 text-sm font-semibold text-yellow-800'>
+                      <FaLeaf className='text-yellow-600 text-lg' />
+                      <span>
+                        Protein:{' '}
+                        <span className='text-yellow-600'>
+                          {fmt1(totals.protein)}
+                        </span>{' '}
+                        g
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className='mt-4 grid grid-cols-2 gap-3'>
@@ -249,11 +279,7 @@ const MealsList = () => {
                   <img
                     src={selectedMeal.image}
                     alt={selectedMeal.title}
-                    className='w-full h-56 object-cover rounded-xl border border-slate-200'
-                    onError={e => {
-                      e.currentTarget.src =
-                        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop';
-                    }}
+                    className='w-full h-94 object-cover rounded-xl border border-slate-200'
                   />
                 </div>
 
@@ -278,6 +304,18 @@ const MealsList = () => {
                         {fmt1(liveTotals.fat)} g
                       </p>
                     </div>
+                    <div className='rounded-xl bg-gradient-to-br from-teal-400 to-teal-500 text-white p-4 shadow'>
+                      <p className='text-sm opacity-90'>Total Carbohydrates</p>
+                      <p className='text-2xl font-bold'>
+                        {fmt1(liveTotals.carbohydrates)} g
+                      </p>
+                    </div>
+                    <div className='rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-500 text-white p-4 shadow'>
+                      <p className='text-sm opacity-90'>Total Protein</p>
+                      <p className='text-2xl font-bold'>
+                        {fmt1(liveTotals.protein)} g
+                      </p>
+                    </div>
                   </div>
 
                   <div className='mt-4'>
@@ -298,6 +336,8 @@ const MealsList = () => {
                     const qty = Number(item.quantity) || 0;
                     const cal = Number(f.calories) || 0;
                     const fat = Number(f.fat) || 0;
+                    const carb = Number(f.carbohydrate) || 0;
+                    const prot = Number(f.protein) || 0;
 
                     return (
                       <li
@@ -308,7 +348,7 @@ const MealsList = () => {
                           type='button'
                           onClick={() => handleSelectFood(f._id)}
                           className='relative size-16 overflow-hidden rounded-full ring-1 ring-slate-200 shrink-0'
-                          title='Xem chi tiết thực phẩm'
+                          title='View food details'
                         >
                           <img
                             src={f.image}
@@ -326,7 +366,8 @@ const MealsList = () => {
                             {f.category?.toLowerCase() === 'meat'
                               ? 'g'
                               : 'unit'}{' '}
-                            • {fmt1(cal)} kcal • {fmt1(fat)} g fat
+                            • {fmt1(cal)} kcal • {fmt1(fat)} g fat •{' '}
+                            {fmt1(carb)} g carbs • {fmt1(prot)} g protein
                           </p>
                           <div className='mt-2'>
                             <span className='inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-200'>
@@ -363,10 +404,19 @@ const MealsList = () => {
                       {fmt1(liveTotals.fat)} g
                     </p>
                   </div>
+                  <div className='text-slate-800'>
+                    <p className='text-sm'>Total Carbohydrates</p>
+                    <p className='text-2xl font-bold'>
+                      {fmt1(liveTotals.carbohydrates)} g
+                    </p>
+                  </div>
+                  <div className='text-slate-800'>
+                    <p className='text-sm'>Total Protein</p>
+                    <p className='text-2xl font-bold'>
+                      {fmt1(liveTotals.protein)} g
+                    </p>
+                  </div>
                 </div>
-                <p className='mt-2 text-xs text-slate-500'>
-                  *Số lượng chỉ để xem, không thể thay đổi tại đây.
-                </p>
               </div>
             </div>
           </div>

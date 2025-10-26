@@ -40,6 +40,8 @@ const FoodList = ({ selectedFoods, setSelectedFoods }) => {
       image: food.image,
       calories: Number(food.calories) || 0,
       fat: Number(food.fat) || 0,
+      carbohydrates: Number(food.carbohydrate) || 0,
+      protein: Number(food.protein) || 0,
       quantity: Number(quantity) || 1
     };
 

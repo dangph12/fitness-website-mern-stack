@@ -35,11 +35,15 @@ const CreateMeal = () => {
     return selectedFoods.reduce(
       (acc, item) => {
         const qty = Math.max(0, Number(item.quantity) || 0);
+
         acc.calories += (Number(item.calories) || 0) * qty;
         acc.fat += (Number(item.fat) || 0) * qty;
+        acc.carbohydrates += (Number(item.carbohydrate) || 0) * qty;
+        acc.protein += (Number(item.protein) || 0) * qty;
+
         return acc;
       },
-      { calories: 0, fat: 0 }
+      { calories: 0, fat: 0, carbohydrates: 0, protein: 0 }
     );
   }, [selectedFoods]);
 
@@ -213,6 +217,40 @@ const CreateMeal = () => {
                 </div>
               </div>
             </div>
+
+            <div className='rounded-xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-4'>
+              <div className='flex items-center gap-3'>
+                <div className='grid place-items-center rounded-lg bg-teal-100 h-10 w-10'>
+                  <FaDrumstickBite className='text-teal-600' />
+                </div>
+                <div>
+                  <p className='text-xs font-medium text-teal-800/80'>
+                    Total Carbohydrates
+                  </p>
+                  <p className='text-2xl font-bold text-teal-700'>
+                    {fmt1(totals.carbohydrates)}{' '}
+                    <span className='text-sm font-medium'>g</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className='rounded-xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-white p-4'>
+              <div className='flex items-center gap-3'>
+                <div className='grid place-items-center rounded-lg bg-yellow-100 h-10 w-10'>
+                  <FaDrumstickBite className='text-yellow-600' />
+                </div>
+                <div>
+                  <p className='text-xs font-medium text-yellow-800/80'>
+                    Total Protein
+                  </p>
+                  <p className='text-2xl font-bold text-yellow-700'>
+                    {fmt1(totals.protein)}{' '}
+                    <span className='text-sm font-medium'>g</span>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -229,7 +267,8 @@ const CreateMeal = () => {
         />
 
         <p className='mt-3 text-xs text-center text-slate-500'>
-          *Tổng calories & fat thay đổi theo <b>quantity</b> của từng thực phẩm.
+          *Total calories, fat, carbohydrates, and protein change based on the{' '}
+          <b>quantity</b> of each food.
         </p>
       </div>
 
