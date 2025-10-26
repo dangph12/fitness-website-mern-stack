@@ -14,8 +14,21 @@ const HistoryController = {
   },
 
   listByUser: async (req: Request, res: Response) => {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      ...filterParams
+    } = req.query;
     const userId = req.params.userId;
-    const history = await HistoryService.listByUser(userId);
+    const history = await HistoryService.listByUser(userId, {
+      page: Number(page),
+      limit: Number(limit),
+      filterParams: filterParams,
+      sortBy: sortBy as string,
+      sortOrder: sortOrder as string
+    });
     return res
       .status(200)
       .json(ApiResponse.success('History retrieved successfully', history));

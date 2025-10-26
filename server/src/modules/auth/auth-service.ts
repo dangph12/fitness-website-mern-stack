@@ -51,7 +51,7 @@ const AuthService = {
     password: string,
     avatarFile?: Express.Multer.File
   ) => {
-    const user = await UserService.create(userData, avatarFile);
+    const user = await UserService.createFromSignUp(userData, avatarFile);
 
     const hashedPassword = await hashPassword(password);
 

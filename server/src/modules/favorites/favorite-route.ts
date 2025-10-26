@@ -9,17 +9,13 @@ import FavoriteValidationSchema from './favorite-validation';
 const router: Router = express.Router();
 
 router.post(
-  '/:userId/items',
+  '/',
   validate(FavoriteValidationSchema.shape),
   asyncHandler(FavoriteController.addFavoriteItem)
 );
 
-router.get('/:userId', asyncHandler(FavoriteController.listByUser));
+router.get('/user/:userId', asyncHandler(FavoriteController.listByUser));
 
-router.delete(
-  '/:userId/items',
-  validate(FavoriteValidationSchema.shape),
-  asyncHandler(FavoriteController.removeFavoriteItem)
-);
+router.delete('/:favoriteId', asyncHandler(FavoriteController.remove));
 
 export default router;
