@@ -13,49 +13,49 @@ const CATEGORIES = [
     name: 'Beginner',
     icon: <FaDumbbell />,
     gradient: 'from-emerald-400 to-emerald-600',
-    hint: 'Lộ trình nhập môn 4–8 tuần'
+    hint: '4–8 week foundational training roadmap'
   },
   {
     name: 'Home',
     icon: <FaHome />,
     gradient: 'from-sky-400 to-sky-600',
-    hint: 'Tập tại nhà, tối thiểu dụng cụ'
+    hint: 'Train at home with minimal equipment'
   },
   {
     name: 'Gym',
     icon: <FaDumbbell />,
     gradient: 'from-rose-400 to-rose-600',
-    hint: 'Máy móc đầy đủ tại phòng gym'
+    hint: 'Full equipment & machine-based workouts'
   },
   {
     name: 'Men',
     icon: <FaMale />,
     gradient: 'from-indigo-400 to-indigo-600',
-    hint: 'Tối ưu khối cơ & sức mạnh'
+    hint: 'Focused on muscle mass & strength building'
   },
   {
     name: 'Women',
     icon: <FaFemale />,
     gradient: 'from-pink-400 to-pink-600',
-    hint: 'Săn chắc, đốt mỡ an toàn'
+    hint: 'Toning & fat loss with safe progression'
   },
   {
     name: 'Muscle Building',
     icon: <FaDumbbell />,
     gradient: 'from-amber-400 to-amber-600',
-    hint: 'Hypertrophy, progressive overload'
+    hint: 'Hypertrophy & progressive overload focused'
   },
   {
     name: 'Fat Burning',
     icon: <FaFireAlt />,
     gradient: 'from-orange-400 to-orange-600',
-    hint: 'HIIT/MetCon đốt calo hiệu quả'
+    hint: 'HIIT & MetCon for effective calorie burn'
   },
   {
     name: 'Leg',
     icon: <FaRunning />,
     gradient: 'from-teal-400 to-teal-600',
-    hint: 'Leg day: quads, hamstrings, glutes'
+    hint: 'Lower body focus: quads, hamstrings, glutes'
   }
 ];
 
@@ -71,48 +71,34 @@ export default function WorkoutCategory() {
       </div>
 
       <div className='mx-auto max-w-6xl'>
-        <h1 className='text-balance text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl'>
-          F‑Fitness Workout Routine{' '}
+        <h1 className='text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl'>
+          F-Fitness Workout Routine{' '}
           <span className='bg-gradient-to-r from-sky-600 to-teal-500 bg-clip-text text-transparent'>
             Database
           </span>
         </h1>
         <p className='mt-3 max-w-3xl text-slate-600 sm:text-lg'>
-          Khám phá thư viện bài tập đa dạng theo mục tiêu của bạn. Chọn danh mục
-          phù hợp để bắt đầu hành trình tập luyện hiệu quả hơn.
+          Explore a wide library of workouts tailored to your goals. Choose a
+          category to begin your fitness journey more effectively.
         </p>
-
-        <div className='mt-4 flex flex-wrap gap-2 text-xs text-slate-700'>
-          <span className='rounded-full border border-slate-200 bg-white px-3 py-1'>
-            Beginner–Advanced
-          </span>
-          <span className='rounded-full border border-slate-200 bg-white px-3 py-1'>
-            Home & Gym
-          </span>
-          <span className='rounded-full border border-slate-200 bg-white px-3 py-1'>
-            Goal‑based plans
-          </span>
-        </div>
       </div>
 
       <div className='mx-auto mt-8 max-w-6xl'>
-        <div className='mb-5 flex items-end justify-between'>
-          <div>
-            <h2 className='text-2xl font-semibold text-slate-900'>
-              Popular Categories
-            </h2>
-            <p className='text-sm text-slate-500'>
-              Chạm vào một danh mục để xem các routine liên quan
-            </p>
-          </div>
+        <div className='mb-5'>
+          <h2 className='text-2xl font-semibold text-slate-900'>
+            Popular Categories
+          </h2>
+          <p className='text-sm text-slate-500'>
+            Tap a category to view related workout routines
+          </p>
         </div>
 
-        <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'>
+        <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
           {CATEGORIES.map(c => (
             <button
               key={c.name}
               onClick={() => handleCategoryClick(c.name)}
-              className='group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-transform hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500'
+              className='group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition hover:-translate-y-0.5 hover:shadow-md'
               title={c.name}
             >
               <span
@@ -125,16 +111,9 @@ export default function WorkoutCategory() {
                 <span className='text-xl'>{c.icon}</span>
               </div>
 
-              <div className='flex items-center justify-between'>
-                <h3 className='truncate text-base font-semibold text-slate-900'>
-                  {c.name}
-                </h3>
-                <span
-                  className={`ml-2 hidden rounded-full bg-gradient-to-br ${c.gradient} px-2 py-0.5 text-[10px] font-medium text-white sm:inline-block`}
-                >
-                  Explore
-                </span>
-              </div>
+              <h3 className='truncate text-base font-semibold text-slate-900'>
+                {c.name}
+              </h3>
 
               <p className='mt-1 line-clamp-2 text-sm text-slate-500'>
                 {c.hint}
@@ -145,19 +124,6 @@ export default function WorkoutCategory() {
               />
             </button>
           ))}
-        </div>
-
-        <div className='mx-auto mt-8 max-w-3xl'>
-          <div className='relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm'>
-            <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(60rem_16rem_at_50%_0%,rgba(56,189,248,0.12),transparent_60%)]' />
-            <p className='text-sm text-slate-700'>
-              Không chắc nên chọn gì?{' '}
-              <span className='font-semibold'>
-                Hãy cho chúng tôi biết mục tiêu
-              </span>{' '}
-              để nhận kế hoạch cá nhân hoá.
-            </p>
-          </div>
         </div>
       </div>
     </section>
