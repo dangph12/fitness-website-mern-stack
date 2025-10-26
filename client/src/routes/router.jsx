@@ -236,6 +236,22 @@ const router = createBrowserRouter([
               () =>
                 import('~/app/admin/manage-equipments/update-equipment/page')
             )
+          },
+          {
+            path: 'manage-workouts',
+            Component: lazy(() => import('~/app/admin/manage-workouts/page'))
+          },
+          {
+            path: 'manage-workouts/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-workouts/create-workout/page')
+            )
+          },
+          {
+            path: 'manage-workouts/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-workouts/update-workout/page')
+            )
           }
         ]
       }
