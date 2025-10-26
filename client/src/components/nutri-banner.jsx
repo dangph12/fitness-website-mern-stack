@@ -29,7 +29,7 @@ const NutriBanner = () => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
-      className='bg-white text-black flex justify-center items-center min-h-max p-20'
+      className='bg-white text-black flex justify-center items-center min-h-max pt-20 pb-5'
     >
       <div className='flex flex-col lg:flex-row items-center space-x-10 max-w-6xl'>
         <motion.div
