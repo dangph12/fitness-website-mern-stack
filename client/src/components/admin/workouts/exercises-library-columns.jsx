@@ -189,7 +189,7 @@ export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
         </div>
       </CardHeader>
 
-      <CardContent className='h-[calc(100vh-24rem)] overflow-y-auto space-y-4'>
+      <CardContent className='h-auto overflow-y-auto space-y-4'>
         {loadingExercises ? (
           <div className='text-center py-8 text-muted-foreground'>
             Loading exercises...
