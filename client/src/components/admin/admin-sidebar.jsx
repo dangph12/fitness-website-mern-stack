@@ -1,6 +1,7 @@
 import {
   Activity,
   BicepsFlexed,
+  CalendarCheck2,
   Dumbbell,
   Ham,
   HeartPulse,
@@ -90,6 +91,11 @@ export function AdminSidebar({ ...props }) {
           title: 'Workouts Management',
           url: '/admin/manage-workouts',
           icon: HeartPulse
+        },
+        {
+          title: 'Plans Management',
+          url: '/admin/manage-plans',
+          icon: CalendarCheck2
         }
       ]
     }
