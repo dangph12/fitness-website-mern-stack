@@ -13,6 +13,7 @@ import GoalRoute from '~/modules/goals/goal-route';
 import HistoryRoute from '~/modules/histories/history-route';
 import MealRoute from '~/modules/meals/meal-route';
 import MuscleRouter from '~/modules/muscles/muscle-route';
+import PaymentRouter from '~/modules/payments/payment_router';
 import PlanRoute from '~/modules/plans/plan-route';
 import UserRoute from '~/modules/users/user-route';
 import WorkoutRoute from '~/modules/workouts/workout-route';
@@ -62,5 +63,8 @@ router.use('/histories', HistoryRoute);
 
 // AI routes
 router.use('/ai', AIRoute);
+
+// AI routes
+router.use('/payments', PaymentRouter);
 
 export default router;
