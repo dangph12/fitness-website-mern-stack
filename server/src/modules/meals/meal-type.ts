@@ -1,10 +1,18 @@
 import { Types } from 'mongoose';
 
+export enum MealType {
+  Breakfast = 'Breakfast',
+  Lunch = 'Lunch',
+  Dinner = 'Dinner',
+  Snack = 'Snack',
+  Brunch = 'Brunch',
+  Dessert = 'Dessert'
+}
+
 export interface IMeal {
   title: string;
   image: string;
   mealType: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Brunch' | 'Dessert';
-  quantity: number;
   user: Types.ObjectId;
   foods: { food: Types.ObjectId; quantity: number }[];
   scheduleAt: Date;
