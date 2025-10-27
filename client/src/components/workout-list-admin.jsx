@@ -12,8 +12,6 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '~/components/ui/pagination';
-import { fetchExerciseById } from '~/store/features/exercise-slice';
-import { fetchUsers } from '~/store/features/users-slice';
 import { deleteWorkout, fetchWorkouts } from '~/store/features/workout-slice';
 
 import logo from '../assets/logo.png';
@@ -52,85 +50,24 @@ export default function WorkoutListAdmin() {
     totalPages = 1
   } = useSelector(s => s.workouts);
 
-  const { exercises = [] } = useSelector(s => s.exercises || {});
-  const {
-    users = [],
-    loading: usersLoading,
-    error: usersError
-  } = useSelector(s => s.users || {});
-
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    dispatch(fetchWorkouts({ page, limit: 8, title: search }));
+    dispatch(fetchWorkouts({ page, limit: 10, title: search }));
   }, [dispatch, page, search]);
-
-  useEffect(() => {
-    dispatch(fetchUsers({ page: 1, limit: 200 }));
-  }, [dispatch]);
-
-  const usersMap = useMemo(() => {
-    const m = new Map();
-    (users || []).forEach(u => m.set(String(u._id), u));
-    return m;
-  }, [users]);
 
   const adminWorkouts = useMemo(() => {
     const q = search.trim().toLowerCase();
     return (workouts || []).filter(w => {
-      const userId = String(typeof w.user === 'object' ? w.user?._id : w.user);
-      const u = usersMap.get(userId);
-      if (!u) return false;
-      const isAdmin = String(u.role || '').toLowerCase() === 'admin';
-      if (!isAdmin) return false;
-      return w.title?.toLowerCase?.().includes(q);
+      const user = w.user;
+      if (!user) return false;
+      return (
+        user.role?.toLowerCase() === 'admin' &&
+        w.title?.toLowerCase().includes(q)
+      );
     });
-  }, [workouts, usersMap, search]);
-
-  useEffect(() => {
-    if (!adminWorkouts.length) return;
-    const have = new Set(exercises.map(ex => ex?._id?.toString()));
-    const need = new Set();
-    adminWorkouts.forEach(w =>
-      w?.exercises?.forEach(row => {
-        const exId =
-          typeof row?.exercise === 'string' ? row.exercise : row?.exercise?._id;
-        const id = exId ? String(exId) : null;
-        if (id && !have.has(id)) need.add(id);
-      })
-    );
-    need.forEach(id => dispatch(fetchExerciseById(id)));
-  }, [dispatch, adminWorkouts, exercises]);
-
-  const exerciseMap = useMemo(() => {
-    const m = new Map();
-    exercises.forEach(ex => m.set(ex?._id?.toString(), ex));
-    return m;
-  }, [exercises]);
-
-  const getMusclesAndEquipment = exerciseIdOrObj => {
-    const id =
-      typeof exerciseIdOrObj === 'string'
-        ? exerciseIdOrObj
-        : exerciseIdOrObj?._id;
-    const fallbackObj =
-      typeof exerciseIdOrObj === 'object' ? exerciseIdOrObj : undefined;
-    const ex = exerciseMap.get(String(id)) || fallbackObj;
-    if (!ex) return { muscles: 'Loading...', equipment: 'Loading...' };
-
-    const muscles =
-      (ex.muscles || [])
-        .map(mu => (typeof mu === 'string' ? mu : mu?.title))
-        .filter(Boolean)
-        .join(', ') || 'No muscles data';
-    const equipment =
-      (ex.equipments || [])
-        .map(eq => (typeof eq === 'string' ? eq : eq?.title))
-        .filter(Boolean)
-        .join(', ') || 'No equipment data';
-    return { muscles, equipment };
-  };
+  }, [workouts, search]);
 
   const handleDelete = id => {
     const action = dispatch(deleteWorkout(id));
@@ -141,8 +78,18 @@ export default function WorkoutListAdmin() {
 
   const handleView = id => navigate(`/workouts/workout-detail/${id}`);
 
-  const loadingAny = loading || usersLoading;
-  const errorAny = error || usersError;
+  const loadingAny = loading;
+  const errorAny = error;
+
+  // Function to get muscles and equipment from exercise ID
+  const getMusclesAndEquipment = exercise => {
+    const muscles =
+      exercise.muscles?.map(mu => mu.title).join(', ') || 'No muscles data';
+    const equipment =
+      exercise.equipments?.map(eq => eq.title).join(', ') ||
+      'No equipment data';
+    return { muscles, equipment };
+  };
 
   return (
     <section className='mx-auto max-w-7xl px-4 lg:px-6 pt-8 pb-10'>
@@ -239,11 +186,6 @@ export default function WorkoutListAdmin() {
       <div className='space-y-4'>
         {!loadingAny &&
           adminWorkouts.map(w => {
-            const userId = String(
-              typeof w.user === 'object' ? w.user?._id : w.user
-            );
-            const u = usersMap.get(userId);
-
             return (
               <article
                 key={w._id}
@@ -270,7 +212,7 @@ export default function WorkoutListAdmin() {
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${roleBadgeClass}`}
                     >
-                      {getCreatorLabel(u)}
+                      {getCreatorLabel(w.user)}
                     </span>
 
                     <span className='inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200'>

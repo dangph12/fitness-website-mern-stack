@@ -5,7 +5,7 @@ import { IFavorite } from './favorite-type';
 const FavoriteSchema = new Schema<IFavorite>(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    workouts: [{ type: Schema.Types.ObjectId, ref: 'Workout' }]
+    workout: { type: Schema.Types.ObjectId, ref: 'Workout' }
   },
   { timestamps: true }
 );

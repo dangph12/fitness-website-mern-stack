@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FaBook, FaTrash } from 'react-icons/fa';
+import { FaBook, FaGlobeAmericas, FaLock, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -25,6 +25,7 @@ const EditPlan = () => {
   const [planImage, setPlanImage] = useState(null);
   const [planTitle, setPlanTitle] = useState('');
   const [planDescription, setPlanDescription] = useState('');
+  const [isPublic, setIsPublic] = useState(true);
 
   const exerciseMap = useMemo(() => {
     const m = new Map();
@@ -66,6 +67,7 @@ const EditPlan = () => {
     setPlanTitle(currentPlan.title || '');
     setPlanDescription(currentPlan.description || '');
     setPlanImage(currentPlan.image || null);
+    setIsPublic(currentPlan.isPublic ?? true);
 
     const mappedDays = (currentPlan.workouts || []).map(workout => ({
       dayName: workout.title,
@@ -226,7 +228,7 @@ const EditPlan = () => {
     if (planImage && typeof planImage !== 'string') {
       formData.append('image', planImage);
     }
-    formData.append('isPublic', 'true');
+    formData.append('isPublic', String(isPublic));
     formData.append('user', userId);
 
     let workoutIndex = 0;
@@ -364,6 +366,35 @@ const EditPlan = () => {
                   Remove
                 </button>
               )}
+
+              <div className='mt-6'>
+                <label className='mb-2 block text-sm font-medium text-slate-700'>
+                  Visibility
+                </label>
+                <button
+                  onClick={() => setIsPublic(!isPublic)}
+                  type='button'
+                  className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition
+                    ${
+                      isPublic
+                        ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                        : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                    }
+                  `}
+                >
+                  {isPublic ? (
+                    <>
+                      <FaGlobeAmericas className='h-4 w-4' />
+                      Public (Anyone can view)
+                    </>
+                  ) : (
+                    <>
+                      <FaLock className='h-4 w-4' />
+                      Private (Only you)
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 

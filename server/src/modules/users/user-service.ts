@@ -9,6 +9,7 @@ import { sendMail } from '~/utils/email/mailer';
 
 import AuthModel from '../auth/auth-model';
 import BodyRecordModel from '../body-records/body-record-model';
+import GoalModel from '../goals/goal-model';
 import UserModel from './user-model';
 import { IUser } from './user-type';
 
@@ -71,6 +72,35 @@ const UserService = {
     }
 
     return user;
+  },
+
+  createFromSignUp: async (userData: IUser, avatar?: Express.Multer.File) => {
+    const existingUser = await UserModel.findOne({ email: userData.email });
+    if (existingUser) {
+      throw createHttpError(400, 'User with this email already exists');
+    }
+
+    const newUser = await UserModel.create({
+      ...userData,
+      isActive: true
+    });
+
+    if (avatar) {
+      const uploadResult = await uploadAvatar(
+        avatar.buffer,
+        newUser._id.toString()
+      );
+      if (uploadResult.success && uploadResult.data) {
+        newUser.avatar = uploadResult.data.secure_url;
+        await newUser.save();
+      }
+    }
+
+    if (!newUser) {
+      throw createHttpError(500, 'Failed to create user');
+    }
+
+    return newUser;
   },
 
   create: async (userData: IUser, avatar?: Express.Multer.File) => {
@@ -220,6 +250,9 @@ const UserService = {
       height: number;
       weight: number;
       bmi: number;
+      targetWeight: number;
+      diet: string;
+      fitnessGoal: string;
     }
   ) => {
     if (!Types.ObjectId.isValid(userId)) {
@@ -247,9 +280,17 @@ const UserService = {
       bmi: onboardingData.bmi
     });
 
+    const goal = await GoalModel.create({
+      user: userId,
+      targetWeight: onboardingData.targetWeight,
+      diet: onboardingData.diet,
+      fitnessGoal: onboardingData.fitnessGoal
+    });
+
     return {
       user,
-      bodyRecord
+      bodyRecord,
+      goal
     };
   }
 };

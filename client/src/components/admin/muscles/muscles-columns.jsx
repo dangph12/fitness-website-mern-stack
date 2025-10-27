@@ -30,7 +30,7 @@ export const MusclesColumns = [
     cell: ({ row }) => {
       const muscle = row.original;
       return (
-        <Avatar className='h-10 w-10'>
+        <Avatar className='h-20 w-20'>
           <AvatarImage src={muscle.image} alt={muscle.title} />
           <AvatarFallback>{muscle.title?.charAt(0)}</AvatarFallback>
         </Avatar>

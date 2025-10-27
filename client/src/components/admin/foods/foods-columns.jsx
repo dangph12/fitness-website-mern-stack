@@ -35,7 +35,7 @@ export const FoodsColumns = [
     cell: ({ row }) => {
       const food = row.original;
       return (
-        <Avatar className='h-10 w-10'>
+        <Avatar className='h-20 w-20'>
           <AvatarImage src={food.image} alt={food.title} />
           <AvatarFallback>{food.title?.charAt(0)}</AvatarFallback>
         </Avatar>

@@ -36,8 +36,7 @@ export default function AddUserPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    confirmPassword: '',
+
     role: 'user',
     gender: 'unspecified',
     dob: '',
@@ -93,21 +92,6 @@ export default function AddUserPage() {
       return false;
     }
 
-    if (!formData.password) {
-      setError('Password is required');
-      return false;
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return false;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return false;
-    }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError('Please enter a valid email address');
@@ -133,7 +117,7 @@ export default function AddUserPage() {
 
       submitData.append('name', formData.name.trim());
       submitData.append('email', formData.email.trim());
-      submitData.append('password', formData.password);
+
       submitData.append('role', formData.role);
       submitData.append('isActive', formData.isActive);
 
@@ -166,8 +150,6 @@ export default function AddUserPage() {
       setFormData({
         name: '',
         email: '',
-        password: '',
-        confirmPassword: '',
         role: 'user',
         gender: 'unspecified',
         dob: '',
@@ -295,35 +277,6 @@ export default function AddUserPage() {
                   value={formData.email}
                   onChange={e => handleInputChange('email', e.target.value)}
                   placeholder='Enter email address'
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Password Fields */}
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='password'>Password *</Label>
-                <Input
-                  id='password'
-                  type='password'
-                  value={formData.password}
-                  onChange={e => handleInputChange('password', e.target.value)}
-                  placeholder='Enter password'
-                  required
-                />
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='confirmPassword'>Confirm Password *</Label>
-                <Input
-                  id='confirmPassword'
-                  type='password'
-                  value={formData.confirmPassword}
-                  onChange={e =>
-                    handleInputChange('confirmPassword', e.target.value)
-                  }
-                  placeholder='Confirm password'
                   required
                 />
               </div>

@@ -36,10 +36,6 @@ const repsOf = set => {
   }
   if (set && typeof set === 'object') {
     const n = Number(set.reps);
-    Number(set.rep);
-    Number(set.repeat);
-    Number(set.count);
-    Number(set.r);
     return Number.isFinite(n) ? n : 0;
   }
   return 0;
@@ -60,7 +56,7 @@ const WorkoutDetail = () => {
   const { history = [] } = useSelector(state => state.histories);
 
   const { favorite, loading: favLoading } = useSelector(
-    state => state.favorites || {}
+    state => state.favourites
   );
 
   const [completedExerciseIds, setCompletedExerciseIds] = useState(new Set());
@@ -104,13 +100,11 @@ const WorkoutDetail = () => {
     setCompletedExerciseIds(ids);
   }, [latestHistoryForWorkout]);
 
-  const isFav = useMemo(() => {
-    const list = favorite?.workouts || [];
-    return list.some(w => {
-      const id = typeof w === 'string' ? w : w?._id;
-      return id?.toString?.() === workoutId?.toString?.();
-    });
-  }, [favorite?.workouts, workoutId]);
+  const favItem = useMemo(() => {
+    return favorite?.favorites?.find(f => f?.workout?._id === workoutId);
+  }, [favorite?.favorites, workoutId]);
+
+  const isFav = !!favItem;
 
   if (loading)
     return (
@@ -139,26 +133,23 @@ const WorkoutDetail = () => {
 
   const toggleFavorite = () => {
     if (!userId || !workoutId) return;
-    if (isFav) {
-      const p = dispatch(
-        removeFavoriteItems({ userId, workouts: [workoutId] })
-      );
-      (p.unwrap ? p.unwrap() : p)
+
+    if (isFav && favItem?._id) {
+      dispatch(removeFavoriteItems({ favoriteId: favItem._id }))
+        .unwrap()
         .then(() => {
           toast.success('Removed from Favorites');
+          dispatch(fetchFavorites(userId));
         })
-        .catch(() => {
-          toast.error('Failed to remove from Favorites');
-        });
+        .catch(() => toast.error('Failed to remove from Favorites'));
     } else {
-      const p = dispatch(addFavoriteItems({ userId, workouts: [workoutId] }));
-      (p.unwrap ? p.unwrap() : p)
+      dispatch(addFavoriteItems({ userId, workouts: workoutId }))
+        .unwrap()
         .then(() => {
           toast.success('Added to Favorites');
+          dispatch(fetchFavorites(userId));
         })
-        .catch(() => {
-          toast.error('Failed to add to Favorites');
-        });
+        .catch(() => toast.error('Failed to add to Favorites'));
     }
   };
 
@@ -282,17 +273,13 @@ const WorkoutDetail = () => {
                   ${
                     isFav
                       ? 'bg-rose-600 text-white border-rose-600 hover:bg-rose-700'
-                      : 'bg-white text-rose-600 border-rose-300 hover:bg-rose-50'
+                      : 'bg-white text-rose-600 border-rose-400 hover:bg-rose-50'
                   }`}
-                aria-pressed={isFav}
-                aria-label={
-                  isFav ? 'Remove from favorites' : 'Add to favorites'
-                }
               >
                 {isFav ? (
-                  <FaHeart className='mr-2' />
+                  <FaHeart className='mr-2 text-white' />
                 ) : (
-                  <FaRegHeart className='mr-2' />
+                  <FaRegHeart className='mr-2 text-rose-600' />
                 )}
                 {isFav ? 'Favorited' : 'Add to Favorites'}
               </button>
@@ -324,7 +311,6 @@ const WorkoutDetail = () => {
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
                 : 'bg-green-600 text-white hover:bg-green-700'
             }`}
-            title={isWorkoutCompleted ? 'Do again' : 'Start Workout'}
           >
             {isWorkoutCompleted ? 'Do Again' : 'Start Workout'}
           </button>

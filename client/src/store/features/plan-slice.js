@@ -13,7 +13,7 @@ export const fetchPlans = createAsyncThunk(
     filterParams = {}
   }) => {
     try {
-      const response = await axiosInstance.get('/api/plans/filter', {
+      const response = await axiosInstance.get('/api/plans', {
         params: { page, limit, sortBy, sortOrder, ...filterParams }
       });
 

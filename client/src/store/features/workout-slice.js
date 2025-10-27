@@ -12,7 +12,7 @@ export const fetchWorkouts = createAsyncThunk(
     sortOrder = 'desc',
     title = ''
   }) => {
-    const res = await axiosInstance.get('/api/workouts/filter', {
+    const res = await axiosInstance.get('/api/workouts', {
       params: { page, limit, sortBy, sortOrder, title }
     });
     return res.data.data;
@@ -39,7 +39,7 @@ export const fetchWorkoutsByUser = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.get(`/api/workouts/user/${userId}`);
-      const data = res?.data?.data;
+      const data = res?.data?.data?.workouts;
       return Array.isArray(data) ? data : [];
     } catch (err) {
       return rejectWithValue(err?.response?.data?.message || err.message);

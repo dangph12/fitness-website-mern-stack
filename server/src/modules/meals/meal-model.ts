@@ -17,7 +17,8 @@ const MealSchema = new Schema<IMeal>(
         food: { type: Schema.Types.ObjectId, ref: 'Food', required: true },
         quantity: { type: Number, required: true }
       }
-    ]
+    ],
+    scheduleAt: { type: Date, required: true }
   },
   { timestamps: true }
 );

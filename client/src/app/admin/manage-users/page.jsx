@@ -46,7 +46,7 @@ function ManageUsersContent() {
   }, [dispatch, fetchUsersData]);
 
   return (
-    <div className='container mx-auto py-6 space-y-6'>
+    <div className='w-full px-6 py-6 space-y-6'>
       {/* Header */}
       <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
         <div>
@@ -56,12 +56,6 @@ function ManageUsersContent() {
           </p>
         </div>
         <div className='flex items-center gap-2'>
-          <Button variant='outline' onClick={handleRefresh} disabled={loading}>
-            <RefreshCw
-              className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`}
-            />
-            Refresh
-          </Button>
           <UsersPrimaryButtons />
         </div>
       </div>

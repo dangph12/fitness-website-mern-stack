@@ -50,10 +50,6 @@ const router = createBrowserRouter([
         Component: lazy(() => import('~/app/exercises/[id]/page'))
       },
       {
-        path: 'onboarding',
-        Component: lazy(() => import('~/app/onboarding/page'))
-      },
-      {
         path: 'workouts',
         Component: lazy(() => import('~/app/workouts/workouts-list/page'))
       },
@@ -98,6 +94,10 @@ const router = createBrowserRouter([
       {
         path: 'history',
         Component: lazy(() => import('~/app/history/page'))
+      },
+      {
+        path: 'about',
+        Component: lazy(() => import('~/app/about/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
@@ -217,6 +217,24 @@ const router = createBrowserRouter([
             path: 'manage-muscles/update/:id',
             Component: lazy(
               () => import('~/app/admin/manage-muscles/update-muscle/page')
+            )
+          },
+          {
+            path: 'manage-equipments',
+            Component: lazy(() => import('~/app/admin/manage-equipments/page'))
+          },
+          {
+            path: 'manage-equipments/create',
+            Component: lazy(
+              () =>
+                import('~/app/admin/manage-equipments/create-equipment/page')
+            )
+          },
+          {
+            path: 'manage-equipments/update/:id',
+            Component: lazy(
+              () =>
+                import('~/app/admin/manage-equipments/update-equipment/page')
             )
           }
         ]

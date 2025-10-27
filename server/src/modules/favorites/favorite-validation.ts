@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
 const FavoriteValidation = {
-  workouts: z.array(z.string()).min(1, 'At least one workoutId is required')
+  user: z.string(),
+  workout: z.string()
 };
 
 const FavoriteValidationSchema = z.object(FavoriteValidation);

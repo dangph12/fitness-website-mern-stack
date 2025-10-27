@@ -9,6 +9,7 @@ import {
 import { Edit, Eye, Loader2, MoreHorizontal, Trash2 } from 'lucide-react';
 import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 
 import { DataTablePagination } from '~/components/admin/data-table-pagination';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
@@ -107,6 +108,7 @@ const getGenderBadge = gender => {
 };
 
 export function UsersTable() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
     users,
@@ -144,10 +146,10 @@ export function UsersTable() {
 
   const handleEditUser = useCallback(
     user => {
-      dispatch(fetchUserDetails(user._id));
-      openDialog('action', user, 'edit');
+      // Navigate directly to update page instead of opening modal
+      navigate(`/admin/manage-users/update/${user._id}`);
     },
-    [dispatch, openDialog]
+    [navigate]
   );
 
   const handleDeleteUser = useCallback(
@@ -305,11 +307,11 @@ export function UsersTable() {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    manualPagination: true, // Enable server-side pagination
-    pageCount: totalPages, // Total pages from server
+    manualPagination: true,
+    pageCount: totalPages,
     state: {
       pagination: {
-        pageIndex: currentPage - 1, // Convert to 0-based index
+        pageIndex: currentPage - 1,
         pageSize: limit
       }
     },
@@ -322,12 +324,10 @@ export function UsersTable() {
             })
           : updater;
 
-      // Handle page change
       if (newPagination.pageIndex !== currentPage - 1) {
         dispatch(setCurrentPage(newPagination.pageIndex + 1));
       }
 
-      // Handle page size change
       if (newPagination.pageSize !== limit) {
         dispatch(setLimit(newPagination.pageSize));
       }
