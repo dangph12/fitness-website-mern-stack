@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.27.0",
+    "@payos/node": "^2.0.3",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
