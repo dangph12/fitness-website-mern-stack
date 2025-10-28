@@ -15,10 +15,12 @@ export const workoutValidationSchema = yup.object().shape({
     .nullable()
     .test('fileSize', 'Image must be less than 10MB', value => {
       if (!value || typeof value === 'string') return true;
+      if (!(value instanceof File)) return true;
       return value.size <= 10 * 1024 * 1024;
     })
     .test('fileType', 'Only image files are allowed', value => {
       if (!value || typeof value === 'string') return true;
+      if (!(value instanceof File)) return true;
       return value.type?.startsWith('image/');
     }),
 
@@ -26,11 +28,7 @@ export const workoutValidationSchema = yup.object().shape({
     .array()
     .of(
       yup.object().shape({
-        exercise: yup.object().shape({
-          _id: yup.string().required(),
-          title: yup.string().required(),
-          tutorial: yup.string()
-        }),
+        exercise: yup.mixed().required('Exercise is required'),
         sets: yup
           .array()
           .of(yup.number().min(1, 'Reps must be at least 1').required())
