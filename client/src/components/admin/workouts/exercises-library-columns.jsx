@@ -6,14 +6,51 @@ import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '~/components/ui/select';
+import { getImageUrls } from '~/lib/utils';
 import { fetchExercises } from '~/store/features/exercise-slice';
+
+// Animated Image Component for Exercise Library
+const ExerciseImage = ({ src, alt, isSelected }) => {
+  const { previewUrl, animatedUrl } = getImageUrls(src);
+  const [currentSrc, setCurrentSrc] = useState(previewUrl);
+
+  const handleMouseEnter = e => {
+    e.currentTarget.src = animatedUrl;
+    setCurrentSrc(animatedUrl);
+  };
+
+  const handleMouseLeave = e => {
+    e.currentTarget.src = previewUrl;
+    setCurrentSrc(previewUrl);
+  };
+
+  return (
+    <div className='relative h-16 w-16 overflow-hidden rounded-md border flex-shrink-0'>
+      {src ? (
+        <>
+          <img
+            src={currentSrc}
+            alt={alt}
+            className='h-full w-full object-cover'
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          />
+          {isSelected && (
+            <div className='absolute inset-0 bg-primary/20 flex items-center justify-center'>
+              <Badge variant='default' className='text-xs'>
+                Added
+              </Badge>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className='h-full w-full bg-muted flex items-center justify-center'>
+          <span className='text-xs text-muted-foreground'>No img</span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
   const dispatch = useDispatch();
@@ -25,21 +62,16 @@ export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
     totalExercises
   } = useSelector(state => state.exercises);
 
-  // Local state for search and pagination
   const [searchText, setSearchText] = useState('');
   const [appliedQuery, setAppliedQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 6;
 
-  // Fetch exercises when appliedQuery or page changes
   useEffect(() => {
     loadExercises();
   }, [appliedQuery, currentPage]);
 
   const loadExercises = () => {
-    console.log(appliedQuery);
-    console.log(currentPage);
-
     dispatch(
       fetchExercises({
         page: currentPage,
@@ -57,7 +89,7 @@ export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
 
   const handleApplyFilter = () => {
     setAppliedQuery(searchText.trim());
-    setCurrentPage(1); // Reset to page 1 when applying filter
+    setCurrentPage(1);
   };
 
   const handleClearSearch = () => {
@@ -84,10 +116,8 @@ export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
     return selectedExerciseIds.includes(exerciseId);
   };
 
-  // Check if search has changes
   const hasSearchChanges = searchText.trim() !== appliedQuery;
 
-  // Get difficulty badge color
   const getDifficultyColor = difficulty => {
     switch (difficulty?.toLowerCase()) {
       case 'beginner':
@@ -101,7 +131,6 @@ export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
     }
   };
 
-  // Generate page numbers array
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -139,7 +168,6 @@ export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
             </p>
           </div>
 
-          {/* Search Input with Apply Button */}
           <div className='flex gap-2'>
             <div className='relative flex-1'>
               <Input
@@ -227,37 +255,17 @@ export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
                   }`}
                   onClick={() => !isSelected && onAddExercise(exercise)}
                 >
-                  {/* Exercise Image/GIF */}
-                  <div className='relative h-16 w-16 overflow-hidden rounded-md border flex-shrink-0'>
-                    {exercise.image ? (
-                      <img
-                        src={exercise.image}
-                        alt={exercise.title}
-                        className='h-full w-full object-cover'
-                      />
-                    ) : (
-                      <div className='h-full w-full bg-muted flex items-center justify-center'>
-                        <span className='text-xs text-muted-foreground'>
-                          No img
-                        </span>
-                      </div>
-                    )}
-                    {isSelected && (
-                      <div className='absolute inset-0 bg-primary/20 flex items-center justify-center'>
-                        <Badge variant='default' className='text-xs'>
-                          Added
-                        </Badge>
-                      </div>
-                    )}
-                  </div>
+                  <ExerciseImage
+                    src={exercise.tutorial}
+                    alt={exercise.title}
+                    isSelected={isSelected}
+                  />
 
-                  {/* Exercise Info */}
                   <div className='flex-1 min-w-0'>
                     <h4 className='font-semibold text-sm truncate'>
                       {exercise.title}
                     </h4>
 
-                    {/* Badges Row 1 */}
                     <div className='flex items-center gap-1.5 mt-1.5 flex-wrap'>
                       <Badge
                         variant='secondary'
@@ -270,7 +278,6 @@ export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
                       </Badge>
                     </div>
 
-                    {/* Badges Row 2 - Muscles & Equipment */}
                     <div className='flex items-center gap-1.5 mt-1.5 flex-wrap'>
                       {exercise.muscles && exercise.muscles.length > 0 && (
                         <>
@@ -318,7 +325,6 @@ export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
                     </div>
                   </div>
 
-                  {/* Add Button */}
                   <Button
                     type='button'
                     size='sm'
@@ -339,10 +345,8 @@ export function ExerciseLibrary({ onAddExercise, selectedExerciseIds = [] }) {
           </div>
         )}
 
-        {/* Enhanced Pagination */}
         {totalPages > 1 && (
           <div className='flex flex-col gap-3 pt-4 border-t'>
-            {/* Page Numbers Row */}
             <div className='flex items-center justify-center gap-1 flex-wrap'>
               <Button
                 type='button'
