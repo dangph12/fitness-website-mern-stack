@@ -29,7 +29,8 @@ const MealValidationSchema = z.object({
         quantity: z.number().positive()
       })
     )
-  )
+  ),
+  scheduleAt: z.string()
 });
 
 export default MealValidationSchema;
