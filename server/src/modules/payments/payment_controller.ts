@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
+import ApiResponse from '~/types/api-response';
+
 import type { CreatePaymentParams, PaymentStatus } from './payment_service';
 import { paymentService } from './payment_service';
 
@@ -98,7 +100,9 @@ export const paymentController = {
         return res.redirect(payment.checkoutUrl);
       }
 
-      return res.status(201).json(payment);
+      return res
+        .status(201)
+        .json(ApiResponse.success('Payment created successfully', payment));
     } catch (error) {
       next(error);
     }
@@ -138,7 +142,9 @@ export const paymentController = {
         Number(orderCode)
       );
 
-      return res.json(payment);
+      return res
+        .status(200)
+        .json(ApiResponse.success('Payment retrieved successfully', payment));
     } catch (error) {
       next(error);
     }
@@ -157,7 +163,9 @@ export const paymentController = {
           : undefined
       );
 
-      return res.json(payments);
+      return res
+        .status(200)
+        .json(ApiResponse.success('Payment retrieved successfully', payments));
     } catch (error) {
       next(error);
     }
