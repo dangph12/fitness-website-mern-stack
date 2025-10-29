@@ -152,6 +152,23 @@ export const paymentController = {
     }
   },
 
+  listPaymentsByUser: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    try {
+      const { userId } = req.params;
+      const payments = await paymentService.listPaymentsByUser(userId);
+
+      return res
+        .status(200)
+        .json(ApiResponse.success('Payment retrieved successfully', payments));
+    } catch (error) {
+      next(error);
+    }
+  },
+
   listMembershipPayments: async (
     req: Request,
     res: Response,
