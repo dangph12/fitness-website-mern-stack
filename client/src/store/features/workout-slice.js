@@ -7,10 +7,11 @@ export const fetchWorkouts = createAsyncThunk(
   'workouts/fetchWorkouts',
   async ({
     page = 1,
-    limit = 4,
+    limit = 10,
     sortBy = 'createdAt',
     sortOrder = 'desc',
-    title = ''
+    title = '',
+    isPublic = ''
   }) => {
     const res = await axiosInstance.get('/api/workouts', {
       params: { page, limit, sortBy, sortOrder, title }

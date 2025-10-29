@@ -89,10 +89,11 @@ export const planSlice = createSlice({
     builder
       .addCase(fetchPlans.pending, state => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchPlans.fulfilled, (state, action) => {
         state.loading = false;
-        state.plans = action.payload.plans || action.payload.items || [];
+        state.plans = action.payload.plans || [];
         state.totalPages = action.payload.totalPages || 1;
         state.totalPlans = action.payload.totalPlans || 0;
       })
@@ -102,8 +103,17 @@ export const planSlice = createSlice({
       })
 
       // Fetch plan by ID
+      .addCase(fetchPlanById.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchPlanById.fulfilled, (state, action) => {
+        state.loading = false;
         state.currentPlan = action.payload;
+      })
+      .addCase(fetchPlanById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       })
 
       // Create plan
@@ -114,6 +124,7 @@ export const planSlice = createSlice({
       .addCase(createPlan.fulfilled, (state, action) => {
         state.loading = false;
         state.plans.unshift(action.payload);
+        state.totalPlans += 1;
       })
       .addCase(createPlan.rejected, (state, action) => {
         state.loading = false;
@@ -121,7 +132,12 @@ export const planSlice = createSlice({
       })
 
       // Update plan
+      .addCase(updatePlan.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(updatePlan.fulfilled, (state, action) => {
+        state.loading = false;
         const index = state.plans.findIndex(
           plan => plan._id === action.payload._id
         );
@@ -132,10 +148,24 @@ export const planSlice = createSlice({
           state.currentPlan = action.payload;
         }
       })
+      .addCase(updatePlan.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
 
       // Delete plan
+      .addCase(deletePlan.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(deletePlan.fulfilled, (state, action) => {
+        state.loading = false;
         state.plans = state.plans.filter(plan => plan._id !== action.payload);
+        state.totalPlans -= 1;
+      })
+      .addCase(deletePlan.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   }
 });
