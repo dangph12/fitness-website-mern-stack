@@ -43,6 +43,16 @@ const MealController = {
       .json(ApiResponse.success('Meal created successfully', newMeal));
   },
 
+  createMultiple: async (req: Request, res: Response) => {
+    const mealsData = req.body;
+    console.log('Meal Data:', mealsData);
+    console.log('Body:', req.body);
+    const newMeals = await MealService.createMultiple(mealsData);
+    return res
+      .status(201)
+      .json(ApiResponse.success('Meals created successfully', newMeals));
+  },
+
   update: async (req: Request, res: Response) => {
     const mealId = req.params.id;
     const updateData = req.body;

@@ -5,7 +5,10 @@ import asyncHandler from '~/utils/async-handler';
 import { uploadSingle } from '~/utils/multer';
 
 import MealController from './meal-controller';
-import MealValidationSchema from './meal-validation';
+import {
+  MealValidationSchema,
+  MultipleMealsValidationSchema
+} from './meal-validation';
 
 const router: Router = express.Router();
 
@@ -18,6 +21,13 @@ router.post(
   uploadSingle('image'),
   validate(MealValidationSchema.shape),
   asyncHandler(MealController.create)
+);
+
+router.post(
+  '/multiple',
+  uploadSingle('image'),
+  validate(MultipleMealsValidationSchema.shape),
+  asyncHandler(MealController.createMultiple)
 );
 
 router.put(

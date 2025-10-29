@@ -40,6 +40,16 @@ const HistoryController = {
     return res
       .status(200)
       .json(ApiResponse.success('History removed successfully'));
+  },
+
+  getUserStreak: async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    const streakData = await HistoryService.getUserStreak(userId);
+    return res
+      .status(200)
+      .json(
+        ApiResponse.success('User streak retrieved successfully', streakData)
+      );
   }
 };
 

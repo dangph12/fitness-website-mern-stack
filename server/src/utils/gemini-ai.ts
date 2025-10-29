@@ -30,21 +30,47 @@ const buildGeminiContents = (prompt: string): Content[] => [
 ];
 
 const extractGeminiText = (payload: GenerateContentResponse): string => {
-  const getterText = payload.text?.trim();
-  if (getterText) return getterText;
+  const collectRawText = () => {
+    const getterText = payload.text?.trim();
+    if (getterText) return getterText;
 
-  if (!payload.candidates?.length) return '';
+    if (!payload.candidates?.length) return '';
 
-  return payload.candidates
-    .map(candidate =>
-      candidate.content?.parts
-        ?.map(part => part.text?.trim())
-        .filter(Boolean)
-        .join('\n')
-    )
-    .filter(Boolean)
-    .join('\n')
-    .trim();
+    return payload.candidates
+      .map(candidate =>
+        candidate.content?.parts
+          ?.map(part => part.text?.trim())
+          .filter(Boolean)
+          .join('\n')
+      )
+      .filter(Boolean)
+      .join('\n')
+      .trim();
+  };
+
+  const rawText = collectRawText();
+  if (!rawText) return '';
+
+  const codeBlockMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidateJson = (codeBlockMatch?.[1] ?? rawText).trim();
+  if (!candidateJson) return '';
+
+  try {
+    const parsed = JSON.parse(candidateJson);
+    return JSON.stringify(parsed);
+  } catch {
+    try {
+      const cleaned = rawText
+        .replace(/```(?:json)?/gi, '')
+        .replace(/```/g, '')
+        .trim();
+      if (!cleaned) return '';
+      const parsed = JSON.parse(cleaned);
+      return JSON.stringify(parsed);
+    } catch {
+      return candidateJson;
+    }
+  }
 };
 
 const buildGeminiError = (error: unknown) => {

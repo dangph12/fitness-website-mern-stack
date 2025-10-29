@@ -210,11 +210,18 @@ const isQuotaOrRateLimitError = (error: unknown): boolean => {
   );
 };
 
-const fallbackMealString = async (
+type GeneratedMeal = {
+  title: string;
+  mealType: MealType;
+  scheduledAt: string;
+  foods: { food: string; quantity: number }[];
+};
+
+const fallbackMealPlan = async (
   context: MealContext,
   foods: FoodWithId[],
   scheduledDates: string[]
-): Promise<string> => {
+): Promise<GeneratedMeal[]> => {
   const foodIds = foods.map(food => getFoodIdentifier(food)).filter(Boolean);
 
   if (!foodIds.length) {
@@ -225,7 +232,7 @@ const fallbackMealString = async (
     foodIds.push(foodIds[foodIds.length - 1]);
   }
 
-  const meals = scheduledDates.map((date, index) => ({
+  const meals: GeneratedMeal[] = scheduledDates.map((date, index) => ({
     title: `${context.goal.fitnessGoal ?? 'Balanced'} Meal ${index + 1}`,
     mealType: FALLBACK_MEAL_TYPES[index % FALLBACK_MEAL_TYPES.length],
     scheduledAt: date,
@@ -235,7 +242,19 @@ const fallbackMealString = async (
     }))
   }));
 
-  return JSON.stringify(meals);
+  return meals;
+};
+
+const parseMealPlan = (raw: string): GeneratedMeal[] => {
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      throw new Error('Gemini meal plan is not an array');
+    }
+    return parsed as GeneratedMeal[];
+  } catch {
+    throw createHttpError(502, 'Gemini returned an invalid meal plan payload');
+  }
 };
 
 const AIService = {
@@ -243,7 +262,7 @@ const AIService = {
     query: string,
     userId: string,
     options?: IMealGenerationOptions
-  ): Promise<string> => {
+  ): Promise<GeneratedMeal[]> => {
     const context = await loadMealContext(userId);
     const input = buildMealInput(context);
     const foods = (await FoodService.findAll()) as FoodWithId[];
@@ -253,10 +272,10 @@ const AIService = {
 
     try {
       const mealRaw = await generateByOpenAI(prompt);
-      return mealRaw;
+      return parseMealPlan(mealRaw);
     } catch (error) {
       if (isQuotaOrRateLimitError(error)) {
-        return fallbackMealString(context, foods, scheduledDates);
+        return fallbackMealPlan(context, foods, scheduledDates);
       }
       throw error;
     }
