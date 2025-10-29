@@ -80,17 +80,6 @@ const SignUp = () => {
     }
   };
 
-  // Navigate based on profile completion status after user state updates
-  useEffect(() => {
-    if (user) {
-      if (user.profileCompleted === false) {
-        navigate('/onboarding');
-      } else {
-        navigate('/');
-      }
-    }
-  }, [user, navigate]);
-
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };

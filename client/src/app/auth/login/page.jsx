@@ -71,17 +71,6 @@ const Login = () => {
     }
   };
 
-  // Navigate based on profile completion status after user state updates
-  useEffect(() => {
-    if (user) {
-      if (user.profileCompleted === false) {
-        navigate('/onboarding');
-      } else {
-        navigate('/');
-      }
-    }
-  }, [user, navigate]);
-
   return (
     <div className='flex min-h-screen items-center justify-center p-4'>
       <Card className='w-full max-w-md'>
