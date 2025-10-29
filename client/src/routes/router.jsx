@@ -34,6 +34,10 @@ const router = createBrowserRouter([
         Component: lazy(() => import('~/app/nutrition/create-meal/page'))
       },
       {
+        path: 'nutrition/create-ai-meal',
+        Component: lazy(() => import('~/app/nutrition/create-ai-meal/page'))
+      },
+      {
         path: 'nutrition/food/:foodId',
         Component: lazy(() => import('~/app/nutrition/food/[id]/page'))
       },
