@@ -21,6 +21,8 @@ import { logout } from '~/store/features/auth-slice';
 import { setAvatar, updateAvatar } from '~/store/features/avatar-slice';
 import { updateUser } from '~/store/features/users-slice';
 
+import FitnessGoalCard from './fitness-goal-card';
+
 const ProfilePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -369,6 +371,10 @@ const ProfilePage = () => {
             </div>
           </form>
         </div>
+      </div>
+
+      <div className='sm:col-span-2'>
+        <FitnessGoalCard userId={user.id} />
       </div>
     </div>
   );
