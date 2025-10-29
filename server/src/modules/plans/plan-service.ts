@@ -20,9 +20,18 @@ const PlanService = {
     const filterRecord: Record<string, any> = {};
 
     for (const [key, value] of Object.entries(filterParams)) {
-      if (value && value !== '') {
-        // options for case-insensitive
-        filterRecord[key] = { $regex: value, $options: 'i' };
+      if (value !== undefined && value !== '') {
+        // handling for boolean field
+        if (
+          typeof value === 'boolean' ||
+          value === 'true' ||
+          value === 'false'
+        ) {
+          filterRecord[key] = value === true || value === 'true';
+        } else {
+          // options for case-insensitive search for string
+          filterRecord[key] = { $regex: value, $options: 'i' };
+        }
       }
     }
 
@@ -91,8 +100,18 @@ const PlanService = {
     const filterRecord: Record<string, any> = { user: userId };
 
     for (const [key, value] of Object.entries(filterParams)) {
-      if (value && value !== '') {
-        filterRecord[key] = { $regex: value, $options: 'i' };
+      if (value !== undefined && value !== '') {
+        // handling for boolean field
+        if (
+          typeof value === 'boolean' ||
+          value === 'true' ||
+          value === 'false'
+        ) {
+          filterRecord[key] = value === true || value === 'true';
+        } else {
+          // options for case-insensitive search for string
+          filterRecord[key] = { $regex: value, $options: 'i' };
+        }
       }
     }
 
