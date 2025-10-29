@@ -1,41 +1,27 @@
-// ...existing code...
-import { ArrowUpDown, ExternalLink, MoreHorizontal } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 
 import { DataTableColumnHeader } from '~/components/admin/data-table-column-header';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Checkbox } from '~/components/ui/checkbox';
+import { getImageUrls, isImageUrl } from '~/lib/utils';
 
 import { useExercises } from './exercises-provider';
 import { ExercisesRowActions } from './exercises-row-actions';
 
 const AnimatedTutorialImage = ({ src, alt }) => {
-  const [currentSrc, setCurrentSrc] = useState(() => {
-    // Convert GIF to JPG preview (first frame)
-    const isGif = src.toLowerCase().endsWith('.gif');
-    if (isGif && src.includes('/upload/')) {
-      // Cloudinary transformation: get first frame as JPG
-      return src.replace('/upload/', '/upload/f_jpg,so_0/');
-    }
-    return src;
-  });
-
-  const originalSrc = src;
-  const previewSrc = src.includes('/upload/')
-    ? src.replace('/upload/', '/upload/f_jpg,so_0/')
-    : src;
+  const { previewUrl, animatedUrl } = getImageUrls(src);
+  const [currentSrc, setCurrentSrc] = useState(previewUrl);
 
   const handleMouseEnter = e => {
-    // Switch to animated GIF on hover
-    e.currentTarget.src = originalSrc;
-    setCurrentSrc(originalSrc);
+    e.currentTarget.src = animatedUrl;
+    setCurrentSrc(animatedUrl);
   };
 
   const handleMouseLeave = e => {
-    // Switch back to static preview
-    e.currentTarget.src = previewSrc;
-    setCurrentSrc(previewSrc);
+    e.currentTarget.src = previewUrl;
+    setCurrentSrc(previewUrl);
   };
 
   return (
@@ -48,7 +34,7 @@ const AnimatedTutorialImage = ({ src, alt }) => {
         onMouseLeave={handleMouseLeave}
         onClick={() =>
           typeof window !== 'undefined' &&
-          window.open(originalSrc, '_blank', 'noopener,noreferrer')
+          window.open(animatedUrl, '_blank', 'noopener,noreferrer')
         }
       />
       <div className='absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-md pointer-events-none' />
@@ -57,10 +43,6 @@ const AnimatedTutorialImage = ({ src, alt }) => {
   );
 };
 
-/**
- * useExercisesColumns - hook that returns columns array.
- * Must be called inside a component wrapped by ExercisesProvider.
- */
 export const useExercisesColumns = () => {
   const {
     musclesMap = {},
@@ -172,14 +154,10 @@ export const useExercisesColumns = () => {
         const url = row.getValue('tutorial');
         if (!url) return '—';
 
-        // Kiểm tra nếu URL là ảnh
-        const isImage = /\.(gif|jpe?g|png|webp)$/i.test(url);
-
-        if (isImage) {
+        if (isImageUrl(url)) {
           return <AnimatedTutorialImage src={url} alt='Exercise tutorial' />;
         }
 
-        // Nếu là URL khác (video, link), hiển thị button như cũ
         return (
           <Button
             variant='outline'
@@ -196,7 +174,7 @@ export const useExercisesColumns = () => {
       },
       enableSorting: false
     },
-
+    // ... rest of columns remain the same
     {
       accessorKey: 'muscles',
       header: 'Muscles',
@@ -209,11 +187,8 @@ export const useExercisesColumns = () => {
           if (!item) return null;
           if (typeof item === 'string') return item;
           if (typeof item === 'object') {
-            // Mongoose population object with _id
             if (item._id) return String(item._id);
-            // some serializers return {$oid: '...'}
             if (item.$oid) return String(item.$oid);
-            // if object has name/title, no id needed
             return null;
           }
           return String(item);
@@ -237,7 +212,6 @@ export const useExercisesColumns = () => {
         return (
           <div className='flex flex-wrap gap-1'>
             {items.map((muscle, index) => {
-              // if populated object with name/title -> use it
               if (
                 muscle &&
                 typeof muscle === 'object' &&
@@ -251,12 +225,6 @@ export const useExercisesColumns = () => {
               }
 
               const id = normalizeId(muscle);
-              const labelFromMap = id
-                ? useExercises
-                  ? undefined
-                  : undefined
-                : null; // noop to keep linting consistent
-              // try provider map first (resolveRefLabel will use map), fallback to short id or populated object
               const label =
                 (typeof resolveRefLabel === 'function' &&
                   resolveRefLabel(muscle, musclesMap)) ||
@@ -355,7 +323,6 @@ export const useExercisesColumns = () => {
       },
       enableSorting: false
     },
-
     {
       id: 'actions',
       cell: ({ row }) => <ExercisesRowActions exercise={row.original} />,
@@ -364,4 +331,3 @@ export const useExercisesColumns = () => {
     }
   ];
 };
-// ...existing code...
