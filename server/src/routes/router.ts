@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import authorize from '~/middleware/authorize';
+import AIRoute from '~/modules/ai/ai-route';
 import AuthRoutes from '~/modules/auth/auth-route';
 import BodyClassificationRouter from '~/modules/body-classification/body-classification-route';
 import BodyRecordRoute from '~/modules/body-records/body-record-route';
@@ -12,6 +13,7 @@ import GoalRoute from '~/modules/goals/goal-route';
 import HistoryRoute from '~/modules/histories/history-route';
 import MealRoute from '~/modules/meals/meal-route';
 import MuscleRouter from '~/modules/muscles/muscle-route';
+import PaymentRouter from '~/modules/payments/payment_router';
 import PlanRoute from '~/modules/plans/plan-route';
 import UserRoute from '~/modules/users/user-route';
 import WorkoutRoute from '~/modules/workouts/workout-route';
@@ -58,5 +60,11 @@ router.use('/favorites', FavoriteRoute);
 
 // History routes
 router.use('/histories', HistoryRoute);
+
+// AI routes
+router.use('/ai', AIRoute);
+
+// AI routes
+router.use('/payments', PaymentRouter);
 
 export default router;
