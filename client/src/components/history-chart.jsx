@@ -23,7 +23,7 @@ export default function HistoryChart() {
 
   if (!data.length) {
     return (
-      <div className='w-full max-w-4xl mx-auto py-10 px-6 text-center rounded-xl border border-dashed border-slate-300 bg-slate-50'>
+      <div className='w-full max-w-4xl mx-auto py-10 px-6 text-center rounded-xl border border-dashed border-slate-300 bg-slate-50 mt-10'>
         <p className='text-slate-700 font-medium'>No workout progress yet.</p>
         <p className='text-slate-400 text-xs mt-1'>
           Start your first workout to track improvement.
