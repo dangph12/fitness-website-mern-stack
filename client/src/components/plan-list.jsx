@@ -58,7 +58,11 @@ const PlanList = () => {
 
   const filteredPlans = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    return q ? plans.filter(p => p.title?.toLowerCase().includes(q)) : plans;
+    let visible = plans.filter(p => p.isPublic === false);
+    if (q) {
+      visible = visible.filter(p => p.title?.toLowerCase().includes(q));
+    }
+    return visible;
   }, [plans, searchQuery]);
 
   const startIndex = (page - 1) * limit;
