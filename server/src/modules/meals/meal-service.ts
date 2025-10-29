@@ -6,7 +6,7 @@ import { uploadImage } from '~/utils/cloudinary';
 import FoodModel from '../foods/food-model';
 import UserModel from '../users/user-model';
 import MealModel from './meal-model';
-import { IMeal } from './meal-type';
+import { IMeal, IMultipleMeals } from './meal-type';
 
 const MealService = {
   find: async ({
@@ -140,6 +140,15 @@ const MealService = {
     }
 
     return populatedMeal;
+  },
+
+  createMultiple: async (mealsData: IMultipleMeals) => {
+    const createdMeals = [];
+    for (const meal of mealsData.meals) {
+      const createdMeal = await MealService.create(meal);
+      createdMeals.push(createdMeal);
+    }
+    return createdMeals;
   },
 
   update: async (
