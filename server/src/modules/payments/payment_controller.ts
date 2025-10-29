@@ -125,7 +125,9 @@ export const paymentController = {
         cancellationReason
       });
 
-      return res.json(payment);
+      return res
+        .status(200)
+        .json(ApiResponse.success('Payment updated successfully', payment));
     } catch (error) {
       next(error);
     }
