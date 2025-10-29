@@ -66,6 +66,7 @@ const Login = () => {
       const { accessToken } = response.data.data;
       dispatch(loadUser({ accessToken, isRemember }));
       toast.success('Login successful!');
+      navigate('/');
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Login failed.');
     }
