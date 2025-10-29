@@ -268,6 +268,22 @@ export const paymentService = {
     return payment;
   },
 
+  listPaymentsByUser: async (userId: string) => {
+    const trimmedUserId = typeof userId === 'string' ? userId.trim() : '';
+    if (!trimmedUserId || !Types.ObjectId.isValid(trimmedUserId)) {
+      throw createHttpError(400, 'Invalid userId');
+    }
+
+    return PaymentModel.find({
+      user: new Types.ObjectId(trimmedUserId)
+    })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'user',
+        select: 'name email membershipLevel'
+      });
+  },
+
   listMembershipPayments: async (status?: PaymentStatus) => {
     const filter: Record<string, unknown> = {
       targetMembership: { $exists: true }
