@@ -14,7 +14,7 @@ export const fetchWorkouts = createAsyncThunk(
     isPublic = ''
   }) => {
     const res = await axiosInstance.get('/api/workouts', {
-      params: { page, limit, sortBy, sortOrder, title }
+      params: { page, limit, sortBy, sortOrder, title, isPublic }
     });
     return res.data.data;
   }
