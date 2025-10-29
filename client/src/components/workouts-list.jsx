@@ -56,7 +56,7 @@ const WorkoutList = () => {
   const filteredWorkouts = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return (workoutsByUser || [])
-      .filter(w => w.title?.toLowerCase?.().includes(q))
+      .filter(w => w.isPublic === false && w.title?.toLowerCase?.().includes(q))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [workoutsByUser, searchQuery]);
 
