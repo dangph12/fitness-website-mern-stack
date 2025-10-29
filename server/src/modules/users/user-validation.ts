@@ -8,6 +8,7 @@ const UserValidation = {
     if (typeof val === 'string' || val instanceof Date) return new Date(val);
   }, z.date()),
   role: z.enum(['user', 'admin']),
+  membershipLevel: z.enum(['normal', 'vip', 'premium']).optional(),
   isActive: z.preprocess(val => {
     if (typeof val === 'string') {
       return val.toLowerCase() === 'true';

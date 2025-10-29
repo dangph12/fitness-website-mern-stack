@@ -11,4 +11,19 @@ router.post(
   asyncHandler(paymentController.createPayment)
 );
 
+router.get(
+  '/membership',
+  asyncHandler(paymentController.listMembershipPayments)
+);
+
+router.get(
+  '/membership/order/:orderCode',
+  asyncHandler(paymentController.getMembershipPaymentByOrderCode)
+);
+
+router.patch(
+  '/membership/order/:orderCode/status',
+  asyncHandler(paymentController.updateMembershipPaymentStatus)
+);
+
 export default router as Router;
