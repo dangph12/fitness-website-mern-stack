@@ -80,6 +80,10 @@ const router = createBrowserRouter([
         Component: lazy(() => import('~/app/plans/rountine-builder/page'))
       },
       {
+        path: 'plans/routine-database',
+        Component: lazy(() => import('~/app/plans/rountine-database/page'))
+      },
+      {
         path: 'workout/edit-workout/:workoutId',
         Component: lazy(() => import('~/app/workouts/edit-workout/page'))
       },
