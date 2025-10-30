@@ -9,6 +9,7 @@ import { IFood } from '~/modules/foods/food-type';
 import GoalService from '~/modules/goals/goal-service';
 import { IGoal } from '~/modules/goals/goal-type';
 import { MealType } from '~/modules/meals/meal-type';
+import { userMembershipService } from '~/modules/users/user-membership-service';
 import UserService from '~/modules/users/user-service';
 import { IUser } from '~/modules/users/user-type';
 import { generateByOpenAI } from '~/utils/gemini-ai';
@@ -269,6 +270,9 @@ const AIService = {
     const scheduledDates = resolveScheduledDates(options);
     const prompt = buildPrompt(input, foods, scheduledDates, options, query);
     console.log(prompt);
+
+    const tokensRequired = Math.max(1, scheduledDates.length);
+    await userMembershipService.consumeAiMealTokens(userId, tokensRequired);
 
     try {
       const mealRaw = await generateByOpenAI(prompt);

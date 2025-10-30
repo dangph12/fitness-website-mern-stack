@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { FaBook, FaTrash } from 'react-icons/fa';
+import { FaBook, FaGlobeAmericas, FaLock, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -14,6 +14,8 @@ const CreatePlan = () => {
   const [planImage, setPlanImage] = useState(null);
   const [planTitle, setPlanTitle] = useState('');
   const [planDescription, setPlanDescription] = useState('');
+
+  const [isPublic, setIsPublic] = useState(true);
 
   const userId = useSelector(state => state.auth.user.id);
   const { loading } = useSelector(state => state.plans);
@@ -154,20 +156,20 @@ const CreatePlan = () => {
     }
 
     const formData = new FormData();
-    formData.append('title', planTitle || `Plan ${Date.now()}`);
-    formData.append(
-      'description',
-      planDescription || `Description for Plan ${Date.now()}`
-    );
-    if (planImage) formData.append('image', planImage);
-    formData.append('isPublic', 'true');
+    formData.append('title', planTitle);
+    formData.append('description', planDescription);
     formData.append('user', userId);
+    formData.append('isPublic', String(isPublic));
+    if (planImage) formData.append('image', planImage);
 
     let workoutIndex = 0;
     days.forEach(day => {
       day.workouts.forEach(workout => {
         formData.append(`workouts[${workoutIndex}][title]`, workout.title);
-        formData.append(`workouts[${workoutIndex}][isPublic]`, 'false');
+        formData.append(
+          `workouts[${workoutIndex}][isPublic]`,
+          String(isPublic)
+        );
         formData.append(`workouts[${workoutIndex}][user]`, userId);
         if (workout.image)
           formData.append(`workouts[${workoutIndex}][image]`, workout.image);
@@ -298,6 +300,32 @@ const CreatePlan = () => {
                   Remove
                 </button>
               )}
+
+              <div className='mt-6'>
+                <label className='mb-2 block text-sm font-medium text-slate-700'>
+                  Visibility
+                </label>
+
+                <button
+                  onClick={() => setIsPublic(!isPublic)}
+                  type='button'
+                  className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition
+      ${isPublic ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}
+    `}
+                >
+                  {isPublic ? (
+                    <>
+                      <FaGlobeAmericas className='h-4 w-4' />
+                      Public (Anyone can view)
+                    </>
+                  ) : (
+                    <>
+                      <FaLock className='h-4 w-4' />
+                      Private (Only you)
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 

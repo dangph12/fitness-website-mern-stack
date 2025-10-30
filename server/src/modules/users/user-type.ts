@@ -10,4 +10,7 @@ export interface IUser {
   isActive?: boolean;
   profileCompleted?: boolean;
   membershipLevel?: MembershipLevel;
+  membershipExpiresAt?: Date | null;
+  aiMealTokens?: number;
+  aiMealTokensLastReset?: Date | null;
 }
