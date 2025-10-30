@@ -10,6 +10,7 @@ import { sendMail } from '~/utils/email/mailer';
 import AuthModel from '../auth/auth-model';
 import BodyRecordModel from '../body-records/body-record-model';
 import { userMembershipService } from './user-membership-service';
+import GoalModel from '../goals/goal-model';
 import UserModel from './user-model';
 import { IUser } from './user-type';
 
@@ -261,6 +262,9 @@ const UserService = {
       height: number;
       weight: number;
       bmi: number;
+      targetWeight: number;
+      diet: string;
+      fitnessGoal: string;
     }
   ) => {
     if (!Types.ObjectId.isValid(userId)) {
@@ -288,9 +292,17 @@ const UserService = {
       bmi: onboardingData.bmi
     });
 
+    const goal = await GoalModel.create({
+      user: userId,
+      targetWeight: onboardingData.targetWeight,
+      diet: onboardingData.diet,
+      fitnessGoal: onboardingData.fitnessGoal
+    });
+
     return {
       user,
-      bodyRecord
+      bodyRecord,
+      goal
     };
   }
 };

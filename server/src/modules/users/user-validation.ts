@@ -33,7 +33,18 @@ export const OnboardingValidation = z.object({
   gender: z.enum(['male', 'female', 'other']),
   height: z.number().positive().min(50).max(300), // in cm
   weight: z.number().positive().min(20).max(500), // in kg
-  bmi: z.number().positive().min(10).max(100)
+  bmi: z.number().positive().min(10).max(100),
+  targetWeight: z.number().positive().min(20).max(500), // in kg
+  diet: z.enum([
+    'Mediterranean',
+    'Ketogenic (Keto)',
+    'Paleo',
+    'Vegetarian',
+    'Vegan',
+    'Gluten-Free',
+    'Low-Carb'
+  ]),
+  fitnessGoal: z.enum(['Lose Weight', 'Build Muscle', 'To be Healthy'])
 });
 
 export default UserValidationSchema;

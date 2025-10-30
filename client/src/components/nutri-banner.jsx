@@ -13,7 +13,7 @@ const NutriBanner = () => {
   const handleClick = e => {
     if (!userId) {
       e.preventDefault();
-      toast.error('Bạn chưa đăng nhập, vui lòng đăng nhập để tiếp tục!');
+      toast.error('You are not logged in, please log in to continue!');
       setTimeout(() => {
         navigate('/auth/login');
       }, 1000);
@@ -29,7 +29,7 @@ const NutriBanner = () => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
-      className='bg-white text-black flex justify-center items-center min-h-max p-20'
+      className='bg-white text-black flex justify-center items-center min-h-max pt-20 pb-5'
     >
       <div className='flex flex-col lg:flex-row items-center space-x-10 max-w-6xl'>
         <motion.div
@@ -56,12 +56,12 @@ const NutriBanner = () => {
               onClick={handleClick}
               className='inline-flex items-center justify-center rounded-xl bg-[#3067B6] px-6 py-3 text-lg font-semibold text-white shadow-sm transition hover:bg-[#275397]'
             >
-              Bắt đầu tạo bữa ăn
+              Start creating meals
             </Link>
           </motion.div>
 
           <p className='text-xs text-slate-500'>
-            Không cần thẻ tín dụng • Hủy bất cứ lúc nào
+            No credit card required • Cancel anytime
           </p>
         </motion.div>
 

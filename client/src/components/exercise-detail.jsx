@@ -9,6 +9,7 @@ import { GiMuscleUp } from 'react-icons/gi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 
+import { formatInstructions } from '~/lib/utils';
 import { fetchExerciseById } from '~/store/features/exercise-slice';
 
 export default function ExerciseDetail() {
@@ -189,7 +190,8 @@ export default function ExerciseDetail() {
                 Instructions
               </h3>
               <div className='whitespace-pre-line leading-relaxed text-slate-700'>
-                {instructions || 'No instructions provided.'}
+                {formatInstructions(instructions) ||
+                  'No instructions provided.'}
               </div>
             </section>
           </div>
