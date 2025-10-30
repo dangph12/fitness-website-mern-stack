@@ -34,6 +34,12 @@ router.put(
   asyncHandler(UserController.completeOnboarding)
 );
 
+router.post(
+  '/:id/membership/refresh-tokens',
+  authenticate(),
+  asyncHandler(UserController.refreshMembershipTokens)
+);
+
 router.put(
   '/:id',
   uploadSingle('avatar'),
