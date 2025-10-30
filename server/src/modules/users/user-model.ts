@@ -24,6 +24,9 @@ const UserSchema = new Schema<IUserDocument>(
       enum: ['normal', 'vip', 'premium'],
       default: 'normal'
     },
+    membershipExpiresAt: { type: Date },
+    aiMealTokens: { type: Number, default: 0 },
+    aiMealTokensLastReset: { type: Date },
     dob: { type: Date },
     isActive: { type: Boolean, default: true },
     profileCompleted: { type: Boolean, default: false }
