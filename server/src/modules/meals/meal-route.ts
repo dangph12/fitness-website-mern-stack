@@ -14,6 +14,8 @@ const router: Router = express.Router();
 
 router.get('/', asyncHandler(MealController.find));
 
+router.get('/admin', asyncHandler(MealController.findByAdmin));
+
 router.get('/:id', asyncHandler(MealController.findById));
 
 router.post(

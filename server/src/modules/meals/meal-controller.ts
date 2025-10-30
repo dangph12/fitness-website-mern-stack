@@ -35,6 +35,13 @@ const MealController = {
       .json(ApiResponse.success('Meal retrieved successfully', meal));
   },
 
+  findByAdmin: async (req: Request, res: Response) => {
+    const meals = await MealService.findByAdmin();
+    return res
+      .status(200)
+      .json(ApiResponse.success('Meals retrieved successfully', meals));
+  },
+
   create: async (req: Request, res: Response) => {
     const mealData = req.body;
     const newMeal = await MealService.create(mealData, req.file);

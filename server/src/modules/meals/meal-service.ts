@@ -82,6 +82,20 @@ const MealService = {
     return meal;
   },
 
+  findByAdmin: async () => {
+    const adminIds: Types.ObjectId[] = await UserModel.find({
+      role: 'admin'
+    }).distinct('_id');
+
+    if (adminIds.length === 0) return [];
+
+    const meals = await MealModel.find({ user: { $in: adminIds } })
+      .populate('user')
+      .populate('foods.food');
+
+    return meals;
+  },
+
   create: async (mealData: IMeal, file?: Express.Multer.File) => {
     if (!Types.ObjectId.isValid(mealData.user)) {
       throw createHttpError(400, 'Invalid userId');
