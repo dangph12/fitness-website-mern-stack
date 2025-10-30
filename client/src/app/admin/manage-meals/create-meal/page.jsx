@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
-import { mealValidationSchema } from '~/app/admin/manage-meals/validations/meal-validation';
+import { singleMealValidationSchema } from '~/app/admin/manage-meals/validations/meal-validation';
 import { FoodLibrary } from '~/components/admin/meals/food-library';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -37,7 +37,7 @@ const CreateMeal = () => {
     setValue,
     formState: { errors }
   } = useForm({
-    resolver: yupResolver(mealValidationSchema),
+    resolver: yupResolver(singleMealValidationSchema), // Đổi schema
     defaultValues: {
       title: '',
       mealType: 'Breakfast',
@@ -114,12 +114,16 @@ const CreateMeal = () => {
   };
 
   const onSubmit = async data => {
-    console.log('Form data:', data); // Debug
+    console.log('Form data:', data);
 
     const mealData = new FormData();
     mealData.append('title', data.title.trim());
     mealData.append('mealType', data.mealType);
     mealData.append('user', userId);
+
+    // Tự động thêm scheduleAt (ngày hiện tại)
+    const currentDate = new Date().toISOString();
+    mealData.append('scheduleAt', currentDate);
 
     if (data.image) {
       mealData.append('image', data.image);

@@ -34,6 +34,7 @@ const DashboardPage = () => {
     fetchDashboardStats();
   }, []);
 
+  // ...existing code...
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
@@ -58,22 +59,48 @@ const DashboardPage = () => {
         axiosInstance.get('/api/equipments', { params: { page: 1, limit: 1 } })
       ]);
 
+      // Log để debug
+      console.log('Foods Response:', foodsRes.data);
+      console.log('Muscles Response:', musclesRes.data);
+      console.log('Equipments Response:', equipmentsRes.data);
+
       setStats({
         totalUsers: usersRes.data?.data?.totalUsers || 0,
         totalExercises: exercisesRes.data?.data?.totalExercises || 0,
         totalWorkouts: workoutsRes.data?.data?.totalWorkouts || 0,
         totalPlans: plansRes.data?.data?.totalPlans || 0,
-        totalFoods: foodsRes.data?.data?.totalCount || 0,
+        // Fix: Thử nhiều cách lấy data từ response
+        totalFoods:
+          foodsRes.data?.data?.totalFoods || foodsRes.data?.totalFoods || 0,
         totalMeals: mealsRes.data?.data?.totalMeals || 0,
-        totalMuscles: musclesRes.data?.data?.totalMuscles || 0,
-        totalEquipments: equipmentsRes.data?.data?.totalEquipments || 0
+        // Fix: Thử nhiều cách lấy data từ response
+        totalMuscles:
+          musclesRes.data?.data?.totalMuscles ||
+          musclesRes.data?.totalMuscles ||
+          (Array.isArray(musclesRes.data?.data)
+            ? musclesRes.data.data.length
+            : 0) ||
+          0,
+        // Fix: Thử nhiều cách lấy data từ response
+        totalEquipments:
+          equipmentsRes.data?.data?.totalEquipments ||
+          equipmentsRes.data?.totalEquipments ||
+          (Array.isArray(equipmentsRes.data?.data)
+            ? equipmentsRes.data.data.length
+            : 0) ||
+          0
       });
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
+      // Log chi tiết lỗi từng API
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+      }
     } finally {
       setLoading(false);
     }
   };
+  // ...existing code...
 
   const statCards = [
     {
@@ -82,8 +109,7 @@ const DashboardPage = () => {
       icon: Users,
       description: 'Registered users',
       color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      trend: '+12.5%'
+      bgColor: 'bg-blue-50'
     },
     {
       title: 'Exercises',
@@ -91,8 +117,7 @@ const DashboardPage = () => {
       icon: Activity,
       description: 'Exercise library',
       color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      trend: '+8.2%'
+      bgColor: 'bg-green-50'
     },
     {
       title: 'Workouts',
@@ -100,8 +125,7 @@ const DashboardPage = () => {
       icon: Dumbbell,
       description: 'Total workouts',
       color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      trend: '+15.3%'
+      bgColor: 'bg-purple-50'
     },
     {
       title: 'Plans',
@@ -109,8 +133,7 @@ const DashboardPage = () => {
       icon: BicepsFlexed,
       description: 'Workout plans',
       color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      trend: '+5.7%'
+      bgColor: 'bg-orange-50'
     },
     {
       title: 'Foods',
@@ -118,8 +141,7 @@ const DashboardPage = () => {
       icon: Ham,
       description: 'Food database',
       color: 'text-red-600',
-      bgColor: 'bg-red-50',
-      trend: '+20.1%'
+      bgColor: 'bg-red-50'
     },
     {
       title: 'Meals',
@@ -127,8 +149,7 @@ const DashboardPage = () => {
       icon: Utensils,
       description: 'Meal plans',
       color: 'text-pink-600',
-      bgColor: 'bg-pink-50',
-      trend: '+10.9%'
+      bgColor: 'bg-pink-50'
     }
   ];
 

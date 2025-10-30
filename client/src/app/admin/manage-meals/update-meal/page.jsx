@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 
-import { mealValidationSchema } from '~/app/admin/manage-meals/validations/meal-validation';
+import { singleMealValidationSchema } from '~/app/admin/manage-meals/validations/meal-validation';
 import { FoodLibrary } from '~/components/admin/meals/food-library';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -44,7 +44,7 @@ const UpdateMeal = () => {
     reset,
     formState: { errors }
   } = useForm({
-    resolver: yupResolver(mealValidationSchema),
+    resolver: yupResolver(singleMealValidationSchema), // Đổi sang singleMealValidationSchema
     defaultValues: {
       title: '',
       mealType: 'Breakfast',
@@ -71,7 +71,7 @@ const UpdateMeal = () => {
           foods:
             result.foods?.map(item => ({
               food: item.food?._id || item.food,
-              foodName: item.food?.title || '',
+              foodName: item.food?.title || item.food?.name || '',
               quantity: item.quantity || 1,
               foodData: item.food || {} // Store full food data for display
             })) || []
@@ -118,7 +118,7 @@ const UpdateMeal = () => {
 
     const foodItem = {
       food: food._id,
-      foodName: food.title,
+      foodName: food.title || food.name,
       quantity: 1,
       foodData: food // Store full food data for display
     };
@@ -167,6 +167,10 @@ const UpdateMeal = () => {
     mealData.append('title', data.title.trim());
     mealData.append('mealType', data.mealType);
     mealData.append('user', userId);
+
+    // Tự động thêm scheduleAt (giữ nguyên hoặc ngày hiện tại)
+    const scheduleDate = currentMeal?.scheduleAt || new Date().toISOString();
+    mealData.append('scheduleAt', scheduleDate);
 
     // Only append image if changed
     if (isImageChanged) {
@@ -479,7 +483,7 @@ const UpdateMeal = () => {
                                 {food?.image ? (
                                   <img
                                     src={food.image}
-                                    alt={food.title || 'Food'}
+                                    alt={food.title || food.name || 'Food'}
                                     className='h-full w-full object-cover'
                                   />
                                 ) : (
@@ -492,7 +496,8 @@ const UpdateMeal = () => {
                               </div>
                               <div className='flex-1 min-w-0'>
                                 <h4 className='font-semibold'>
-                                  {foodIndex + 1}. {food?.title || 'Food'}
+                                  {foodIndex + 1}.{' '}
+                                  {food?.title || food?.name || 'Food'}
                                 </h4>
                                 <div className='flex flex-wrap gap-1 mt-1'>
                                   <Badge
