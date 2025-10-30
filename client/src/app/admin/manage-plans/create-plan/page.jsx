@@ -657,7 +657,7 @@ const CreatePlan = () => {
                                     )
                                   }
                                 />
-                                <Button
+                                {/* <Button
                                   type='button'
                                   variant='outline'
                                   size='sm'
@@ -667,7 +667,7 @@ const CreatePlan = () => {
                                     <Upload className='h-4 w-4 mr-2' />
                                     {workout.image ? 'Change' : 'Image'}
                                   </span>
-                                </Button>
+                                </Button> */}
                               </label>
                               <Button
                                 type='button'
