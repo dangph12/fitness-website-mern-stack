@@ -1,6 +1,8 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-
-import axiosInstance from '~/lib/axios-instance';
+import {
+  createAsyncThunk,
+  createSlice
+} from '/node_modules/.vite/deps/@reduxjs_toolkit.js?v=8a52d1ed';
+import axiosInstance from '/src/lib/axios-instance.js';
 
 // Fetch all meals
 export const fetchMeals = createAsyncThunk(
@@ -22,7 +24,7 @@ export const fetchMealById = createAsyncThunk(
   }
 );
 
-// Create meal
+// Create single meal
 export const createMeal = createAsyncThunk(
   'meals/createMeal',
   async mealData => {
@@ -32,6 +34,30 @@ export const createMeal = createAsyncThunk(
     } catch (error) {
       console.error(
         'Error creating meal:',
+        error.response ? error.response.data : error.message
+      );
+      throw error;
+    }
+  }
+);
+
+// Create multiple meals (new API)
+export const createMultipleMeals = createAsyncThunk(
+  'meals/createMultipleMeals',
+  async mealDataArray => {
+    try {
+      const response = await axiosInstance.post('/api/meals/multiple', {
+        meals: mealDataArray
+      });
+
+      if (!Array.isArray(response.data.data)) {
+        throw new Error('Unexpected response format');
+      }
+
+      return response.data.data;
+    } catch (error) {
+      console.error(
+        'Error creating multiple meals:',
         error.response ? error.response.data : error.message
       );
       throw error;
@@ -109,6 +135,20 @@ export const mealSlice = createSlice({
       .addCase(createMeal.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Failed to create meal';
+      })
+
+      // Create multiple meals (new action)
+      .addCase(createMultipleMeals.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createMultipleMeals.fulfilled, (state, action) => {
+        state.loading = false;
+        state.meals = [...action.payload, ...state.meals];
+      })
+      .addCase(createMultipleMeals.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to create multiple meals';
       })
 
       // Update meal
