@@ -1,5 +1,5 @@
 import { Activity, Clock, Trash2 } from 'lucide-react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -37,6 +37,13 @@ const HistoryPage = () => {
     loading,
     error
   } = useSelector(state => state.histories);
+
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, []);
 
   useEffect(() => {
     if (userId) dispatch(fetchHistoryByUser(userId));
