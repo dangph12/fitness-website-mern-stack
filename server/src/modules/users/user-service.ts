@@ -53,7 +53,15 @@ const UserService = {
       throw createHttpError(400, 'Invalid ObjectId');
     }
 
-    return userMembershipService.refreshMembership(userId);
+    await userMembershipService.refreshMembership(userId);
+
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+      throw createHttpError(404, 'User not found');
+    }
+
+    return user;
   },
 
   findByEmail: async (email: string) => {
