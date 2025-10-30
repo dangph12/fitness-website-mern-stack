@@ -77,6 +77,14 @@ const UserService = {
     return userMembershipService.refreshMembership(user._id);
   },
 
+  refreshMembershipTokens: async (userId: string) => {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
+    return userMembershipService.forceRefreshTokens(userId);
+  },
+
   createFromSignUp: async (userData: IUser, avatar?: Express.Multer.File) => {
     const existingUser = await UserModel.findOne({ email: userData.email });
     if (existingUser) {

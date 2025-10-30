@@ -47,6 +47,15 @@ const UserController = {
       .status(200)
       .json(ApiResponse.success('User retrieved successfully', user));
   },
+  refreshMembershipTokens: async (req: Request, res: Response) => {
+    const userId = req.params.id;
+    const user = await UserService.refreshMembershipTokens(userId);
+    return res
+      .status(200)
+      .json(
+        ApiResponse.success('Membership tokens refreshed successfully', user)
+      );
+  },
   update: async (req: Request, res: Response) => {
     const userId = req.params.id;
     const updateData = req.body;

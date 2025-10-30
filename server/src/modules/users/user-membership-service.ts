@@ -190,12 +190,34 @@ const refreshMembership = async (
   return user;
 };
 
-export const userMembershipService = {
+const forceRefreshTokens = async (
+  userId: string | Types.ObjectId,
+  now = new Date()
+): Promise<IUserDocument> => {
+  const user = await refreshMembership(userId, now);
+  const level = normalizeLevel(user.membershipLevel);
+
+  if (level === 'vip' || level === 'premium') {
+    const quota = getDailyQuota(level);
+    user.aiMealTokens = quota;
+    user.aiMealTokensLastReset = now;
+  } else {
+    user.aiMealTokens = 0;
+    user.aiMealTokensLastReset = undefined;
+  }
+
+  await user.save();
+  return user;
+};
+
+const userMembershipService = {
   getDailyQuota,
   applyMembershipLevel,
   consumeAiMealTokens,
   refreshMembership,
+  forceRefreshTokens,
   calculateExpiryDate
 };
 
+export { userMembershipService };
 export default userMembershipService;
