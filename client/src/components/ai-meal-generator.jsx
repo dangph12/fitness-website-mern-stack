@@ -4,15 +4,18 @@ import {
   FaRobot,
   FaSpinner,
   FaSyncAlt,
-  FaTimes
+  FaTimes,
+  FaUtensils
 } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import {
   clearAiRecommendations,
   fetchAiMeals
 } from '~/store/features/meal-ai-slice';
+import { createMultipleMeals } from '~/store/features/meal-slice';
 
 import BodyRecordCard from './body-record-list';
 import FitnessGoalCard from './fitness-goal-card';
@@ -46,6 +49,16 @@ export default function AiMealGenerator() {
   } = useSelector(state => state.mealAi || {});
   const userId = useSelector(state => state.auth?.user?.id);
   const [formData, setFormData] = useState(initialFormData);
+  const [creating, setCreating] = useState(false);
+  const MEAL_TYPES = [
+    'Breakfast',
+    'Lunch',
+    'Dinner',
+    'Snack',
+    'Brunch',
+    'Dessert'
+  ];
+  const navigate = useNavigate();
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -54,34 +67,28 @@ export default function AiMealGenerator() {
 
   const handleGenerate = async e => {
     e.preventDefault();
+
+    const { query, startDate, endDate } = formData;
+    if (!query || !startDate || !endDate)
+      return toast.error('Please provide a query and valid dates.');
+
     const payload = {
-      query: formData.query,
+      query,
       bodyFatPercentage: parseFloat(formData.bodyFatPercentage) || 0,
       skeletalMuscleMass: parseFloat(formData.skeletalMuscleMass) || 0,
       ecwRatio: parseFloat(formData.ecwRatio) || 0,
       bodyFatMass: parseFloat(formData.bodyFatMass) || 0,
       visceralFatArea: parseFloat(formData.visceralFatArea) || 0,
-      startDate: formatDateForApi(formData.startDate),
-      endDate: formatDateForApi(formData.endDate),
-      title: 'AI Generated Meal Plan',
-      mealType: 'Lunch',
-      user: userId || 'unknown-user',
-      foods: []
+      startDate: formatDateForApi(startDate),
+      endDate: formatDateForApi(endDate),
+      user: userId || 'unknown-user'
     };
-
-    if (!payload.query || !payload.startDate || !payload.endDate) {
-      return toast.error('Please provide a query and valid dates.');
-    }
 
     try {
       await dispatch(fetchAiMeals(payload)).unwrap();
       toast.success('AI meals generated successfully!');
     } catch (err) {
-      const message =
-        typeof err === 'string'
-          ? err
-          : err?.message || 'Failed to generate AI meals.';
-      toast.error(message);
+      toast.error(err?.message || 'Failed to generate AI meals.');
     }
   };
 
@@ -91,17 +98,72 @@ export default function AiMealGenerator() {
     toast.info('Form and results cleared.');
   };
 
+  const handleCreateMeals = async () => {
+    if (!recommendedMeals.length) return toast.info('No AI meals to create.');
+
+    try {
+      setCreating(true);
+
+      const formattedMeals = recommendedMeals.map((meal, index) => ({
+        title: meal.title || `AI Meal Plan #${index + 1}`,
+        totalCalories: meal.totalCalories || 0,
+        protein: meal.protein || 0,
+        carbs: meal.carbs || 0,
+        fat: meal.fat || 0,
+        foods: meal.foods || [],
+        scheduledAt: meal.scheduledAt || new Date().toISOString(),
+        user: userId,
+        mealType:
+          meal.mealType && MEAL_TYPES.includes(meal.mealType)
+            ? meal.mealType
+            : MEAL_TYPES[index % MEAL_TYPES.length]
+      }));
+
+      await dispatch(createMultipleMeals(formattedMeals)).unwrap();
+      toast.success('Meals successfully created and saved!');
+      navigate('/nutrition');
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.message || 'Failed to create meals.');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div className='max-w-full mx-auto p-4 md:p-8 bg-gray-50 min-h-screen'>
-      <header className='flex items-center gap-4 mb-8 p-4 bg-white rounded-2xl shadow-lg'>
-        <FaRobot className='text-emerald-600 text-4xl' />
-        <div>
-          <h1 className='text-3xl font-bold text-gray-800'>AI Meal Planner</h1>
-          <p className='text-md text-gray-500'>
-            Generate personalized meal recommendations based on your body
-            metrics and fitness goals.
-          </p>
+      <header className='flex flex-wrap justify-between items-center gap-4 mb-8 p-4 bg-white rounded-2xl shadow-lg'>
+        <div className='flex items-center gap-4'>
+          <FaRobot className='text-emerald-600 text-4xl' />
+          <div>
+            <h1 className='text-3xl font-bold text-gray-800'>
+              AI Meal Planner
+            </h1>
+            <p className='text-md text-gray-500'>
+              Generate personalized meal recommendations based on your body
+              metrics and fitness goals.
+            </p>
+          </div>
         </div>
+
+        {recommendedMeals.length > 0 && (
+          <button
+            onClick={handleCreateMeals}
+            disabled={creating}
+            className={`flex items-center gap-2 px-5 py-3 rounded-xl text-white font-semibold shadow-md transition-all ${
+              creating
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800'
+            }`}
+          >
+            {creating ? (
+              <FaSpinner className='animate-spin' />
+            ) : (
+              <FaUtensils className='text-lg' />
+            )}
+            {creating ? 'Saving...' : 'Create Meals'}
+          </button>
+        )}
       </header>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
@@ -123,7 +185,7 @@ export default function AiMealGenerator() {
 
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1'>
-                Goal/Query
+                Goal / Query
               </label>
               <textarea
                 name='query'
@@ -169,7 +231,7 @@ export default function AiMealGenerator() {
                   <input
                     type='number'
                     step='0.1'
-                    min='0.1'
+                    min='0'
                     name={key}
                     value={formData[key]}
                     onChange={handleChange}
@@ -233,7 +295,13 @@ export default function AiMealGenerator() {
               </div>
 
               {recommendedMeals.map((meal, index) => (
-                <MealCard key={index} meal={meal} />
+                <MealCard
+                  key={index}
+                  meal={{
+                    ...meal,
+                    title: meal.title || `AI Meal Plan #${index + 1}`
+                  }}
+                />
               ))}
             </div>
           )}
