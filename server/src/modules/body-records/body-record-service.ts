@@ -28,7 +28,9 @@ const BodyRecordService = {
       throw createHttpError(400, 'Invalid ObjectId');
     }
 
-    const bodyRecord = await BodyRecordModel.findById(bodyRecordId);
+    const bodyRecord = await BodyRecordModel.findById(bodyRecordId)
+      .populate('user')
+      .populate('bodyClassification');
 
     if (!bodyRecord) {
       throw createHttpError(404, 'Record not found');
@@ -42,7 +44,9 @@ const BodyRecordService = {
       throw createHttpError(400, 'Invalid userId');
     }
 
-    const bodyRecord = await BodyRecordModel.find({ user: userId });
+    const bodyRecord = await BodyRecordModel.find({ user: userId })
+      .populate('user')
+      .populate('bodyClassification');
 
     if (!bodyRecord) {
       throw createHttpError(404, 'Records not found');
