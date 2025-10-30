@@ -11,6 +11,8 @@ router.post(
   asyncHandler(paymentController.createPayment)
 );
 
+router.get('/user/:userId', asyncHandler(paymentController.listPaymentsByUser));
+
 router.get(
   '/membership',
   asyncHandler(paymentController.listMembershipPayments)
