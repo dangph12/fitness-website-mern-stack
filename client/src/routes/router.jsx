@@ -152,7 +152,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            Component: lazy(() => import('~/app/admin/page'))
+            Component: lazy(() => import('~/app/admin/dashboard/page'))
           },
           {
             path: 'manage-users',
