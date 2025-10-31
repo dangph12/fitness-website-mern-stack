@@ -6,7 +6,7 @@ import { uploadImage } from '~/utils/cloudinary';
 import FoodModel from '../foods/food-model';
 import UserModel from '../users/user-model';
 import MealModel from './meal-model';
-import { IMeal, IMultipleMeals } from './meal-type';
+import { IMeal, IMultipleMeals, IMultipleMealsUpdate } from './meal-type';
 
 const MealService = {
   find: async ({
@@ -25,18 +25,18 @@ const MealService = {
     };
 
     if (startDate || endDate) {
-      filterRecord.scheduleAt = {};
+      filterRecord.scheduledAt = {};
 
       if (startDate) {
         const start = new Date(startDate);
         start.setHours(0, 0, 0, 0);
-        filterRecord.scheduleAt.$gte = start;
+        filterRecord.scheduledAt.$gte = start;
       }
 
       if (endDate) {
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
-        filterRecord.scheduleAt.$lte = end;
+        filterRecord.scheduledAt.$lte = end;
       }
     }
 
@@ -156,12 +156,24 @@ const MealService = {
     return populatedMeal;
   },
 
-  createMultiple: async (mealsData: IMultipleMeals) => {
+  createMultiple: async (
+    mealsData: IMultipleMeals,
+    files?: Express.Multer.File[]
+  ) => {
     const createdMeals = [];
-    for (const meal of mealsData.meals) {
-      const createdMeal = await MealService.create(meal);
+
+    for (let i = 0; i < mealsData.meals.length; i++) {
+      const meal = mealsData.meals[i];
+      const file = files?.[i];
+
+      const createdMeal = await MealService.create(meal, file);
+      if (!createdMeal) {
+        throw createHttpError(500, `Failed to create meal at index ${i}`);
+      }
+
       createdMeals.push(createdMeal);
     }
+
     return createdMeals;
   },
 
@@ -247,6 +259,47 @@ const MealService = {
     }
 
     return populatedMeal;
+  },
+
+  updateMultiple: async (
+    mealsData: IMultipleMealsUpdate,
+    files?: Express.Multer.File[]
+  ) => {
+    for (let i = 0; i < mealsData.meals.length; i++) {
+      const mealData = mealsData.meals[i];
+      const { _id } = mealData;
+
+      if (!_id) {
+        throw createHttpError(400, `Meal at index ${i} is missing _id`);
+      }
+
+      if (!Types.ObjectId.isValid(_id)) {
+        throw createHttpError(400, `Invalid ObjectId at index ${i}: ${_id}`);
+      }
+
+      const existingMeal = await MealModel.findById(_id);
+      if (!existingMeal) {
+        throw createHttpError(404, `Meal not found with id: ${_id}`);
+      }
+    }
+
+    const updatedMeals = [];
+
+    for (let i = 0; i < mealsData.meals.length; i++) {
+      const mealData = mealsData.meals[i];
+      const file = files?.[i];
+
+      const { _id, ...updateData } = mealData;
+
+      const updatedMeal = await MealService.update(_id, updateData, file);
+      if (!updatedMeal) {
+        throw createHttpError(500, `Failed to update meal at index ${i}`);
+      }
+
+      updatedMeals.push(updatedMeal);
+    }
+
+    return updatedMeals;
   },
 
   remove: async (mealId: string) => {

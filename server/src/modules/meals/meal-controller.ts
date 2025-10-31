@@ -52,9 +52,8 @@ const MealController = {
 
   createMultiple: async (req: Request, res: Response) => {
     const mealsData = req.body;
-    console.log('Meal Data:', mealsData);
-    console.log('Body:', req.body);
-    const newMeals = await MealService.createMultiple(mealsData);
+    const files = req.files as Express.Multer.File[];
+    const newMeals = await MealService.createMultiple(mealsData, files);
     return res
       .status(201)
       .json(ApiResponse.success('Meals created successfully', newMeals));
@@ -67,6 +66,15 @@ const MealController = {
     return res
       .status(200)
       .json(ApiResponse.success('Meal updated successfully', updatedMeal));
+  },
+
+  updateMultiple: async (req: Request, res: Response) => {
+    const mealsData = req.body;
+    const files = req.files as Express.Multer.File[];
+    const updatedMeals = await MealService.updateMultiple(mealsData, files);
+    return res
+      .status(200)
+      .json(ApiResponse.success('Meals updated successfully', updatedMeals));
   },
 
   remove: async (req: Request, res: Response) => {
