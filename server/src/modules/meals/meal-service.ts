@@ -82,6 +82,18 @@ const MealService = {
     return meal;
   },
 
+  findByUser: async (userId: string) => {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
+    const meals = await MealModel.find({ user: userId })
+      .populate('user')
+      .populate('foods.food');
+
+    return meals;
+  },
+
   findByAdmin: async () => {
     const adminIds: Types.ObjectId[] = await UserModel.find({
       role: 'admin'
@@ -94,6 +106,61 @@ const MealService = {
       .populate('foods.food');
 
     return meals;
+  },
+
+  cloneAdminMealToUser: async (mealId: string, userId: string) => {
+    if (!Types.ObjectId.isValid(mealId)) {
+      throw createHttpError(400, 'Invalid mealId');
+    }
+
+    if (!Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid userId');
+    }
+
+    const meal = await MealModel.findById(mealId).populate('user');
+    if (!meal) {
+      throw createHttpError(404, 'Meal not found');
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw createHttpError(404, 'User not found');
+    }
+
+    // Only users can clone meals (admin cannot clone)
+    if (user.role === 'admin') {
+      throw createHttpError(400, 'Admin cannot clone meals');
+    }
+
+    // Check if the meal belongs to an admin
+    const mealOwner = meal.user as any;
+    if (!mealOwner || mealOwner.role !== 'admin') {
+      throw createHttpError(403, 'You can only clone admin meals');
+    }
+
+    const clonedMealData = {
+      title: meal.title,
+      image: meal.image,
+      mealType: meal.mealType,
+      user: userId,
+      foods: meal.foods,
+      scheduledAt: meal.scheduledAt
+    };
+
+    const clonedMeal = await MealModel.create(clonedMealData);
+    if (!clonedMeal) {
+      throw createHttpError(500, 'Failed to clone meal');
+    }
+
+    const populatedMeal = await MealModel.findById(clonedMeal._id)
+      .populate('user')
+      .populate('foods.food');
+
+    if (!populatedMeal) {
+      throw createHttpError(500, 'Failed to populate cloned meal');
+    }
+
+    return populatedMeal;
   },
 
   create: async (mealData: IMeal, file?: Express.Multer.File) => {

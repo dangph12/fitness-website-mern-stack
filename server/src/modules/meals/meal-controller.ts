@@ -35,11 +35,28 @@ const MealController = {
       .json(ApiResponse.success('Meal retrieved successfully', meal));
   },
 
+  findByUser: async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    const meals = await MealService.findByUser(userId);
+    return res
+      .status(200)
+      .json(ApiResponse.success('Meals retrieved successfully', meals));
+  },
+
   findByAdmin: async (req: Request, res: Response) => {
     const meals = await MealService.findByAdmin();
     return res
       .status(200)
       .json(ApiResponse.success('Meals retrieved successfully', meals));
+  },
+
+  cloneAdminMealToUser: async (req: Request, res: Response) => {
+    const mealId = req.params.id;
+    const userId = req.body.userId;
+    const clonedMeal = await MealService.cloneAdminMealToUser(mealId, userId);
+    return res
+      .status(201)
+      .json(ApiResponse.success('Meal cloned successfully', clonedMeal));
   },
 
   create: async (req: Request, res: Response) => {

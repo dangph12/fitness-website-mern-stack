@@ -15,9 +15,13 @@ const router: Router = express.Router();
 
 router.get('/', asyncHandler(MealController.find));
 
+router.get('/user/:userId', asyncHandler(MealController.findByUser));
+
 router.get('/admin', asyncHandler(MealController.findByAdmin));
 
 router.get('/:id', asyncHandler(MealController.findById));
+
+router.post('/:id/clone', asyncHandler(MealController.cloneAdminMealToUser));
 
 router.post(
   '/',
