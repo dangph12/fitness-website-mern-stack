@@ -7,7 +7,7 @@ import { Types } from 'mongoose';
 
 import { payOS } from '~/utils/payos';
 
-import UserModel from '../users/user-model';
+import { userMembershipService } from '../users/user-membership-service';
 import type { MembershipLevel } from '../users/user-type';
 import PaymentModel, {
   type MembershipUpgradeLevel,
@@ -112,12 +112,9 @@ export const paymentService = {
         throw createHttpError(400, 'Invalid userId');
       }
 
-      const user = await UserModel.findById(params.userId);
-      if (!user) {
-        throw createHttpError(404, 'User not found');
-      }
+      const user = await userMembershipService.refreshMembership(params.userId);
 
-      userId = user._id;
+      userId = user._id as Types.ObjectId;
       previousMembership = normalizeMembership(
         user.membershipLevel as MembershipLevel | undefined
       );
@@ -230,14 +227,27 @@ export const paymentService = {
       payment.cancellationReason = undefined;
 
       const userId = extractUserId(payment.user);
-      if (userId) {
-        await UserModel.findByIdAndUpdate(userId, {
-          membershipLevel: payment.targetMembership
-        });
+      const targetMembershipLevel = payment.targetMembership;
+      if (userId && targetMembershipLevel) {
+        await userMembershipService.applyMembershipLevel(
+          userId,
+          targetMembershipLevel
+        );
       }
     } else if (status === 'cancelled') {
       payment.cancellationReason = cancellationReason?.trim();
       payment.completedAt = undefined;
+
+      const userId = extractUserId(payment.user);
+      if (userId && payment.previousMembership) {
+        const user = await userMembershipService.refreshMembership(userId);
+        if (user.membershipLevel === payment.targetMembership) {
+          await userMembershipService.applyMembershipLevel(
+            userId,
+            normalizeMembership(payment.previousMembership)
+          );
+        }
+      }
     }
 
     await payment.save();

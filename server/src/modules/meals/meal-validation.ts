@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const MealValidationSchema = z.object({
   title: z.string(),
+  image: z.string().optional(),
   mealType: z.enum([
     'Breakfast',
     'Lunch',
@@ -35,4 +36,12 @@ export const MealValidationSchema = z.object({
 
 export const MultipleMealsValidationSchema = z.object({
   meals: z.array(MealValidationSchema)
+});
+
+export const MultipleMealsUpdateValidationSchema = z.object({
+  meals: z.array(
+    MealValidationSchema.extend({
+      _id: z.string()
+    })
+  )
 });

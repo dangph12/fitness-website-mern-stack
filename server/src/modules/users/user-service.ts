@@ -9,6 +9,7 @@ import { sendMail } from '~/utils/email/mailer';
 
 import AuthModel from '../auth/auth-model';
 import BodyRecordModel from '../body-records/body-record-model';
+import { userMembershipService } from './user-membership-service';
 import GoalModel from '../goals/goal-model';
 import UserModel from './user-model';
 import { IUser } from './user-type';
@@ -53,7 +54,10 @@ const UserService = {
       throw createHttpError(400, 'Invalid ObjectId');
     }
 
+    await userMembershipService.refreshMembership(userId);
+
     const user = await UserModel.findById(userId);
+
     if (!user) {
       throw createHttpError(404, 'User not found');
     }
@@ -71,7 +75,15 @@ const UserService = {
       throw createHttpError(404, 'User not found');
     }
 
-    return user;
+    return userMembershipService.refreshMembership(user._id);
+  },
+
+  refreshMembershipTokens: async (userId: string) => {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
+    return userMembershipService.forceRefreshTokens(userId);
   },
 
   createFromSignUp: async (userData: IUser, avatar?: Express.Multer.File) => {

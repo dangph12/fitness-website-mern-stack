@@ -1,5 +1,5 @@
 import createHttpError from 'http-errors';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 import AuthModel from '~/modules/auth/auth-model';
 import { comparePassword, hashPassword } from '~/utils/bcrypt';
@@ -18,7 +18,8 @@ const AuthService = {
   login: async (email: string, password: string, role?: string) => {
     const user = await UserService.findByEmail(email);
 
-    const auth = await AuthModel.findOne({ user: user._id, provider: 'local' });
+    const userId = user._id as Types.ObjectId;
+    const auth = await AuthModel.findOne({ user: userId, provider: 'local' });
 
     if (!auth || !auth.localPassword) {
       throw createHttpError(401, 'Password is incorrect');
@@ -35,7 +36,7 @@ const AuthService = {
     }
 
     const { accessToken, refreshToken } = generateToken({
-      id: user._id.toString(),
+      id: userId.toString(),
       role: user.role,
       profileCompleted: user.profileCompleted
     });
@@ -52,18 +53,19 @@ const AuthService = {
     avatarFile?: Express.Multer.File
   ) => {
     const user = await UserService.createFromSignUp(userData, avatarFile);
+    const userId = user._id as Types.ObjectId;
 
     const hashedPassword = await hashPassword(password);
 
     await AuthModel.create({
-      user: user._id,
+      user: userId,
       provider: 'local',
       providerId: user.email,
       localPassword: hashedPassword
     });
 
     const { accessToken, refreshToken } = generateToken({
-      id: user._id.toString(),
+      id: userId.toString(),
       role: user.role,
       profileCompleted: user.profileCompleted
     });
@@ -77,7 +79,8 @@ const AuthService = {
   forgotPassword: async (email: string) => {
     const user = await UserService.findByEmail(email);
 
-    const resetToken = generateResetPasswordToken(user._id.toString());
+    const userId = user._id as Types.ObjectId;
+    const resetToken = generateResetPasswordToken(userId.toString());
 
     await sendMail({
       to: user.email,
@@ -108,11 +111,12 @@ const AuthService = {
 
     const hashedPassword = await hashPassword(newPassword);
 
-    let auth = await AuthModel.findOne({ user: user._id, provider: 'local' });
+    const userId = user._id as Types.ObjectId;
+    let auth = await AuthModel.findOne({ user: userId, provider: 'local' });
 
     if (!auth) {
       auth = await AuthModel.create({
-        user: user._id,
+        user: userId,
         provider: 'local',
         providerId: user.email,
         localPassword: hashedPassword
@@ -143,8 +147,9 @@ const AuthService = {
       throw createHttpError(404, 'User not found');
     }
 
+    const userId = user._id as Types.ObjectId;
     const { accessToken } = generateToken({
-      id: user._id.toString(),
+      id: userId.toString(),
       role: user.role,
       profileCompleted: user.profileCompleted
     });
@@ -160,7 +165,7 @@ const AuthService = {
 
     if (!auth) {
       auth = await AuthModel.create({
-        user: user._id,
+        user: user._id as Types.ObjectId,
         provider,
         providerId,
         verifyAt: new Date()

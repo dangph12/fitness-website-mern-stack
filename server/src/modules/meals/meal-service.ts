@@ -6,7 +6,7 @@ import { uploadImage } from '~/utils/cloudinary';
 import FoodModel from '../foods/food-model';
 import UserModel from '../users/user-model';
 import MealModel from './meal-model';
-import { IMeal, IMultipleMeals } from './meal-type';
+import { IMeal, IMultipleMeals, IMultipleMealsUpdate } from './meal-type';
 
 const MealService = {
   find: async ({
@@ -25,18 +25,18 @@ const MealService = {
     };
 
     if (startDate || endDate) {
-      filterRecord.scheduleAt = {};
+      filterRecord.scheduledAt = {};
 
       if (startDate) {
         const start = new Date(startDate);
         start.setHours(0, 0, 0, 0);
-        filterRecord.scheduleAt.$gte = start;
+        filterRecord.scheduledAt.$gte = start;
       }
 
       if (endDate) {
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
-        filterRecord.scheduleAt.$lte = end;
+        filterRecord.scheduledAt.$lte = end;
       }
     }
 
@@ -80,6 +80,87 @@ const MealService = {
     }
 
     return meal;
+  },
+
+  findByUser: async (userId: string) => {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
+    const meals = await MealModel.find({ user: userId })
+      .populate('user')
+      .populate('foods.food');
+
+    return meals;
+  },
+
+  findByAdmin: async () => {
+    const adminIds: Types.ObjectId[] = await UserModel.find({
+      role: 'admin'
+    }).distinct('_id');
+
+    if (adminIds.length === 0) return [];
+
+    const meals = await MealModel.find({ user: { $in: adminIds } })
+      .populate('user')
+      .populate('foods.food');
+
+    return meals;
+  },
+
+  cloneAdminMealToUser: async (mealId: string, userId: string) => {
+    if (!Types.ObjectId.isValid(mealId)) {
+      throw createHttpError(400, 'Invalid mealId');
+    }
+
+    if (!Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid userId');
+    }
+
+    const meal = await MealModel.findById(mealId).populate('user');
+    if (!meal) {
+      throw createHttpError(404, 'Meal not found');
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw createHttpError(404, 'User not found');
+    }
+
+    // Only users can clone meals (admin cannot clone)
+    if (user.role === 'admin') {
+      throw createHttpError(400, 'Admin cannot clone meals');
+    }
+
+    // Check if the meal belongs to an admin
+    const mealOwner = meal.user as any;
+    if (!mealOwner || mealOwner.role !== 'admin') {
+      throw createHttpError(403, 'You can only clone admin meals');
+    }
+
+    const clonedMealData = {
+      title: meal.title,
+      image: meal.image,
+      mealType: meal.mealType,
+      user: userId,
+      foods: meal.foods,
+      scheduledAt: meal.scheduledAt
+    };
+
+    const clonedMeal = await MealModel.create(clonedMealData);
+    if (!clonedMeal) {
+      throw createHttpError(500, 'Failed to clone meal');
+    }
+
+    const populatedMeal = await MealModel.findById(clonedMeal._id)
+      .populate('user')
+      .populate('foods.food');
+
+    if (!populatedMeal) {
+      throw createHttpError(500, 'Failed to populate cloned meal');
+    }
+
+    return populatedMeal;
   },
 
   create: async (mealData: IMeal, file?: Express.Multer.File) => {
@@ -142,12 +223,24 @@ const MealService = {
     return populatedMeal;
   },
 
-  createMultiple: async (mealsData: IMultipleMeals) => {
+  createMultiple: async (
+    mealsData: IMultipleMeals,
+    files?: Express.Multer.File[]
+  ) => {
     const createdMeals = [];
-    for (const meal of mealsData.meals) {
-      const createdMeal = await MealService.create(meal);
+
+    for (let i = 0; i < mealsData.meals.length; i++) {
+      const meal = mealsData.meals[i];
+      const file = files?.[i];
+
+      const createdMeal = await MealService.create(meal, file);
+      if (!createdMeal) {
+        throw createHttpError(500, `Failed to create meal at index ${i}`);
+      }
+
       createdMeals.push(createdMeal);
     }
+
     return createdMeals;
   },
 
@@ -233,6 +326,47 @@ const MealService = {
     }
 
     return populatedMeal;
+  },
+
+  updateMultiple: async (
+    mealsData: IMultipleMealsUpdate,
+    files?: Express.Multer.File[]
+  ) => {
+    for (let i = 0; i < mealsData.meals.length; i++) {
+      const mealData = mealsData.meals[i];
+      const { _id } = mealData;
+
+      if (!_id) {
+        throw createHttpError(400, `Meal at index ${i} is missing _id`);
+      }
+
+      if (!Types.ObjectId.isValid(_id)) {
+        throw createHttpError(400, `Invalid ObjectId at index ${i}: ${_id}`);
+      }
+
+      const existingMeal = await MealModel.findById(_id);
+      if (!existingMeal) {
+        throw createHttpError(404, `Meal not found with id: ${_id}`);
+      }
+    }
+
+    const updatedMeals = [];
+
+    for (let i = 0; i < mealsData.meals.length; i++) {
+      const mealData = mealsData.meals[i];
+      const file = files?.[i];
+
+      const { _id, ...updateData } = mealData;
+
+      const updatedMeal = await MealService.update(_id, updateData, file);
+      if (!updatedMeal) {
+        throw createHttpError(500, `Failed to update meal at index ${i}`);
+      }
+
+      updatedMeals.push(updatedMeal);
+    }
+
+    return updatedMeals;
   },
 
   remove: async (mealId: string) => {

@@ -31,4 +31,8 @@ router.put(
 
 router.delete('/:id', asyncHandler(WorkoutController.remove));
 
+router.post('/:id/share', asyncHandler(WorkoutController.shareWorkout));
+
+router.post('/:id/clone', asyncHandler(WorkoutController.cloneWorkout));
+
 export default router;

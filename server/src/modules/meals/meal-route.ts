@@ -2,11 +2,12 @@ import express, { Router } from 'express';
 
 import validate from '~/middleware/validate';
 import asyncHandler from '~/utils/async-handler';
-import { uploadSingle } from '~/utils/multer';
+import { uploadMultiple, uploadSingle } from '~/utils/multer';
 
 import MealController from './meal-controller';
 import {
   MealValidationSchema,
+  MultipleMealsUpdateValidationSchema,
   MultipleMealsValidationSchema
 } from './meal-validation';
 
@@ -14,7 +15,13 @@ const router: Router = express.Router();
 
 router.get('/', asyncHandler(MealController.find));
 
+router.get('/user/:userId', asyncHandler(MealController.findByUser));
+
+router.get('/admin', asyncHandler(MealController.findByAdmin));
+
 router.get('/:id', asyncHandler(MealController.findById));
+
+router.post('/:id/clone', asyncHandler(MealController.cloneAdminMealToUser));
 
 router.post(
   '/',
@@ -25,9 +32,16 @@ router.post(
 
 router.post(
   '/multiple',
-  uploadSingle('image'),
+  uploadMultiple('images', 10),
   validate(MultipleMealsValidationSchema.shape),
   asyncHandler(MealController.createMultiple)
+);
+
+router.put(
+  '/multiple',
+  uploadMultiple('images', 10),
+  validate(MultipleMealsUpdateValidationSchema.shape),
+  asyncHandler(MealController.updateMultiple)
 );
 
 router.put(
