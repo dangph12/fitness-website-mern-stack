@@ -1,6 +1,14 @@
-import { Dumbbell, Salad, Scale } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import {
+  FaBalanceScale,
+  FaDumbbell,
+  FaEdit,
+  FaLeaf,
+  FaPlus,
+  FaSave,
+  FaTimes
+} from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 
@@ -21,7 +29,6 @@ const GOALS = ['Lose Weight', 'Build Muscle', 'To be Healthy'];
 const FitnessGoalCard = ({ userId }) => {
   const dispatch = useDispatch();
   const { userGoal, loading: goalLoading, error } = useSelector(s => s.goals);
-
   const [editing, setEditing] = useState(false);
 
   const {
@@ -74,7 +81,7 @@ const FitnessGoalCard = ({ userId }) => {
 
   return (
     <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
-      <h3 className='mb-3 text-sm font-semibold uppercase text-slate-500'>
+      <h3 className='mb-3 text-sm font-semibold uppercase text-slate-500 tracking-wide'>
         Fitness Goal
       </h3>
 
@@ -92,19 +99,19 @@ const FitnessGoalCard = ({ userId }) => {
             <>
               {userGoal ? (
                 <div className='space-y-3'>
-                  <Row icon={<Scale size={16} />} label='Target Weight'>
+                  <Row icon={<FaBalanceScale />} label='Target Weight'>
                     <span className='font-semibold text-slate-900'>
                       {userGoal.targetWeight ?? '—'} kg
                     </span>
                   </Row>
 
-                  <Row icon={<Salad size={16} />} label='Diet Plan'>
+                  <Row icon={<FaLeaf />} label='Diet Plan'>
                     <span className='font-semibold text-slate-900'>
                       {userGoal.diet || '—'}
                     </span>
                   </Row>
 
-                  <Row icon={<Dumbbell size={16} />} label='Goal'>
+                  <Row icon={<FaDumbbell />} label='Goal'>
                     <span className='font-semibold text-slate-900'>
                       {userGoal.fitnessGoal || '—'}
                     </span>
@@ -116,26 +123,31 @@ const FitnessGoalCard = ({ userId }) => {
                 </p>
               )}
 
-              <div className='pt-4'>
+              <div className='pt-5 flex justify-end'>
                 <button
                   onClick={() => setEditing(true)}
-                  className='rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800'
+                  className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 transition'
                 >
+                  {userGoal ? <FaEdit /> : <FaPlus />}
                   {userGoal ? 'Edit Goal' : 'Create Goal'}
                 </button>
               </div>
             </>
           ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-              <div className='flex items-center gap-3'>
-                <label className='w-36 text-sm font-medium text-slate-700'>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className='space-y-5 bg-slate-50/60 rounded-xl p-5 border border-slate-200 mt-2'
+            >
+              <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
+                <label className='w-40 text-sm font-medium text-slate-700 flex items-center gap-2'>
+                  <FaBalanceScale className='text-blue-500' />
                   Target Weight (kg)
                 </label>
                 <input
                   type='number'
                   step='0.1'
                   inputMode='decimal'
-                  className='w-40 rounded-md border border-slate-300 px-2 py-1 text-sm text-slate-900'
+                  className='flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-blue-200 outline-none'
                   placeholder='e.g. 64'
                   {...register('targetWeight', {
                     valueAsNumber: true,
@@ -144,17 +156,18 @@ const FitnessGoalCard = ({ userId }) => {
                 />
               </div>
               {errors?.targetWeight && (
-                <p className='-mt-2 pl-36 text-xs text-rose-600'>
+                <p className='text-xs text-rose-600 pl-40'>
                   {errors.targetWeight.message}
                 </p>
               )}
 
-              <div className='flex items-center gap-3'>
-                <label className='w-36 text-sm font-medium text-slate-700'>
-                  Diet
+              <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
+                <label className='w-40 text-sm font-medium text-slate-700 flex items-center gap-2'>
+                  <FaLeaf className='text-green-500' />
+                  Diet Plan
                 </label>
                 <select
-                  className='w-60 rounded-md border border-slate-300 px-2 py-1 text-sm text-slate-900'
+                  className='flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-green-200 outline-none'
                   {...register('diet')}
                 >
                   <option value=''>— Select diet —</option>
@@ -166,12 +179,13 @@ const FitnessGoalCard = ({ userId }) => {
                 </select>
               </div>
 
-              <div className='flex items-center gap-3'>
-                <label className='w-36 text-sm font-medium text-slate-700'>
-                  Goal
+              <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
+                <label className='w-40 text-sm font-medium text-slate-700 flex items-center gap-2'>
+                  <FaDumbbell className='text-indigo-500' />
+                  Fitness Goal
                 </label>
                 <select
-                  className='w-60 rounded-md border border-slate-300 px-2 py-1 text-sm text-slate-900'
+                  className='flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:ring-2 focus:ring-indigo-200 outline-none'
                   {...register('fitnessGoal')}
                 >
                   <option value=''>— Select goal —</option>
@@ -183,18 +197,7 @@ const FitnessGoalCard = ({ userId }) => {
                 </select>
               </div>
 
-              <div className='flex items-center gap-2 pt-2'>
-                <button
-                  type='submit'
-                  disabled={isSubmitting}
-                  className={`rounded-md px-3 py-2 text-sm font-medium text-white ${
-                    isSubmitting
-                      ? 'bg-slate-400 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700'
-                  }`}
-                >
-                  {isSubmitting ? 'Saving…' : 'Save'}
-                </button>
+              <div className='flex items-center justify-end gap-3 pt-3'>
                 <button
                   type='button'
                   onClick={() => {
@@ -208,9 +211,22 @@ const FitnessGoalCard = ({ userId }) => {
                     });
                     setEditing(false);
                   }}
-                  className='rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50'
+                  className='inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition'
                 >
-                  Cancel
+                  <FaTimes /> Cancel
+                </button>
+
+                <button
+                  type='submit'
+                  disabled={isSubmitting}
+                  className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition ${
+                    isSubmitting
+                      ? 'bg-slate-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90'
+                  }`}
+                >
+                  <FaSave />
+                  {isSubmitting ? 'Saving…' : 'Save'}
                 </button>
               </div>
             </form>
