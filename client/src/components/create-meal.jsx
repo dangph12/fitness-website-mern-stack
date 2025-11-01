@@ -12,6 +12,7 @@ import {
   FaTag,
   FaTimes,
   FaTrash,
+  FaUtensils,
   FaWeight
 } from 'react-icons/fa';
 import { GiCupcake, GiMeal as GiFood, GiMeal } from 'react-icons/gi';
@@ -69,11 +70,7 @@ export default function CreateMealSchedule() {
     ];
   });
 
-  const [selected, setSelected] = useState(() => ({
-    dayId: null,
-    mealId: null
-  }));
-
+  const [selected, setSelected] = useState({ dayId: null, mealId: null });
   const [saving, setSaving] = useState(false);
 
   useLayoutEffect(() => {
@@ -135,20 +132,14 @@ export default function CreateMealSchedule() {
     const newMeal = {
       id: genId(),
       title: '',
-      mealType: 'Snack',
+      mealType: 'Breakfast',
       image: null,
       previewUrl: null,
       foods: []
     };
-
     setDays(prev =>
       prev.map(d =>
-        d.id === dayId
-          ? {
-              ...d,
-              meals: [...d.meals, newMeal]
-            }
-          : d
+        d.id === dayId ? { ...d, meals: [...d.meals, newMeal] } : d
       )
     );
     setSelected({ dayId, mealId: newMeal.id });
@@ -161,7 +152,6 @@ export default function CreateMealSchedule() {
         const nextMeals = d.meals.filter(m => m.id !== mealId);
 
         const currentMealIndex = d.meals.findIndex(m => m.id === mealId);
-
         let nextSelectedMealId = null;
         if (nextMeals.length > 0) {
           const nextMealToSelect =
@@ -190,7 +180,6 @@ export default function CreateMealSchedule() {
         } else {
           setSelected({ dayId, mealId: updatedDay.meals[0].id });
         }
-
         return updatedDay;
       })
     );
@@ -213,7 +202,6 @@ export default function CreateMealSchedule() {
 
   const updateMealImage = (dayId, mealId, file) => {
     const previewUrl = file ? URL.createObjectURL(file) : null;
-
     setDays(prev =>
       prev.map(d =>
         d.id !== dayId
@@ -221,13 +209,7 @@ export default function CreateMealSchedule() {
           : {
               ...d,
               meals: d.meals.map(m =>
-                m.id === mealId
-                  ? {
-                      ...m,
-                      image: file,
-                      previewUrl: previewUrl
-                    }
-                  : m
+                m.id === mealId ? { ...m, image: file, previewUrl } : m
               )
             }
       )
@@ -382,386 +364,384 @@ export default function CreateMealSchedule() {
     );
 
   return (
-    <div className='max-w-full mx-auto p-4 md:p-8 bg-slate-50 min-h-screen'>
-      <header className='flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 p-4 bg-white rounded-xl shadow-lg'>
-        <div className='flex items-center gap-4 mb-4 sm:mb-0'>
+    <div className='min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-8 px-5 md:px-10'>
+      <header className='flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-3xl shadow-xl p-6 mb-10'>
+        <div className='flex items-center gap-4'>
           <GiFood className='text-emerald-600 text-4xl' />
           <div>
-            <h1 className='text-3xl font-bold text-slate-800'>
+            <h1 className='text-3xl font-extrabold text-slate-800'>
               Plan Your Meal Schedule
             </h1>
-            <p className='text-md text-slate-500'>
-              Create multiple meals across different days and save them at once.
+            <p className='text-slate-500 text-sm'>
+              Create multiple meals across different days and save them all.
             </p>
           </div>
         </div>
 
-        <div className='flex items-center gap-6 p-3 border rounded-xl bg-slate-100'>
-          <div className='text-sm text-slate-700'>
-            <div className='font-semibold'>
-              <GiFood className='inline mr-1 text-emerald-600' /> Total Meals:{' '}
-              <b className='text-emerald-600'>{totalMealsCount}</b>
+        <div className='flex flex-wrap items-center gap-4 mt-4 lg:mt-0'>
+          <div className='bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 text-sm text-emerald-800 flex items-center gap-3'>
+            <div className='flex items-center gap-1'>
+              <FaUtensils className='text-emerald-600' />
+              <span>{totalMealsCount} meals</span>
             </div>
-            <div className='font-semibold'>
-              <FaDrumstickBite className='inline mr-1 text-emerald-600' /> Total
-              Foods: <b className='text-emerald-600'>{totalFoodsCount}</b>
+            <div className='flex items-center gap-1'>
+              <FaDrumstickBite className='text-emerald-600' />
+              <span>{totalFoodsCount} foods</span>
             </div>
           </div>
           <button
             onClick={handleSubmitAll}
             disabled={saving}
-            className={`px-6 py-3 rounded-xl text-white font-semibold shadow-md transition-colors flex items-center gap-2 ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold shadow-md ${
               saving
                 ? 'bg-slate-400'
-                : 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800'
+                : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-90'
             }`}
           >
-            <FaSave />
-            {saving ? 'Saving...' : `Create ${totalMealsCount} Meal(s)`}
+            <FaSave /> {saving ? 'Saving...' : 'Save All'}
           </button>
         </div>
       </header>
 
-      <div className='grid grid-cols-1 lg:grid-cols-12 gap-8'>
-        <div className='lg:col-span-8 space-y-6'>
-          <div className='rounded-2xl border bg-white p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
-            <div className='flex flex-wrap items-center gap-4'>
-              <label className='text-md text-slate-700 font-medium flex items-center gap-2'>
-                <FaCalendarAlt className='text-emerald-600' /> Add New Day:
-              </label>
-              <input
-                type='date'
-                className='border rounded-lg px-3 py-2 text-slate-700 focus:ring-emerald-500 focus:border-emerald-500'
-                onChange={e => addDay(new Date(e.target.value))}
-              />
-              <button
-                onClick={() => addDay(new Date())}
-                className='px-4 py-2 bg-emerald-500 text-white rounded-lg shadow hover:bg-emerald-600 transition flex items-center gap-1'
-              >
-                <FaPlus className='text-xs' /> Today
-              </button>
-            </div>
-            <button
-              onClick={() => {
-                const d = {
+      <div className='bg-white rounded-3xl shadow-lg border border-slate-200 p-6 mb-8 flex flex-wrap justify-between items-center gap-4'>
+        <div className='flex flex-wrap items-center gap-3'>
+          <FaCalendarAlt className='text-emerald-600 text-lg' />
+          <label className='text-slate-700 font-medium'>Add New Day:</label>
+          <button
+            onClick={() => addDay(new Date())}
+            className='px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg shadow hover:opacity-90 flex items-center gap-1'
+          >
+            <FaPlus className='text-xs' /> Today
+          </button>
+          <input
+            type='date'
+            className='border rounded-lg px-3 py-2 text-slate-700 focus:ring-2 focus:ring-emerald-400 outline-none'
+            onChange={e => addDay(new Date(e.target.value))}
+          />
+        </div>
+        <button
+          onClick={() => {
+            const d = {
+              id: genId(),
+              date: new Date(),
+              meals: [
+                {
                   id: genId(),
-                  date: new Date(),
-                  meals: [
-                    {
-                      id: genId(),
-                      title: '',
-                      mealType: 'Breakfast',
-                      image: null,
-                      previewUrl: null,
-                      foods: []
-                    }
-                  ]
-                };
-                setDays([d]);
-                setSelected({ dayId: d.id, mealId: d.meals[0].id });
-                toast.info('Schedule has been reset to today.');
-              }}
-              className='px-4 py-2 border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-100 transition flex items-center gap-1'
+                  title: '',
+                  mealType: 'Breakfast',
+                  image: null,
+                  previewUrl: null,
+                  foods: []
+                }
+              ]
+            };
+            setDays([d]);
+            setSelected({ dayId: d.id, mealId: d.meals[0].id });
+            toast.info('Schedule has been reset to today.');
+          }}
+          className='px-4 py-2 border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-100 transition flex items-center gap-1'
+        >
+          <FaSyncAlt /> Reset
+        </button>
+      </div>
+
+      <div className='grid grid-cols-1 lg:grid-cols-12 gap-8'>
+        <div className='lg:col-span-8 space-y-8'>
+          {days.map(day => (
+            <div
+              key={day.id}
+              className='bg-white rounded-3xl border border-slate-200 p-6 shadow-lg'
             >
-              <FaSyncAlt /> Reset Schedule
-            </button>
-          </div>
-
-          <div className='space-y-6'>
-            {days.map(day => (
-              <div
-                key={day.id}
-                className='rounded-2xl border border-slate-200 bg-white p-6 shadow-xl'
-              >
-                <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b mb-4'>
-                  <div className='flex items-center gap-3'>
-                    <FaCalendarAlt className='text-2xl text-slate-500' />
-                    <h2 className='text-xl font-bold text-slate-800'>
-                      {day.date.toLocaleDateString(undefined, {
-                        weekday: 'long',
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
-                    </h2>
-                    <span className='text-sm text-slate-500'>
-                      ({dateToShort(day.date)})
-                    </span>
-                  </div>
-
-                  <div className='flex items-center gap-3 mt-3 sm:mt-0'>
-                    <button
-                      onClick={() => addMeal(day.id)}
-                      className='flex items-center gap-1 px-3 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-200 transition'
-                    >
-                      <FaPlus className='text-xs' /> Add Meal
-                    </button>
-                    <button
-                      onClick={() => removeDay(day.id)}
-                      className='flex items-center gap-1 px-3 py-2 text-red-500 rounded-lg text-sm hover:bg-red-50 transition'
-                      title='Remove entire day'
-                    >
-                      <FaTrash className='text-xs' /> Remove Day
-                    </button>
-                  </div>
+              <div className='flex justify-between items-center border-b pb-3 mb-5'>
+                <div className='flex items-center gap-3'>
+                  <FaCalendarAlt className='text-emerald-600 text-xl' />
+                  <h2 className='text-lg font-semibold text-slate-800'>
+                    {day.date.toLocaleDateString(undefined, {
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </h2>
+                  <span className='text-sm text-slate-500'>
+                    ({dateToShort(day.date)})
+                  </span>
                 </div>
+                <button
+                  onClick={() => removeDay(day.id)}
+                  className='text-red-500 hover:text-red-700 text-sm flex items-center gap-1'
+                >
+                  <FaTrash /> Remove Day
+                </button>
+              </div>
 
-                <div className='space-y-4'>
-                  {day.meals.map(meal => {
-                    const isSelected =
-                      selected.dayId === day.id && selected.mealId === meal.id;
-                    const mealTotalCalories = getMealTotal(meal, 'calories');
-                    const mealTotalProtein = getMealTotal(meal, 'protein');
-                    const mealTotalCarb = getMealTotal(meal, 'carbohydrate');
-                    const mealTotalFat = getMealTotal(meal, 'fat');
+              <div className='space-y-6'>
+                {day.meals.map(meal => {
+                  const isSelected =
+                    selected.dayId === day.id && selected.mealId === meal.id;
+                  const mealTotalCalories = getMealTotal(meal, 'calories');
+                  const mealTotalProtein = getMealTotal(meal, 'protein');
+                  const mealTotalCarb = getMealTotal(meal, 'carbohydrate');
+                  const mealTotalFat = getMealTotal(meal, 'fat');
 
-                    return (
-                      <div
-                        key={meal.id}
-                        onClick={() =>
-                          setSelected({ dayId: day.id, mealId: meal.id })
-                        }
-                        className={`rounded-xl p-5 border cursor-pointer transition-all w-full ${
-                          isSelected
-                            ? 'ring-4 ring-emerald-300 border-emerald-400 bg-emerald-50 shadow-lg'
-                            : 'bg-white hover:shadow-md border-slate-200'
-                        }`}
-                      >
-                        <div className='flex items-center justify-between mb-3'>
-                          <div className='flex items-center gap-2'>
-                            {mealTypeIcons[meal.mealType] || (
-                              <GiMeal className='text-lg text-slate-600' />
-                            )}
-                            <h3 className='font-semibold text-slate-800 text-lg'>
-                              {meal.title || meal.mealType}
-                            </h3>
-                          </div>
-                          <button
-                            onClick={e => {
-                              e.stopPropagation();
-                              removeMeal(day.id, meal.id);
-                            }}
-                            className='text-red-400 hover:text-red-600 transition p-1'
-                            title='Remove meal'
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-
-                        <div className='space-y-3 mb-4'>
-                          <div className='flex gap-3'>
-                            <select
-                              value={meal.mealType}
-                              onClick={e => e.stopPropagation()}
-                              onChange={e =>
-                                updateMealField(
-                                  day.id,
-                                  meal.id,
-                                  'mealType',
-                                  e.target.value
-                                )
-                              }
-                              className='flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm appearance-none cursor-pointer'
-                            >
-                              {Object.keys(mealTypeIcons).map(t => (
-                                <option key={t} value={t}>
-                                  {t}
-                                </option>
-                              ))}
-                            </select>
-
-                            <input
-                              placeholder='Meal title (optional)'
-                              value={meal.title}
-                              onClick={e => e.stopPropagation()}
-                              onChange={e =>
-                                updateMealField(
-                                  day.id,
-                                  meal.id,
-                                  'title',
-                                  e.target.value
-                                )
-                              }
-                              className='flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm'
-                            />
-                          </div>
-
-                          <div className='relative group'>
-                            {meal.previewUrl && (
-                              <>
-                                <img
-                                  src={meal.previewUrl}
-                                  alt='Meal Preview'
-                                  className='w-full h-40 object-cover rounded-lg mb-2 shadow-md'
-                                />
-                                <button
-                                  onClick={e => {
-                                    e.stopPropagation();
-                                    updateMealImage(day.id, meal.id, null);
-                                  }}
-                                  title='Remove image'
-                                  className='absolute top-4 right-4 p-2 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition opacity-0 group-hover:opacity-100'
-                                >
-                                  <FaTimes className='text-sm' />
-                                </button>
-                              </>
-                            )}
-                            <label className='flex items-center gap-2 cursor-pointer bg-white border-2 border-dashed border-slate-300 hover:border-emerald-400 hover:bg-emerald-50 px-3 py-4 rounded-lg text-sm text-slate-600 w-full justify-center transition'>
-                              <FaImage />{' '}
-                              {meal.image?.name ||
-                                'Upload Meal Image (Optional)'}
-                              <input
-                                type='file'
-                                accept='image/*'
-                                className='hidden'
-                                onClick={e => e.stopPropagation()}
-                                onChange={e =>
-                                  updateMealImage(
-                                    day.id,
-                                    meal.id,
-                                    e.target.files?.[0]
-                                  )
-                                }
-                              />
-                            </label>
-                          </div>
-                        </div>
-
-                        <div className='flex items-center justify-between py-2 border-t border-b border-slate-200 mb-3'>
-                          <div className='font-bold text-2xl text-emerald-600 flex items-center gap-2'>
-                            <FaFire />
-                            {mealTotalCalories.toFixed(0)} cal
-                          </div>
-                          <div className='text-sm text-slate-600 flex gap-4'>
-                            <span className='flex items-center gap-1'>
-                              <FaDrumstickBite className='text-blue-500' />
-                              <b className='text-slate-800'>P:</b>{' '}
-                              {mealTotalProtein.toFixed(1)}g
-                            </span>
-                            <span className='flex items-center gap-1'>
-                              <GiCupcake className='text-yellow-500' />
-                              <b className='text-slate-800'>C:</b>{' '}
-                              {mealTotalCarb.toFixed(1)}g
-                            </span>
-                            <span className='flex items-center gap-1'>
-                              <FaWeight className='text-red-500' />
-                              <b className='text-slate-800'>F:</b>{' '}
-                              {mealTotalFat.toFixed(1)}g
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className='mt-4 space-y-2 max-h-56 overflow-y-auto pr-2'>
-                          {meal.foods.length === 0 ? (
-                            <div className='p-4 border-2 border-dashed border-slate-300 rounded-lg text-center text-sm text-slate-500 bg-white'>
-                              <FaTag className='inline mr-2' />
-                              No foods yet. Select this meal and use the Food
-                              Library on the right to add items.
-                            </div>
-                          ) : (
-                            <div className='space-y-2'>
-                              {meal.foods.map(f => (
-                                <div
-                                  key={f.food}
-                                  className='flex items-center justify-between p-3 bg-white rounded-lg border border-slate-100 shadow-sm'
-                                >
-                                  <div className='flex items-center gap-3'>
-                                    <img
-                                      src={
-                                        globalFoods.find(g => g._id === f.food)
-                                          ?.image || '/placeholder-food.png'
-                                      }
-                                      alt={f.title}
-                                      className='w-10 h-10 object-cover rounded-full border'
-                                    />
-                                    <div>
-                                      <div className='font-medium text-slate-800 text-sm'>
-                                        {f.title}
-                                      </div>
-                                      <div className='text-xs text-slate-500 flex items-center gap-2'>
-                                        <FaFire className='text-red-400' />
-                                        {(
-                                          (f.calories ?? 0) * (f.quantity ?? 0)
-                                        ).toFixed(0)}{' '}
-                                        cal
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className='flex items-center gap-2'>
-                                    <FaExchangeAlt className='text-slate-400' />
-                                    <input
-                                      type='number'
-                                      min={0}
-                                      value={f.quantity}
-                                      onClick={e => e.stopPropagation()}
-                                      onChange={e =>
-                                        updateFoodQty(
-                                          day.id,
-                                          meal.id,
-                                          f.food,
-                                          e.target.value
-                                        )
-                                      }
-                                      className='w-16 border rounded-lg px-2 py-1 text-sm text-center focus:ring-emerald-500'
-                                    />
-                                    <button
-                                      onClick={e => {
-                                        e.stopPropagation();
-                                        removeFoodFromMeal(
-                                          day.id,
-                                          meal.id,
-                                          f.food
-                                        );
-                                      }}
-                                      className='text-red-400 hover:text-red-600 p-1'
-                                      title='Remove food item from meal'
-                                    >
-                                      <FaTimes className='text-sm' />
-                                    </button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                  return (
+                    <div
+                      key={meal.id}
+                      onClick={() =>
+                        setSelected({ dayId: day.id, mealId: meal.id })
+                      }
+                      className={`rounded-2xl p-5 border transition-all w-full ${
+                        isSelected
+                          ? 'ring-4 ring-emerald-300 border-emerald-400 bg-emerald-50 shadow-lg'
+                          : 'bg-white hover:shadow-md border-slate-200'
+                      }`}
+                    >
+                      <div className='flex items-center justify-between mb-4'>
+                        <div className='flex items-center gap-2'>
+                          {mealTypeIcons[meal.mealType] || (
+                            <GiMeal className='text-lg text-slate-600' />
                           )}
+                          <h3 className='font-semibold text-slate-800 text-lg'>
+                            {meal.title || meal.mealType}
+                          </h3>
+                        </div>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            removeMeal(day.id, meal.id);
+                          }}
+                          className='text-red-400 hover:text-red-600 transition p-1'
+                          title='Remove meal'
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+
+                      <div className='flex flex-col md:flex-row gap-3 mb-4'>
+                        <select
+                          value={meal.mealType}
+                          onClick={e => e.stopPropagation()}
+                          onChange={e =>
+                            updateMealField(
+                              day.id,
+                              meal.id,
+                              'mealType',
+                              e.target.value
+                            )
+                          }
+                          className='flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-gray-400 outline-none bg-white text-gray-800'
+                        >
+                          {Object.keys(mealTypeIcons).map(t => (
+                            <option key={t} value={t}>
+                              {t}
+                            </option>
+                          ))}
+                        </select>
+
+                        <input
+                          placeholder='Meal title (optional)'
+                          value={meal.title}
+                          onClick={e => e.stopPropagation()}
+                          onChange={e =>
+                            updateMealField(
+                              day.id,
+                              meal.id,
+                              'title',
+                              e.target.value
+                            )
+                          }
+                          className='flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-300 outline-none'
+                        />
+                      </div>
+
+                      <div className='relative group mb-4'>
+                        {meal.previewUrl && (
+                          <>
+                            <img
+                              src={meal.previewUrl}
+                              alt='Meal Preview'
+                              className='w-full h-44 object-cover rounded-xl mb-2 shadow-md'
+                            />
+                            <button
+                              onClick={e => {
+                                e.stopPropagation();
+                                updateMealImage(day.id, meal.id, null);
+                              }}
+                              title='Remove image'
+                              className='absolute top-4 right-4 p-2 bg-red-500/90 text-white rounded-full hover:bg-red-600 transition opacity-0 group-hover:opacity-100'
+                            >
+                              <FaTimes className='text-sm' />
+                            </button>
+                          </>
+                        )}
+                        <label className='flex items-center gap-2 cursor-pointer bg-white border-2 border-dashed border-slate-300 hover:border-emerald-400 hover:bg-emerald-50 px-3 py-4 rounded-lg text-sm text-slate-600 w-full justify-center transition'>
+                          <FaImage />{' '}
+                          {meal.image?.name || 'Upload Meal Image (Optional)'}
+                          <input
+                            type='file'
+                            accept='image/*'
+                            className='hidden'
+                            onClick={e => e.stopPropagation()}
+                            onChange={e =>
+                              updateMealImage(
+                                day.id,
+                                meal.id,
+                                e.target.files?.[0]
+                              )
+                            }
+                          />
+                        </label>
+                      </div>
+
+                      <div className='flex items-center justify-between py-2 border-y border-slate-200 mb-4'>
+                        <div className='font-bold text-2xl text-emerald-600 flex items-center gap-2'>
+                          <FaFire />
+                          {mealTotalCalories.toFixed(0)} cal
+                        </div>
+                        <div className='text-sm text-slate-600 flex gap-3 sm:gap-5'>
+                          <StatPill
+                            icon={<FaDrumstickBite />}
+                            label='P'
+                            value={`${mealTotalProtein.toFixed(1)}g`}
+                          />
+                          <StatPill
+                            icon={<GiCupcake />}
+                            label='C'
+                            value={`${mealTotalCarb.toFixed(1)}g`}
+                          />
+                          <StatPill
+                            icon={<FaWeight />}
+                            label='F'
+                            value={`${mealTotalFat.toFixed(1)}g`}
+                          />
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+
+                      <div className='mt-2 space-y-2 max-h-56 overflow-y-auto pr-1'>
+                        {meal.foods.length === 0 ? (
+                          <div className='p-4 border-2 border-dashed border-slate-300 rounded-lg text-center text-sm text-slate-500 bg-white'>
+                            <FaTag className='inline mr-2' />
+                            No foods yet. Select this meal and use the Food
+                            Library on the right to add items.
+                          </div>
+                        ) : (
+                          meal.foods.map(f => {
+                            const imgSrc =
+                              globalFoods.find(g => g._id === f.food)?.image ||
+                              '/placeholder-food.png';
+                            const kcal = (
+                              (f.calories ?? 0) * (f.quantity ?? 0)
+                            ).toFixed(0);
+                            return (
+                              <div
+                                key={f.food}
+                                className='flex items-center justify-between p-3 bg-white rounded-lg border border-slate-100 shadow-sm'
+                              >
+                                <div className='flex items-center gap-3'>
+                                  <img
+                                    src={imgSrc}
+                                    alt={f.title}
+                                    className='w-10 h-10 object-cover rounded-full border'
+                                  />
+                                  <div>
+                                    <div className='font-medium text-slate-800 text-sm'>
+                                      {f.title}
+                                    </div>
+                                    <div className='text-xs text-slate-500 flex items-center gap-2'>
+                                      <FaFire className='text-red-400' />
+                                      {kcal} cal
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className='flex items-center gap-2'>
+                                  <FaExchangeAlt className='text-slate-400' />
+                                  <input
+                                    type='number'
+                                    min={0}
+                                    value={f.quantity}
+                                    onClick={e => e.stopPropagation()}
+                                    onChange={e =>
+                                      updateFoodQty(
+                                        day.id,
+                                        meal.id,
+                                        f.food,
+                                        e.target.value
+                                      )
+                                    }
+                                    className='w-20 border rounded-lg px-2 py-1 text-sm text-center focus:ring-2 focus:ring-emerald-300 outline-none'
+                                  />
+                                  <button
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      removeFoodFromMeal(
+                                        day.id,
+                                        meal.id,
+                                        f.food
+                                      );
+                                    }}
+                                    className='text-red-400 hover:text-red-600 p-1'
+                                    title='Remove food item from meal'
+                                  >
+                                    <FaTimes className='text-sm' />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <button
+                  onClick={() => addMeal(day.id)}
+                  className='mt-2 w-full border-2 border-dashed border-emerald-300 text-emerald-700 py-3 rounded-xl hover:bg-emerald-50 transition flex items-center justify-center gap-2'
+                >
+                  <FaPlus className='text-xs' /> Add Meal
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
 
         <div className='lg:col-span-4'>
           <div className='sticky top-8 space-y-4'>
-            <div className='rounded-2xl border border-emerald-300 bg-white p-5 shadow-lg'>
+            <div className='rounded-3xl border border-emerald-300 bg-white p-5 shadow-xl'>
               <h4 className='text-lg font-bold text-slate-800 mb-2 flex items-center gap-2'>
                 <FaDrumstickBite className='text-emerald-600' /> Food Library
               </h4>
               <div className='text-sm text-slate-600 flex items-center mb-3 p-2 bg-emerald-50 rounded-lg'>
                 <FaChevronRight className='text-emerald-600 mr-2' />
-                Add foods by clicking the **+** button in the list below.
+                Add foods by clicking the <b className='mx-1'>+</b> button in
+                the list below.
               </div>
-              <div className='text-md text-slate-700 font-medium'>
+              <div className='text-sm text-slate-700'>
                 Selected Meal:
-                <div className='px-3 py-1 bg-slate-100 rounded-md mt-1 font-bold text-emerald-700'>
+                <div className='px-3 py-1 bg-slate-100 rounded-md mt-1 font-semibold text-emerald-700'>
                   {selectedMeal
-                    ? `${selectedMeal.mealType} - ${days
-                        .find(d => d.id === selected.dayId)
-                        ?.date.toLocaleDateString()}`
+                    ? `${selectedMeal.mealType} – ${days.find(d => d.id === selected.dayId)?.date.toLocaleDateString()}`
                     : 'No meal selected'}
                 </div>
               </div>
             </div>
 
-            <div className='rounded-2xl border bg-white p-0 shadow-lg max-h-[60vh] overflow-y-auto'>
+            <div className='rounded-3xl border bg-white p-0 shadow-xl max-h-full overflow-y-auto'>
               <FoodLibrary handleAddFood={handleAddFoodToSelected} />
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function StatPill({ icon, label, value }) {
+  return (
+    <span className='inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md'>
+      {icon}
+      <b className='text-slate-800'>{label}:</b> {value}
+    </span>
   );
 }
