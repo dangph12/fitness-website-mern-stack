@@ -36,6 +36,53 @@ const mealTypeIcons = {
   Dessert: <GiCupcake className='text-red-600' />
 };
 
+const ymd = d => {
+  const x = new Date(d);
+  const y = x.getFullYear();
+  const m = String(x.getMonth() + 1).padStart(2, '0');
+  const day = String(x.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+function buildMealsFormDataFromDays(days, userId) {
+  const fd = new FormData();
+  let mealIndex = 0;
+
+  days.forEach(d => {
+    const scheduledAt = ymd(d.date);
+
+    d.meals.forEach(m => {
+      const base = `meals[${mealIndex}]`;
+
+      fd.append(
+        `${base}[title]`,
+        m.title || `${m.mealType} ${d.date.toDateString()}`
+      );
+      fd.append(`${base}[mealType]`, m.mealType || 'Breakfast');
+      fd.append(`${base}[user]`, userId || '');
+      fd.append(`${base}[scheduledAt]`, scheduledAt);
+
+      (m.foods || []).forEach((f, j) => {
+        fd.append(`${base}[foods][${j}][food]`, String(f.food));
+        fd.append(
+          `${base}[foods][${j}][quantity]`,
+          String(Number(f.quantity) || 0)
+        );
+      });
+
+      if (m.image instanceof File) {
+        fd.append('images', m.image);
+      } else if (typeof m.image === 'string' && m.image.trim()) {
+        fd.append(`${base}[image]`, m.image.trim());
+      }
+
+      mealIndex += 1;
+    });
+  });
+
+  return fd;
+}
+
 export default function CreateMealSchedule() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -300,32 +347,19 @@ export default function CreateMealSchedule() {
     for (const d of days) {
       for (const m of d.meals) {
         if (!m.foods || m.foods.length === 0) {
-          return toast.warning(
+          toast.warning(
             `Meal "${m.title || m.mealType}" on ${d.date.toDateString()} is empty. Please add foods or remove the meal.`
           );
+          return;
         }
       }
     }
 
-    const mealDataArray = days
-      .map(d =>
-        d.meals.map(m => ({
-          title: m.title || `${m.mealType} ${d.date.toDateString()}`,
-          mealType: m.mealType,
-          user: userId || '',
-          scheduledAt: d.date.toISOString().split('T')[0],
-          image: m.image,
-          foods: m.foods.map(f => ({
-            food: f.food,
-            quantity: String(Number(f.quantity) || 0)
-          }))
-        }))
-      )
-      .flat();
+    const fd = buildMealsFormDataFromDays(days, userId);
 
     setSaving(true);
     try {
-      await dispatch(createMultipleMeals(mealDataArray));
+      await dispatch(createMultipleMeals(fd)).unwrap();
       toast.success('Meal schedule created successfully!');
       navigate('/nutrition');
     } catch (err) {
@@ -721,7 +755,9 @@ export default function CreateMealSchedule() {
                 Selected Meal:
                 <div className='px-3 py-1 bg-slate-100 rounded-md mt-1 font-semibold text-emerald-700'>
                   {selectedMeal
-                    ? `${selectedMeal.mealType} – ${days.find(d => d.id === selected.dayId)?.date.toLocaleDateString()}`
+                    ? `${selectedMeal.mealType} – ${days
+                        .find(d => d.id === selected.dayId)
+                        ?.date.toLocaleDateString()}`
                     : 'No meal selected'}
                 </div>
               </div>
