@@ -1,10 +1,8 @@
-import {
-  createAsyncThunk,
-  createSlice
-} from '/node_modules/.vite/deps/@reduxjs_toolkit.js?v=8a52d1ed';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
 import axiosInstance from '/src/lib/axios-instance.js';
 
-// Fetch all meals
+// FETCH MEALS
 export const fetchMeals = createAsyncThunk(
   'meals/fetchMeals',
   async ({ page, limit, sortBy, sortOrder, filterParams }) => {
@@ -15,7 +13,22 @@ export const fetchMeals = createAsyncThunk(
   }
 );
 
-// Fetch meal by ID
+// FETCH ADMIN MEALS
+export const fetchAdminMeals = createAsyncThunk(
+  'meals/fetchAdminMeals',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get('/api/meals/admin');
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to fetch admin meals'
+      );
+    }
+  }
+);
+
+//  FETCH MEAL BY ID
 export const fetchMealById = createAsyncThunk(
   'meals/fetchMealById',
   async id => {
@@ -24,71 +37,109 @@ export const fetchMealById = createAsyncThunk(
   }
 );
 
-// Create single meal
+//  CREATE SINGLE MEAL
 export const createMeal = createAsyncThunk(
   'meals/createMeal',
   async mealData => {
-    try {
-      const response = await axiosInstance.post('/api/meals', mealData);
-      return response.data.data;
-    } catch (error) {
-      console.error(
-        'Error creating meal:',
-        error.response ? error.response.data : error.message
-      );
-      throw error;
-    }
-  }
-);
-
-// Create multiple meals (new API)
-export const createMultipleMeals = createAsyncThunk(
-  'meals/createMultipleMeals',
-  async mealDataArray => {
-    try {
-      const response = await axiosInstance.post('/api/meals/multiple', {
-        meals: mealDataArray
-      });
-
-      if (!Array.isArray(response.data.data)) {
-        throw new Error('Unexpected response format');
-      }
-
-      return response.data.data;
-    } catch (error) {
-      console.error(
-        'Error creating multiple meals:',
-        error.response ? error.response.data : error.message
-      );
-      throw error;
-    }
-  }
-);
-
-// Update meal
-export const updateMeal = createAsyncThunk(
-  'meals/updateMeal',
-  async ({ id, updateData }) => {
-    const response = await axiosInstance.put(`/api/meals/${id}`, updateData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+    const isFD =
+      typeof FormData !== 'undefined' && mealData instanceof FormData;
+    const response = await axiosInstance.post('/api/meals', mealData, {
+      ...(isFD && { headers: { 'Content-Type': 'multipart/form-data' } })
     });
     return response.data.data;
   }
 );
 
-// Delete meal
+// CREATE MULTIPLE MEALS
+export const createMultipleMeals = createAsyncThunk(
+  'meals/createMultipleMeals',
+  async payload => {
+    const isFD = typeof FormData !== 'undefined' && payload instanceof FormData;
+
+    const res = isFD
+      ? await axiosInstance.post('/api/meals/multiple', payload, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+      : await axiosInstance.post('/api/meals/multiple', { meals: payload });
+
+    const data = res.data?.data;
+    if (!Array.isArray(data)) throw new Error('Unexpected response format');
+    return data;
+  }
+);
+
+// UPDATE MEAL
+export const updateMeal = createAsyncThunk(
+  'meals/updateMeal',
+  async ({ id, updateData }) => {
+    const isFD =
+      typeof FormData !== 'undefined' && updateData instanceof FormData;
+    const response = await axiosInstance.put(`/api/meals/${id}`, updateData, {
+      ...(isFD && { headers: { 'Content-Type': 'multipart/form-data' } })
+    });
+    return response.data.data;
+  }
+);
+
+// UPDATE MULTIPLE MEALS
+export const updateMultipleMeals = createAsyncThunk(
+  'meals/updateMultipleMeals',
+  async (mealDataArray, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.put('/api/meals/multiple', {
+        meals: mealDataArray
+      });
+      const data = response.data?.data;
+      if (!Array.isArray(data)) throw new Error('Unexpected response format');
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to update multiple meals'
+      );
+    }
+  }
+);
+
+// DELETE MEAL
 export const deleteMeal = createAsyncThunk('meals/deleteMeal', async id => {
   await axiosInstance.delete(`/api/meals/${id}`);
   return id;
 });
 
-// Meal slice
+// Clone an admin template to the current user
+export const cloneAdminMealToUser = createAsyncThunk(
+  'meals/cloneAdminMealToUser',
+  async ({ mealId, body }, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post(`/api/meals/${mealId}/clone`, body);
+      return res.data?.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || 'Clone admin meal failed'
+      );
+    }
+  }
+);
+
+// GET /api/meals/user/:userId
+export const fetchMealsByUser = createAsyncThunk(
+  'meals/fetchMealsByUser',
+  async (userId, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get(`/api/meals/user/${userId}`);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 export const mealSlice = createSlice({
   name: 'meals',
   initialState: {
     meals: [],
+    adminMeals: [],
+    mealsByUser: [],
     currentMeal: null,
     loading: false,
     error: null
@@ -104,7 +155,7 @@ export const mealSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      // Fetch all meals
+      // ========= User meals =========
       .addCase(fetchMeals.pending, state => {
         state.loading = true;
         state.error = null;
@@ -118,59 +169,94 @@ export const mealSlice = createSlice({
         state.error = action.payload || 'Failed to fetch meals';
       })
 
-      // Fetch meal by ID
+      // ========= Admin meals =========
+      .addCase(fetchAdminMeals.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAdminMeals.fulfilled, (state, action) => {
+        state.loading = false;
+        state.adminMeals = action.payload || [];
+      })
+      .addCase(fetchAdminMeals.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to fetch admin meals';
+      })
+
+      // ========= Fetch meal by ID =========
       .addCase(fetchMealById.fulfilled, (state, action) => {
         state.currentMeal = action.payload;
       })
 
-      // Create meal
-      .addCase(createMeal.pending, state => {
-        state.loading = true;
-        state.error = null;
-      })
+      // ========= Create meal =========
       .addCase(createMeal.fulfilled, (state, action) => {
-        state.loading = false;
         state.meals.unshift(action.payload);
       })
-      .addCase(createMeal.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Failed to create meal';
-      })
 
-      // Create multiple meals (new action)
-      .addCase(createMultipleMeals.pending, state => {
-        state.loading = true;
-        state.error = null;
-      })
+      // ========= Create multiple =========
       .addCase(createMultipleMeals.fulfilled, (state, action) => {
-        state.loading = false;
         state.meals = [...action.payload, ...state.meals];
       })
-      .addCase(createMultipleMeals.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Failed to create multiple meals';
-      })
 
-      // Update meal
+      // ========= Update =========
       .addCase(updateMeal.fulfilled, (state, action) => {
         const index = state.meals.findIndex(
           meal => meal._id === action.payload._id
         );
-        if (index !== -1) {
-          state.meals[index] = action.payload;
-        }
-        if (state.currentMeal?._id === action.payload._id) {
+        if (index !== -1) state.meals[index] = action.payload;
+        if (state.currentMeal?._id === action.payload._id)
           state.currentMeal = action.payload;
-        }
       })
 
-      // Delete meal
+      // ========= Update multiple =========
+      .addCase(updateMultipleMeals.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateMultipleMeals.fulfilled, (state, action) => {
+        state.loading = false;
+        action.payload.forEach(updatedMeal => {
+          const idx = state.meals.findIndex(m => m._id === updatedMeal._id);
+          if (idx !== -1) state.meals[idx] = updatedMeal;
+        });
+      })
+      .addCase(updateMultipleMeals.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to update multiple meals';
+      })
+
+      // ========= Delete =========
       .addCase(deleteMeal.fulfilled, (state, action) => {
         state.meals = state.meals.filter(meal => meal._id !== action.payload);
+      })
+
+      .addCase(cloneAdminMealToUser.fulfilled, (state, action) => {
+        const newMeal = action.payload;
+        if (newMeal?._id) {
+          const idx = state.meals.findIndex(m => m._id === newMeal._id);
+          if (idx === -1) state.meals.unshift(newMeal);
+          else state.meals[idx] = newMeal;
+        }
+      })
+      .addCase(cloneAdminMealToUser.rejected, (state, action) => {
+        state.error = action.payload || 'Clone admin meal failed';
+      })
+
+      // ========= Meals by User =========
+      .addCase(fetchMealsByUser.pending, state => {
+        state.loadingByUser = true;
+        state.errorByUser = null;
+      })
+      .addCase(fetchMealsByUser.fulfilled, (state, action) => {
+        state.loadingByUser = false;
+        state.mealsByUser = action.payload || [];
+      })
+      .addCase(fetchMealsByUser.rejected, (state, action) => {
+        state.loadingByUser = false;
+        state.errorByUser = action.payload || 'Failed to fetch meals by user';
       });
   }
 });
 
 export const { setMeals, clearMeals } = mealSlice.actions;
-
 export default mealSlice.reducer;
