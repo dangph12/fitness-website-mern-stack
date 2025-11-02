@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import {
+  FaChartLine,
   FaCheckCircle,
+  FaFireAlt,
+  FaLeaf,
   FaRobot,
+  FaRulerVertical,
   FaSpinner,
   FaSyncAlt,
   FaTimes,
@@ -20,6 +24,7 @@ import { createMultipleMeals } from '~/store/features/meal-slice';
 import BodyRecordCard from './body-record-list';
 import FitnessGoalCard from './fitness-goal-card';
 import MealCard from './meal-card';
+import { ScrollArea, ScrollBar } from './ui/scroll-area';
 
 const formatDateForApi = dateString => {
   if (!dateString) return '';
@@ -177,15 +182,15 @@ export default function AiMealGenerator() {
 
           <form
             onSubmit={handleGenerate}
-            className='bg-white p-6 rounded-2xl shadow-lg space-y-6 border border-gray-200'
+            className='bg-white p-6 rounded-2xl shadow-lg space-y-8 border border-gray-200'
           >
             <h2 className='text-xl font-semibold text-gray-800 flex items-center gap-2 border-b pb-3'>
               <FaSyncAlt className='text-emerald-500' /> Input Metrics & Goals
             </h2>
 
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1'>
-                Goal / Query
+            <div className='bg-emerald-50 border border-emerald-200 rounded-xl p-4'>
+              <label className='block text-sm font-semibold text-emerald-700 mb-2 flex items-center gap-2'>
+                <FaChartLine className='text-emerald-500' /> Goal / Query
               </label>
               <textarea
                 name='query'
@@ -194,54 +199,76 @@ export default function AiMealGenerator() {
                 rows='3'
                 maxLength={200}
                 required
+                placeholder='Example: Plan a 5-day high-protein, low-fat diet for muscle gain...'
                 className='w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500 resize-none'
               />
             </div>
 
-            <div className='flex gap-3'>
-              {['startDate', 'endDate'].map(field => (
-                <div className='flex-1' key={field}>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    {field === 'startDate' ? 'Start Date' : 'End Date'}
-                  </label>
-                  <input
-                    type='date'
-                    name={field}
-                    value={formData[field]}
-                    onChange={handleChange}
-                    required
-                    className='w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500'
-                  />
-                </div>
-              ))}
+            <div className='bg-gray-50 border border-dashed border-emerald-200 rounded-xl p-5 md:p-6'>
+              <h3 className='text-md font-semibold text-emerald-700 mb-4 flex items-center gap-2'>
+                <FaLeaf /> Optional: Add your metrics or date range
+              </h3>
+
+              <div className='flex flex-col sm:flex-row gap-3 mb-5'>
+                {['startDate', 'endDate'].map(field => (
+                  <div className='flex-1' key={field}>
+                    <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      {field === 'startDate' ? 'Start Date' : 'End Date'}
+                    </label>
+                    <input
+                      type='date'
+                      name={field}
+                      value={formData[field]}
+                      onChange={handleChange}
+                      className='w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500'
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3'>
+                {Object.entries({
+                  bodyFatPercentage: {
+                    label: 'Body Fat (%)',
+                    icon: <FaFireAlt className='text-orange-500' />
+                  },
+                  skeletalMuscleMass: {
+                    label: 'Muscle Mass (kg)',
+                    icon: <FaRulerVertical className='text-blue-500' />
+                  },
+                  ecwRatio: {
+                    label: 'ECW Ratio',
+                    icon: <FaLeaf className='text-green-500' />
+                  },
+                  bodyFatMass: {
+                    label: 'Body Fat Mass (kg)',
+                    icon: <FaFireAlt className='text-rose-500' />
+                  },
+                  visceralFatArea: {
+                    label: 'Visceral Fat Area (cm²)',
+                    icon: <FaChartLine className='text-teal-500' />
+                  }
+                }).map(([key, { label, icon }]) => (
+                  <div key={key}>
+                    <label className='block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2'>
+                      {icon} {label}
+                    </label>
+                    <input
+                      type='number'
+                      step='0.1'
+                      min='0'
+                      name={key}
+                      value={formData[key]}
+                      onChange={handleChange}
+                      placeholder='Enter value'
+                      className='w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500'
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className='grid grid-cols-2 gap-3'>
-              {Object.entries({
-                bodyFatPercentage: 'Body Fat (%)',
-                skeletalMuscleMass: 'Muscle Mass',
-                ecwRatio: 'ECW Ratio',
-                bodyFatMass: 'Body Fat Mass',
-                visceralFatArea: 'Visceral Fat Area'
-              }).map(([key, label]) => (
-                <div key={key}>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    {label}
-                  </label>
-                  <input
-                    type='number'
-                    step='0.1'
-                    min='0'
-                    name={key}
-                    value={formData[key]}
-                    onChange={handleChange}
-                    className='w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500'
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className='flex gap-3 pt-3'>
+            <div className='flex gap-3 pt-4'>
               <button
                 type='button'
                 onClick={handleClear}
@@ -280,37 +307,44 @@ export default function AiMealGenerator() {
             </div>
           )}
 
-          {!loading && !error && recommendedMeals.length > 0 && (
-            <div className='space-y-4'>
-              <div className='flex items-start gap-3 p-4 bg-green-50 text-green-700 border-l-4 border-green-500 rounded-xl shadow-sm'>
-                <FaCheckCircle className='text-green-500 text-xl mt-1' />
-                <div>
-                  <p className='font-semibold'>
-                    {recommendedMeals.length} meal(s) generated.
-                  </p>
-                  <p className='text-sm italic'>
-                    "Focused on: {formData.query}"
-                  </p>
-                </div>
+          {!loading && !error && (
+            <ScrollArea className='h-[100vh] bg-white border border-slate-200 rounded-2xl shadow-inner p-4'>
+              <div className='space-y-4'>
+                {recommendedMeals.length > 0 ? (
+                  <>
+                    <div className='flex items-start gap-3 p-4 bg-green-50 text-green-700 border-l-4 border-green-500 rounded-xl shadow-sm'>
+                      <FaCheckCircle className='text-green-500 text-xl mt-1' />
+                      <div>
+                        <p className='font-semibold'>
+                          {recommendedMeals.length} meal(s) generated.
+                        </p>
+                        <p className='text-sm italic'>
+                          "Focused on: {formData.query}"
+                        </p>
+                      </div>
+                    </div>
+
+                    {recommendedMeals.map((meal, index) => (
+                      <MealCard
+                        key={index}
+                        meal={{
+                          ...meal,
+                          title: meal.title || `AI Meal Plan #${index + 1}`
+                        }}
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <div className='text-center p-10 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl'>
+                    <FaRobot className='text-5xl mx-auto mb-4' />
+                    <p>
+                      Enter your metrics and goal, then click "Generate Meals".
+                    </p>
+                  </div>
+                )}
               </div>
-
-              {recommendedMeals.map((meal, index) => (
-                <MealCard
-                  key={index}
-                  meal={{
-                    ...meal,
-                    title: meal.title || `AI Meal Plan #${index + 1}`
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {!loading && !error && recommendedMeals.length === 0 && (
-            <div className='text-center p-10 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl'>
-              <FaRobot className='text-5xl mx-auto mb-4' />
-              <p>Enter your metrics and goal, then click "Generate Meals".</p>
-            </div>
+              <ScrollBar orientation='vertical' />
+            </ScrollArea>
           )}
         </div>
       </div>
