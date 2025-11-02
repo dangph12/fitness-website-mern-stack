@@ -3,16 +3,18 @@ import {
   FaEdit,
   FaFireAlt,
   FaLeaf,
+  FaPlus,
   FaTimes,
   FaTrash,
-  FaUtensils
+  FaUtensils,
+  FaUtensilSpoon
 } from 'react-icons/fa';
 import { GiAvocado, GiBreadSlice } from 'react-icons/gi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
-import { deleteMeal, fetchMeals } from '~/store/features/meal-slice';
+import { deleteMeal, fetchMealsByUser } from '~/store/features/meal-slice';
 
 import { Calendar } from './ui/calendar';
 import { ScrollArea } from './ui/scroll-area';
@@ -20,8 +22,12 @@ import { ScrollArea } from './ui/scroll-area';
 export default function MealsList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userId = useSelector(state => state.auth.user?.id);
-  const { meals = [], loading, error } = useSelector(state => state.meals);
+  const userId = useSelector(state => state.auth.user.id);
+  const {
+    mealsByUser = [],
+    loadingByUser,
+    errorByUser
+  } = useSelector(state => state.meals);
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -30,11 +36,13 @@ export default function MealsList() {
 
   useEffect(() => {
     if (userId) {
-      dispatch(fetchMeals({ userId, page: 1, limit: 10 }))
+      dispatch(fetchMealsByUser(userId))
         .unwrap()
         .catch(() => toast.error('Failed to load meals.'));
     }
   }, [dispatch, userId]);
+
+  console.log('Meals fetched:', mealsByUser);
 
   const fmt = n => (isFinite(n) ? Number(n).toFixed(1) : '0.0');
 
@@ -64,15 +72,15 @@ export default function MealsList() {
 
   const mealsByDate = useMemo(() => {
     const map = {};
-    for (const m of meals) {
-      const raw = m.scheduledAt || m.createdAt;
+    for (const m of mealsByUser) {
+      const raw = m.scheduledAt || m.scheduleAt || m.createdAt; // ✅ fix
       const key = toLocalKey(raw);
       if (!key) continue;
       if (!map[key]) map[key] = [];
       map[key].push(m);
     }
     return map;
-  }, [meals]);
+  }, [mealsByUser]);
 
   const markedDays = useMemo(
     () => Object.keys(mealsByDate).sort(),
@@ -143,16 +151,16 @@ export default function MealsList() {
 
   const mealsOfDay = selectedDate ? mealsByDate[selectedDate] || [] : [];
 
-  if (loading)
+  if (loadingByUser)
     return (
       <div className='text-center p-10 text-slate-500 animate-pulse'>
         Loading meals...
       </div>
     );
 
-  if (error) return <p className='text-center text-red-500'>{error}</p>;
+  if (errorByUser) return <p className='text-center text-red-500'>{error}</p>;
 
-  if (!meals.length)
+  if (!mealsByUser.length)
     return (
       <div className='text-center p-16 text-slate-600'>
         <h2 className='text-2xl font-semibold mb-2'>No meals yet</h2>
@@ -162,14 +170,25 @@ export default function MealsList() {
 
   return (
     <div className='max-w-6xl mx-auto px-6 py-10'>
-      <div className='text-center mb-8'>
-        <h1 className='text-4xl font-bold text-slate-900 flex items-center justify-center gap-2'>
-          <FaUtensils className='text-rose-500' />
-          Your Meal Calendar
-        </h1>
-        <p className='text-slate-600 mt-2'>
-          Select a date to view scheduled meals.
-        </p>
+      <div className='relative mb-8'>
+        <div className='text-center'>
+          <h1 className='text-4xl font-bold text-slate-900 inline-flex items-center gap-2'>
+            <FaUtensilSpoon className='text-rose-500' />
+            Your Meal Calendar
+          </h1>
+          <p className='text-slate-600 mt-2'>
+            Select a date to view scheduled meals.
+          </p>
+        </div>
+
+        <button
+          onClick={() => navigate('/nutrition/create-meal')}
+          className='absolute right-0 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 
+               px-4 py-2 rounded-lg text-white font-medium bg-emerald-600 hover:bg-emerald-700 shadow'
+        >
+          <FaPlus className='text-sm' />
+          Create Meal
+        </button>
       </div>
 
       <div className='bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-10'>
