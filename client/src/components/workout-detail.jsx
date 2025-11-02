@@ -55,7 +55,7 @@ const WorkoutDetail = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const userId = useSelector(state => state.auth.user.id);
+  const userId = useSelector(state => state?.auth?.user?.id);
 
   const { currentWorkout, loading, error } = useSelector(s => s.workouts);
   const { history = [] } = useSelector(s => s.histories);
