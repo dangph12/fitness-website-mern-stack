@@ -77,22 +77,12 @@ const PlanBanner = ({ imageUrl = DEFAULT_IMAGE }) => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => navigate('/plans/routine-builder')}
+            onClick={() => navigate('/plans/rountine-builder')}
             className='inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400'
           >
             <Dumbbell size={18} />
             Start Building
             <ArrowRight size={16} className='ml-1' />
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => navigate('/plans')}
-            className='inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300'
-          >
-            <Clock size={16} />
-            View All Plans
           </motion.button>
         </div>
       </div>
