@@ -12,6 +12,7 @@ import historiesReducer from '~/store/features/history-slice';
 import mealAisReducer from '~/store/features/meal-ai-slice';
 import mealsReducer from '~/store/features/meal-slice';
 import musclesReducer from '~/store/features/muscles-slice';
+import paymentsReducer from '~/store/features/payment-slice';
 import plansReducer from '~/store/features/plan-slice';
 import usersReducer from '~/store/features/users-slice';
 import workoutsReducer from '~/store/features/workout-slice';
@@ -32,6 +33,7 @@ export default configureStore({
     favourites: favouritesReducer,
     goals: goalsReducer,
     mealAi: mealAisReducer,
-    bodyRecords: bodyRecordsReducer
+    bodyRecords: bodyRecordsReducer,
+    payments: paymentsReducer
   }
 });
