@@ -42,31 +42,40 @@ const MuscleList = () => {
 
   return (
     <div className='container mx-auto p-6'>
-      <div className='mb-8'>
+      <div className='mb-12 text-center lg:text-left'>
         <h2 className='text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl'>
-          Exercise{' '}
-          <span className='bg-gradient-to-r from-sky-600 via-cyan-500 to-teal-500 bg-clip-text text-transparent'>
-            Database
+          Explore the{' '}
+          <span className='relative inline-block'>
+            <span className='absolute inset-0 bg-gradient-to-r from-sky-600 via-cyan-500 to-teal-500 blur-lg opacity-25'></span>
+            <span className='relative bg-gradient-to-r from-sky-600 via-cyan-500 to-teal-500 bg-clip-text text-transparent'>
+              Exercise Database
+            </span>
           </span>
         </h2>
 
-        <p className='mt-3 max-w-3xl text-base text-slate-600 sm:text-lg'>
-          Find the perfect workouts by{' '}
-          <span className='font-semibold text-slate-700'>muscle group</span>,
-          <span className='font-semibold text-slate-700'> equipment</span>, or
-          try something new.
+        <p className='mt-4 max-w-3xl text-base text-slate-600 sm:text-lg mx-auto lg:mx-0 leading-relaxed'>
+          Discover the perfect workout by{' '}
+          <span className='font-semibold text-slate-800'>muscle group</span>,{' '}
+          <span className='font-semibold text-slate-800'>equipment</span>, or
+          try a brand-new routine tailored to your goals.
         </p>
 
-        <div className='mt-4 flex flex-wrap gap-2 text-xs text-slate-700'>
-          <span className='rounded-full border border-slate-200 bg-white px-3 py-1'>
-            1,200+ exercises
-          </span>
-          <span className='rounded-full border border-slate-200 bg-white px-3 py-1'>
-            Beginner–Advanced
-          </span>
-          <span className='rounded-full border border-slate-200 bg-white px-3 py-1'>
-            Home & Gym
-          </span>
+        <div className='mt-6 flex flex-wrap justify-center lg:justify-start gap-2 text-sm'>
+          {[
+            { label: '1,200+ exercises', color: 'from-sky-500 to-cyan-400' },
+            {
+              label: 'Beginner – Advanced',
+              color: 'from-emerald-500 to-teal-400'
+            },
+            { label: 'Home & Gym', color: 'from-indigo-500 to-purple-400' }
+          ].map((item, i) => (
+            <span
+              key={i}
+              className={`rounded-full border border-slate-200 bg-gradient-to-r ${item.color} bg-clip-text text-transparent px-3 py-1.5 font-semibold shadow-sm hover:scale-[1.05] transition-transform`}
+            >
+              {item.label}
+            </span>
+          ))}
         </div>
       </div>
 
