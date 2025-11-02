@@ -1,22 +1,28 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
   FaCheckCircle,
+  FaClone,
   FaDumbbell,
   FaEdit,
   FaHeart,
-  FaRegHeart
+  FaRegHeart,
+  FaShareAlt
 } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 
+import { buildWorkoutShareUrl, shareOrCopy } from '~/lib/share';
 import {
   addFavoriteItems,
   fetchFavorites,
   removeFavoriteItems
 } from '~/store/features/favourite-slice';
 import { fetchHistoryByUser } from '~/store/features/history-slice';
-import { fetchWorkoutById } from '~/store/features/workout-slice';
+import {
+  cloneWorkoutToUser,
+  fetchWorkoutById
+} from '~/store/features/workout-slice';
 
 import logo from '../assets/logo.png';
 
@@ -46,20 +52,18 @@ const calculateTotalReps = sets =>
 
 const WorkoutDetail = () => {
   const { workoutId } = useParams();
-  const userId = useSelector(state => state?.auth?.user?.id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { currentWorkout, loading, error } = useSelector(
-    state => state.workouts
-  );
-  const { history = [] } = useSelector(state => state.histories);
+  const userId = useSelector(state => state.auth.user.id);
 
-  const { favorite, loading: favLoading } = useSelector(
-    state => state.favourites
-  );
+  const { currentWorkout, loading, error } = useSelector(s => s.workouts);
+  const { history = [] } = useSelector(s => s.histories);
+  const { favorite, loading: favLoading } = useSelector(s => s.favourites);
 
   const [completedExerciseIds, setCompletedExerciseIds] = useState(new Set());
+  const [sharing, setSharing] = useState(false);
+  const [cloning, setCloning] = useState(false);
 
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -100,10 +104,10 @@ const WorkoutDetail = () => {
     setCompletedExerciseIds(ids);
   }, [latestHistoryForWorkout]);
 
-  const favItem = useMemo(() => {
-    return favorite?.favorites?.find(f => f?.workout?._id === workoutId);
-  }, [favorite?.favorites, workoutId]);
-
+  const favItem = useMemo(
+    () => favorite?.favorites?.find(f => f?.workout?._id === workoutId),
+    [favorite?.favorites, workoutId]
+  );
   const isFav = !!favItem;
 
   if (loading)
@@ -112,14 +116,12 @@ const WorkoutDetail = () => {
         Loading Workout Details...
       </div>
     );
-
   if (error)
     return (
       <div className='flex justify-center items-center h-screen bg-gray-100 text-red-600'>
         Error loading workout: {error}
       </div>
     );
-
   if (!currentWorkout)
     return (
       <div className='flex justify-center items-center h-screen bg-gray-100 text-gray-500'>
@@ -128,6 +130,7 @@ const WorkoutDetail = () => {
     );
 
   const handleTutorialClick = exerciseId => {
+    if (!exerciseId) return;
     navigate(`/exercise/${exerciseId}`);
   };
 
@@ -150,6 +153,41 @@ const WorkoutDetail = () => {
           dispatch(fetchFavorites(userId));
         })
         .catch(() => toast.error('Failed to add to Favorites'));
+    }
+  };
+
+  const handleShareWorkout = async () => {
+    try {
+      setSharing(true);
+      const url = buildWorkoutShareUrl(currentWorkout._id);
+      const res = await shareOrCopy({
+        title: currentWorkout.title || 'Workout',
+        text: 'Check out this workout!',
+        url
+      });
+      if (res.ok)
+        toast.success(res.mode === 'share' ? 'Shared!' : 'Copied link!');
+      else toast.error(res.error || 'Share failed');
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const handleCloneWorkout = async () => {
+    if (!userId) {
+      toast.error('Please log in to clone this workout.');
+      return;
+    }
+    try {
+      setCloning(true);
+      const cloned = await dispatch(
+        cloneWorkoutToUser({ workoutId: currentWorkout._id, userId })
+      ).unwrap();
+      toast.success('Workout cloned to your library!');
+    } catch (e) {
+      toast.error(typeof e === 'string' ? e : 'Clone failed');
+    } finally {
+      setCloning(false);
     }
   };
 
@@ -213,7 +251,7 @@ const WorkoutDetail = () => {
             </span>
           )}
           <p>
-            {sets.length} Sets — Total Reps: {calculateTotalReps(sets)}
+            {sets?.length || 0} Sets — Total Reps: {calculateTotalReps(sets)}
           </p>
         </div>
       </div>
@@ -266,15 +304,36 @@ const WorkoutDetail = () => {
 
             <div className='flex justify-center sm:justify-end items-center gap-3'>
               <button
+                onClick={handleCloneWorkout}
+                disabled={cloning}
+                aria-busy={cloning}
+                className='inline-flex items-center rounded-lg border px-3 py-2 text-sm font-medium bg-white hover:bg-emerald-50 border-emerald-300 text-emerald-700'
+                title='Clone this workout to my library'
+              >
+                <FaClone className='mr-2' />
+                {cloning ? 'Cloning…' : 'Clone'}
+              </button>
+
+              <button
+                onClick={handleShareWorkout}
+                disabled={sharing}
+                aria-busy={sharing}
+                className='inline-flex items-center rounded-lg border px-3 py-2 text-sm font-medium bg-white hover:bg-slate-50'
+                title='Share workout'
+              >
+                <FaShareAlt className='mr-2' />
+                {sharing ? 'Sharing…' : 'Share'}
+              </button>
+
+              <button
                 onClick={toggleFavorite}
                 disabled={favLoading}
                 title={isFav ? 'Remove from Favorites' : 'Add to Favorites'}
-                className={`inline-flex items-center justify-center rounded-full border px-3 py-2 text-sm font-medium transition
-                  ${
-                    isFav
-                      ? 'bg-rose-600 text-white border-rose-600 hover:bg-rose-700'
-                      : 'bg-white text-rose-600 border-rose-400 hover:bg-rose-50'
-                  }`}
+                className={`inline-flex items-center justify-center rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                  isFav
+                    ? 'bg-rose-600 text-white border-rose-600 hover:bg-rose-700'
+                    : 'bg-white text-rose-600 border-rose-400 hover:bg-rose-50'
+                }`}
               >
                 {isFav ? (
                   <FaHeart className='mr-2 text-white' />
