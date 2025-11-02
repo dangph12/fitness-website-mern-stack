@@ -106,6 +106,14 @@ const router = createBrowserRouter([
       {
         path: 'about',
         Component: lazy(() => import('~/app/about/page'))
+      },
+      {
+        path: 'payments/success',
+        Component: lazy(() => import('~/app/payment/payment-success/page'))
+      },
+      {
+        path: 'payments/cancel',
+        Component: lazy(() => import('~/app/payment/payment-cancel/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
