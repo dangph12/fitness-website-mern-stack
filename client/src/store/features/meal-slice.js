@@ -231,12 +231,8 @@ export const mealSlice = createSlice({
       })
 
       .addCase(cloneAdminMealToUser.fulfilled, (state, action) => {
-        const newMeal = action.payload;
-        if (newMeal?._id) {
-          const idx = state.meals.findIndex(m => m._id === newMeal._id);
-          if (idx === -1) state.meals.unshift(newMeal);
-          else state.meals[idx] = newMeal;
-        }
+        if (!state.mealsByUser) state.mealsByUser = [];
+        state.mealsByUser.unshift(action.payload);
       })
       .addCase(cloneAdminMealToUser.rejected, (state, action) => {
         state.error = action.payload || 'Clone admin meal failed';
