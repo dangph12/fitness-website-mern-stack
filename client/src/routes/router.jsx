@@ -283,6 +283,10 @@ const router = createBrowserRouter([
             Component: lazy(
               () => import('~/app/admin/manage-meals/update-meal/page')
             )
+          },
+          {
+            path: 'memberships',
+            Component: lazy(() => import('~/app/admin/memberships/page'))
           }
         ]
       }
