@@ -8,6 +8,7 @@ import {
   Home,
   LogOut,
   Users,
+  UserStar,
   Utensils
 } from 'lucide-react';
 import React, { useEffect } from 'react';
@@ -71,6 +72,11 @@ export function AdminSidebar({ ...props }) {
           title: 'Users',
           url: '/admin/manage-users',
           icon: Users
+        },
+        {
+          title: 'Memberships',
+          url: '/admin/memberships',
+          icon: UserStar
         }
       ]
     },
