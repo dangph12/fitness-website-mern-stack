@@ -51,23 +51,17 @@ export function UsersFilters() {
   };
 
   const handleRoleChange = (role, checked) => {
-    setPendingFilters(prev => {
-      const currentRoles = Array.isArray(prev.role) ? prev.role : [];
-      const newRoles = checked
-        ? [...currentRoles, role]
-        : currentRoles.filter(r => r !== role);
-      return { ...prev, role: newRoles };
-    });
+    setPendingFilters(prev => ({
+      ...prev,
+      role: checked ? [role] : []
+    }));
   };
 
   const handleGenderChange = (gender, checked) => {
-    setPendingFilters(prev => {
-      const currentGenders = Array.isArray(prev.gender) ? prev.gender : [];
-      const newGenders = checked
-        ? [...currentGenders, gender]
-        : currentGenders.filter(g => g !== gender);
-      return { ...prev, gender: newGenders };
-    });
+    setPendingFilters(prev => ({
+      ...prev,
+      gender: checked ? [gender] : []
+    }));
   };
 
   const handleApplyFilters = () => {
