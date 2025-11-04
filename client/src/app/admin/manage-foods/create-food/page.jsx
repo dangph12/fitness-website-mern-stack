@@ -218,7 +218,7 @@ export default function CreateFoodPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Add Food</CardTitle>
+          <CardTitle>Create Food</CardTitle>
           <CardDescription>Create a new food item</CardDescription>
         </CardHeader>
         <CardContent>
