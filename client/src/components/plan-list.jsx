@@ -1,5 +1,5 @@
 import { Edit, Loader2, Plus, Search, Trash2, X } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -32,6 +32,13 @@ const PlanList = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, []);
+
   useEffect(() => {
     dispatch(fetchPlans({ page, limit }));
   }, [dispatch, page]);
@@ -58,7 +65,11 @@ const PlanList = () => {
 
   const filteredPlans = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    return q ? plans.filter(p => p.title?.toLowerCase().includes(q)) : plans;
+    let visible = plans.filter(p => p.isPublic === false);
+    if (q) {
+      visible = visible.filter(p => p.title?.toLowerCase().includes(q));
+    }
+    return visible;
   }, [plans, searchQuery]);
 
   const startIndex = (page - 1) * limit;

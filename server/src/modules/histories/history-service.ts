@@ -181,6 +181,63 @@ const HistoryService = {
     if (!history) {
       throw createHttpError(404, 'History not found');
     }
+  },
+
+  getUserStreak: async (userId: string) => {
+    if (!userId || !Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid userId');
+    }
+
+    const histories = await HistoryModel.find({ user: userId })
+      .select('createdAt')
+      .lean<{ createdAt: Date }[]>();
+
+    if (histories.length === 0) {
+      return { streak: 0 };
+    }
+
+    // Chuyển createdAt → định dạng "YYYY-MM-DD" (để bỏ giờ, phút, giây)
+    const dateStrings = histories.map(h => {
+      const d = new Date(h.createdAt);
+      return d.toISOString().split('T')[0]; // ví dụ: "2025-10-29"
+    });
+
+    // Loại trùng ngày & sắp xếp giảm dần
+    const uniqueDays = Array.from(new Set(dateStrings)).sort((a, b) =>
+      b.localeCompare(a)
+    );
+
+    // Xử lý logic streak
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    // Nếu ngày gần nhất không phải hôm nay hoặc hôm qua → streak = 0
+    const lastDay = uniqueDays[0];
+    if (lastDay !== todayStr && lastDay !== yesterdayStr) {
+      return { streak: 0 };
+    }
+
+    // Đếm chuỗi ngày liên tiếp
+    let streak = 1;
+    for (let i = 1; i < uniqueDays.length; i++) {
+      const prevDate = new Date(uniqueDays[i - 1]);
+      const currentDate = new Date(uniqueDays[i]);
+
+      const diffDays =
+        (prevDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24);
+
+      if (diffDays === 1) {
+        streak++;
+      } else {
+        break; // gặp khoảng trống thì dừng
+      }
+    }
+
+    return { streak };
   }
 };
 

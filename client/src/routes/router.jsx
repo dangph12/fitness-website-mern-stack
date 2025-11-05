@@ -34,6 +34,10 @@ const router = createBrowserRouter([
         Component: lazy(() => import('~/app/nutrition/create-meal/page'))
       },
       {
+        path: 'nutrition/create-ai-meal',
+        Component: lazy(() => import('~/app/nutrition/create-ai-meal/page'))
+      },
+      {
         path: 'nutrition/food/:foodId',
         Component: lazy(() => import('~/app/nutrition/food/[id]/page'))
       },
@@ -76,6 +80,10 @@ const router = createBrowserRouter([
         Component: lazy(() => import('~/app/plans/rountine-builder/page'))
       },
       {
+        path: 'plans/routine-database',
+        Component: lazy(() => import('~/app/plans/rountine-database/page'))
+      },
+      {
         path: 'workout/edit-workout/:workoutId',
         Component: lazy(() => import('~/app/workouts/edit-workout/page'))
       },
@@ -98,6 +106,14 @@ const router = createBrowserRouter([
       {
         path: 'about',
         Component: lazy(() => import('~/app/about/page'))
+      },
+      {
+        path: 'payments/success',
+        Component: lazy(() => import('~/app/payment/payment-success/page'))
+      },
+      {
+        path: 'payments/cancel',
+        Component: lazy(() => import('~/app/payment/payment-cancel/page'))
       }
     ],
     ErrorBoundary: ErrorComponent

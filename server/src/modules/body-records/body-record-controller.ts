@@ -35,16 +35,6 @@ const BodyRecordController = {
       );
   },
 
-  create: async (req: Request, res: Response) => {
-    const bodyRecordData = req.body;
-    const newBodyRecord = await BodyRecordService.create(bodyRecordData);
-    return res
-      .status(201)
-      .json(
-        ApiResponse.success('Body record created successfully', newBodyRecord)
-      );
-  },
-
   update: async (req: Request, res: Response) => {
     const bodyRecordId = req.params.id;
     const updateData = req.body;

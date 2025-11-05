@@ -18,4 +18,9 @@ router.post(
 
 router.delete('/:id', asyncHandler(HistoryController.removeFromHistory));
 
+router.get(
+  '/streak/user/:userId',
+  asyncHandler(HistoryController.getUserStreak)
+);
+
 export default router;

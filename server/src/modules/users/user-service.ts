@@ -292,17 +292,42 @@ const UserService = {
       bmi: onboardingData.bmi
     });
 
-    const goal = await GoalModel.create({
-      user: userId,
-      targetWeight: onboardingData.targetWeight,
-      diet: onboardingData.diet,
-      fitnessGoal: onboardingData.fitnessGoal
-    });
+    const existingGoal = await GoalModel.findOne({ user: userId });
+    if (existingGoal) {
+      existingGoal.targetWeight = onboardingData.targetWeight;
+      const allowedDiets = [
+        'Mediterranean',
+        'Ketogenic (Keto)',
+        'Paleo',
+        'Vegetarian',
+        'Vegan',
+        'Gluten-Free',
+        'Low-Carb'
+      ] as const;
+      if (allowedDiets.includes(onboardingData.diet as any)) {
+        existingGoal.diet =
+          onboardingData.diet as (typeof allowedDiets)[number];
+      } else {
+        throw createHttpError(400, 'Invalid diet type');
+      }
+      const allowedFitnessGoals = [
+        'Lose Weight',
+        'Build Muscle',
+        'To be Healthy'
+      ] as const;
+      if (allowedFitnessGoals.includes(onboardingData.fitnessGoal as any)) {
+        existingGoal.fitnessGoal =
+          onboardingData.fitnessGoal as (typeof allowedFitnessGoals)[number];
+      } else {
+        throw createHttpError(400, 'Invalid fitness goal');
+      }
+      await existingGoal.save();
+    }
 
     return {
       user,
       bodyRecord,
-      goal
+      existingGoal
     };
   }
 };

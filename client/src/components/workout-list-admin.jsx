@@ -18,7 +18,7 @@ import logo from '../assets/logo.png';
 
 const getCreatorLabel = u => {
   const nameOrEmail = u?.name || u?.email || '';
-  return `Admin${nameOrEmail ? ' • ' + nameOrEmail : ''}`;
+  return nameOrEmail ? nameOrEmail : 'Unknown';
 };
 
 const roleBadgeClass = 'bg-indigo-50 text-indigo-700 ring-indigo-200';
@@ -39,7 +39,7 @@ const Skeleton = ({ className = '' }) => (
   <div className={`bg-slate-200/70 ${className}`} />
 );
 
-export default function WorkoutListAdmin() {
+export default function WorkoutListPublic() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -54,18 +54,13 @@ export default function WorkoutListAdmin() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    dispatch(fetchWorkouts({ page, limit: 10, title: search }));
+    dispatch(fetchWorkouts({ page, limit: 4, title: search, isPublic: true }));
   }, [dispatch, page, search]);
 
-  const adminWorkouts = useMemo(() => {
+  const publicWorkouts = useMemo(() => {
     const q = search.trim().toLowerCase();
     return (workouts || []).filter(w => {
-      const user = w.user;
-      if (!user) return false;
-      return (
-        user.role?.toLowerCase() === 'admin' &&
-        w.title?.toLowerCase().includes(q)
-      );
+      return w.isPublic === true && w.title?.toLowerCase().includes(q);
     });
   }, [workouts, search]);
 
@@ -81,7 +76,6 @@ export default function WorkoutListAdmin() {
   const loadingAny = loading;
   const errorAny = error;
 
-  // Function to get muscles and equipment from exercise ID
   const getMusclesAndEquipment = exercise => {
     const muscles =
       exercise.muscles?.map(mu => mu.title).join(', ') || 'No muscles data';
@@ -97,10 +91,10 @@ export default function WorkoutListAdmin() {
         <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
           <div>
             <h2 className='text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl'>
-              Admin Workouts
+              Public Workouts
             </h2>
             <p className='mt-1 text-slate-600'>
-              <b>Admin's Workouts</b>
+              <b>All workouts shared publicly</b>
             </p>
           </div>
 
@@ -111,7 +105,7 @@ export default function WorkoutListAdmin() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              placeholder='Search admin workouts...'
+              placeholder='Search public workouts...'
               className='w-full sm:w-80 rounded-xl border border-slate-300 bg-white py-2.5 px-4 text-slate-900 shadow-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
             />
 
@@ -159,7 +153,7 @@ export default function WorkoutListAdmin() {
         <div className='space-y-4'>
           {Array.from({ length: 3 }).map((_, i) => (
             <div
-              key={`admin-sk-${i}`}
+              key={`public-sk-${i}`}
               className='flex gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'
             >
               <Skeleton className='h-28 w-28 rounded-xl' />
@@ -177,15 +171,15 @@ export default function WorkoutListAdmin() {
         </div>
       )}
 
-      {!loadingAny && adminWorkouts.length === 0 && (
+      {!loadingAny && publicWorkouts.length === 0 && (
         <div className='rounded-xl border border-slate-200 bg-white p-6 text-center text-slate-500'>
-          No admin workouts found.
+          No public workouts found.
         </div>
       )}
 
       <div className='space-y-4'>
         {!loadingAny &&
-          adminWorkouts.map(w => {
+          publicWorkouts.map(w => {
             return (
               <article
                 key={w._id}
@@ -194,7 +188,7 @@ export default function WorkoutListAdmin() {
                 <button
                   onClick={() => handleView(w._id)}
                   className='relative h-28 w-28 overflow-hidden rounded-xl ring-2 ring-slate-200'
-                  title='Xem chi tiết'
+                  title='View details'
                 >
                   <img
                     src={w.image || logo}

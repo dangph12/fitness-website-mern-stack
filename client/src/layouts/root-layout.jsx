@@ -16,26 +16,14 @@ const RootLayout = () => {
   const { user } = useSelector(state => state.auth);
   const { url: avatarUrl } = useSelector(state => state.avatar);
   const { theme } = useTheme();
-  const [skipOnboarding, setSkipOnboarding] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAvatar(user?.id));
   }, [dispatch, user?.id]);
 
-  useEffect(() => {
-    setSkipOnboarding(false);
-  }, [location.pathname]);
-
-  const handleSkipOnboarding = () => {
-    setSkipOnboarding(true);
-  };
-
   // Check if we should show onboarding
   const shouldShowOnboarding =
-    user &&
-    user.profileCompleted === false &&
-    location.pathname !== '/' &&
-    !skipOnboarding;
+    user && user.profileCompleted === false && location.pathname !== '/';
 
   return (
     <div>
@@ -44,11 +32,7 @@ const RootLayout = () => {
           <Header />
         </div>
       </div>
-      {shouldShowOnboarding ? (
-        <OnboardingComponent onSkip={handleSkipOnboarding} />
-      ) : (
-        <Outlet />
-      )}
+      {shouldShowOnboarding ? <OnboardingComponent /> : <Outlet />}
       <div>
         <Footer />
       </div>
