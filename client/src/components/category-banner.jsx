@@ -165,18 +165,6 @@ export default function CategoryBanner() {
                 </span>
               </div>
 
-              <div className='mt-4 flex items-center justify-center'>
-                <Button
-                  className='group/button relative overflow-hidden rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700'
-                  aria-label={`Join ${c.name} now`}
-                >
-                  <span className='relative z-10'>Join Now</span>
-                  <span
-                    className={`absolute inset-0 -z-0 translate-y-[110%] bg-gradient-to-r ${c.hue} opacity-0 transition-all duration-300 group-hover/button:translate-y-0 group-hover/button:opacity-100`}
-                  />
-                </Button>
-              </div>
-
               <div
                 className={`pointer-events-none absolute -inset-px -z-10 rounded-2xl opacity-0 blur-[18px] transition-opacity duration-300 group-hover:opacity-60 bg-gradient-to-br ${c.hue}`}
               />
