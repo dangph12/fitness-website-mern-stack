@@ -23,7 +23,7 @@ const plans = [
       'No AI included'
     ],
     cta: 'Start for Free',
-    link: '/app'
+    link: '/'
   },
   {
     key: 'vip',
