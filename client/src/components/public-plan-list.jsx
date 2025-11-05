@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { FaEdit, FaGlobe, FaLock, FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
@@ -47,6 +47,13 @@ export default function PlanListPublic() {
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, []);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
