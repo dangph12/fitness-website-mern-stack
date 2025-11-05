@@ -22,9 +22,9 @@ function Page() {
       <Features />
       <IntroSection />
       <IntroIcon />
+      <PlanCourses />
       <CategoryBanner />
       <Feedback />
-      <PlanCourses />
     </div>
   );
 }
