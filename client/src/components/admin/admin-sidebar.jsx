@@ -74,7 +74,7 @@ export function AdminSidebar({ ...props }) {
           icon: Users
         },
         {
-          title: 'Memberships',
+          title: 'Membership Payments',
           url: '/admin/memberships',
           icon: UserStar
         }
