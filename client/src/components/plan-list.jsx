@@ -77,35 +77,42 @@ const PlanList = () => {
   return (
     <div className='min-h-screen w-full bg-gradient-to-b from-slate-50 via-white to-slate-50 py-8'>
       <div className='mx-auto w-full max-w-7xl px-4 lg:px-6 space-y-6'>
-        <div className='flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
-            <h1 className='text-3xl font-extrabold tracking-tight text-slate-900'>
-              Plan List
+            <h1 className='text-3xl md:text-4xl font-extrabold tracking-tight'>
+              <span className='bg-gradient-to-r from-emerald-600 via-teal-500 to-sky-600 bg-clip-text text-transparent'>
+                Plan List
+              </span>
             </h1>
             <p className='mt-1 text-slate-600'>
               Manage, review and refine your workout plans.
             </p>
+            <div className='mt-3 h-[3px] w-24 rounded-full bg-gradient-to-r from-emerald-500/80 via-teal-500/80 to-sky-500/80' />
           </div>
 
           <div className='flex w-full items-center gap-3 sm:w-auto'>
             <div className='relative w-full sm:w-80'>
               <Search
-                className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400'
+                className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-teal-500'
                 size={18}
+                aria-hidden
               />
-
               <input
                 type='text'
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder='Search plans by title...'
-                className='w-full rounded-xl border border-slate-300 bg-white pl-10 pr-10 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+                aria-label='Search plans'
+                className='w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-10 text-sm text-slate-900 shadow-sm outline-none
+                   focus:border-teal-400 focus:ring-2 focus:ring-teal-100'
               />
-
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className='absolute right-2 top-1/2 -translate-y-1/2 grid place-items-center rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+                  className='absolute right-2 top-1/2 -translate-y-1/2 grid place-items-center rounded-md p-1
+                     text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+                  aria-label='Clear search'
+                  title='Clear search'
                 >
                   <X size={16} />
                 </button>
@@ -114,9 +121,12 @@ const PlanList = () => {
 
             <button
               onClick={handleCreatePlan}
-              className='inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700'
+              className='inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-sky-600
+                 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition
+                 hover:from-emerald-700 hover:via-teal-700 hover:to-sky-700 active:translate-y-[1px]'
             >
-              <Plus size={18} /> Create Plan
+              <Plus size={18} />
+              Create Plan
             </button>
           </div>
         </div>
