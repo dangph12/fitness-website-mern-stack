@@ -12,6 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '~/components/ui/pagination';
+import { formatInstructions } from '~/lib/utils';
 import { fetchExercises } from '~/store/features/exercise-slice';
 
 import ExerciseFilterModal from './exercise-filter-modal';
@@ -240,10 +241,10 @@ export default function ExerciseList() {
                     </div>
 
                     <p className='line-clamp-2 text-sm text-slate-600'>
-                      {exercise.instructions
+                      {formatInstructions(exercise.instructions)
                         ? exercise.instructions.length > 200
-                          ? `${exercise.instructions.slice(0, 200)}…`
-                          : exercise.instructions
+                          ? `${formatInstructions(exercise.instructions).slice(0, 200)}…`
+                          : formatInstructions(exercise.instructions)
                         : 'No description available.'}
                     </p>
                   </div>
