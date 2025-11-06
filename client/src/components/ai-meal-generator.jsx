@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  FaCalendarAlt,
   FaChartLine,
   FaCheckCircle,
   FaFireAlt,
@@ -11,6 +12,7 @@ import {
   FaTimes,
   FaUtensils
 } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -25,6 +27,7 @@ import BodyRecordCard from './body-record-list';
 import FitnessGoalCard from './fitness-goal-card';
 import MealCard from './meal-card';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
+import UserBasicInfo from './user-basic-info';
 
 const formatDateForApi = dateString => {
   if (!dateString) return '';
@@ -64,6 +67,7 @@ export default function AiMealGenerator() {
     'Dessert'
   ];
   const navigate = useNavigate();
+  const [showOptional, setShowOptional] = useState(false);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -173,6 +177,7 @@ export default function AiMealGenerator() {
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
         <div className='lg:col-span-2 space-y-6'>
+          <UserBasicInfo userId={userId} />
           <FitnessGoalCard userId={userId} />
 
           <BodyRecordCard
@@ -206,10 +211,10 @@ export default function AiMealGenerator() {
 
             <div className='bg-gray-50 border border-dashed border-emerald-200 rounded-xl p-5 md:p-6'>
               <h3 className='text-md font-semibold text-emerald-700 mb-4 flex items-center gap-2'>
-                <FaLeaf /> Optional: Add your metrics or date range
+                <FaCalendarAlt /> Date Range
               </h3>
 
-              <div className='flex flex-col sm:flex-row gap-3 mb-5'>
+              <div className='flex flex-col sm:flex-row gap-3'>
                 {['startDate', 'endDate'].map(field => (
                   <div className='flex-1' key={field}>
                     <label className='block text-sm font-medium text-gray-700 mb-1'>
@@ -225,46 +230,74 @@ export default function AiMealGenerator() {
                   </div>
                 ))}
               </div>
+            </div>
 
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3'>
-                {Object.entries({
-                  bodyFatPercentage: {
-                    label: 'Body Fat (%)',
-                    icon: <FaFireAlt className='text-orange-500' />
-                  },
-                  skeletalMuscleMass: {
-                    label: 'Muscle Mass (kg)',
-                    icon: <FaRulerVertical className='text-blue-500' />
-                  },
-                  ecwRatio: {
-                    label: 'ECW Ratio',
-                    icon: <FaLeaf className='text-green-500' />
-                  },
-                  bodyFatMass: {
-                    label: 'Body Fat Mass (kg)',
-                    icon: <FaFireAlt className='text-rose-500' />
-                  },
-                  visceralFatArea: {
-                    label: 'Visceral Fat Area (cm²)',
-                    icon: <FaChartLine className='text-teal-500' />
-                  }
-                }).map(([key, { label, icon }]) => (
-                  <div key={key}>
-                    <label className='block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2'>
-                      {icon} {label}
-                    </label>
-                    <input
-                      type='number'
-                      step='0.1'
-                      min='0'
-                      name={key}
-                      value={formData[key]}
-                      onChange={handleChange}
-                      placeholder='Enter value'
-                      className='w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500'
-                    />
+            <div className='border border-emerald-200 rounded-xl bg-white'>
+              <button
+                type='button'
+                onClick={() => setShowOptional(prev => !prev)}
+                className='w-full flex items-center justify-between px-5 py-4'
+                aria-expanded={showOptional}
+                aria-controls='optional-metrics-panel'
+              >
+                <span className='text-md font-semibold text-emerald-700 flex items-center gap-2'>
+                  <FaLeaf /> Optional: Add your body metrics
+                </span>
+                {showOptional ? (
+                  <FaChevronUp className='text-emerald-600' />
+                ) : (
+                  <FaChevronDown className='text-emerald-600' />
+                )}
+              </button>
+
+              <div
+                id='optional-metrics-panel'
+                className={`transition-[max-height] duration-300 ease-in-out overflow-hidden ${
+                  showOptional ? 'max-h-[1000px]' : 'max-h-0'
+                }`}
+              >
+                <div className='px-5 pb-5 pt-0 border-t border-emerald-100 bg-gray-50'>
+                  <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-4'>
+                    {Object.entries({
+                      bodyFatPercentage: {
+                        label: 'Body Fat (%)',
+                        icon: <FaFireAlt className='text-orange-500' />
+                      },
+                      skeletalMuscleMass: {
+                        label: 'Muscle Mass (kg)',
+                        icon: <FaRulerVertical className='text-blue-500' />
+                      },
+                      ecwRatio: {
+                        label: 'ECW Ratio',
+                        icon: <FaLeaf className='text-green-500' />
+                      },
+                      bodyFatMass: {
+                        label: 'Body Fat Mass (kg)',
+                        icon: <FaFireAlt className='text-rose-500' />
+                      },
+                      visceralFatArea: {
+                        label: 'Visceral Fat Area (cm²)',
+                        icon: <FaChartLine className='text-teal-500' />
+                      }
+                    }).map(([key, { label, icon }]) => (
+                      <div key={key}>
+                        <label className='block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2'>
+                          {icon} {label}
+                        </label>
+                        <input
+                          type='number'
+                          step='0.1'
+                          min='0'
+                          name={key}
+                          value={formData[key]}
+                          onChange={handleChange}
+                          placeholder='Enter value'
+                          className='w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500'
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             </div>
 
