@@ -157,22 +157,6 @@ export default function PaymentCancel() {
           >
             Back to Home
           </Button>
-
-          <Button
-            variant='outline'
-            onClick={() => navigate('/pricing')}
-            className='w-full sm:w-auto rounded-xl px-5 py-2.5'
-          >
-            View Plans
-          </Button>
-
-          <Button
-            variant='outline'
-            onClick={tryAgain}
-            className='w-full sm:w-auto rounded-xl px-5 py-2.5'
-          >
-            Try Again
-          </Button>
         </div>
 
         <p className='mt-4 text-center text-xs text-slate-500'>
