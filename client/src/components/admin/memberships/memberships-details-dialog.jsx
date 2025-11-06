@@ -19,12 +19,33 @@ const MembershipsDetailsDialog = () => {
   if (!selectedPayment) return null;
 
   const getStatusBadge = status => {
+    // Gentle style for cancelled
+    if (status === 'cancelled') {
+      return (
+        <Badge
+          variant='outline'
+          className='text-red-700 bg-red-50 border-red-200'
+        >
+          Cancelled
+        </Badge>
+      );
+    }
+
     const variants = {
       completed: 'default',
-      pending: 'secondary',
-      cancelled: 'destructive'
+      pending: 'secondary'
     };
-    return <Badge variant={variants[status]}>{status}</Badge>;
+
+    const labels = {
+      completed: 'Completed',
+      pending: 'Pending'
+    };
+
+    return (
+      <Badge variant={variants[status] || 'secondary'}>
+        {labels[status] || status}
+      </Badge>
+    );
   };
 
   return (
@@ -163,33 +184,6 @@ const MembershipsDetailsDialog = () => {
               </div>
             </>
           )}
-
-          {/* URLs */}
-          <Separator />
-          <div className='space-y-3'>
-            <h3 className='font-semibold text-lg'>Payment URLs</h3>
-            <div className='space-y-2'>
-              <div>
-                <p className='text-sm text-muted-foreground'>Checkout URL</p>
-                <a
-                  href={selectedPayment.checkoutUrl}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-sm text-primary hover:underline break-all'
-                >
-                  {selectedPayment.checkoutUrl}
-                </a>
-              </div>
-              <div>
-                <p className='text-sm text-muted-foreground'>Return URL</p>
-                <p className='text-sm break-all'>{selectedPayment.returnUrl}</p>
-              </div>
-              <div>
-                <p className='text-sm text-muted-foreground'>Cancel URL</p>
-                <p className='text-sm break-all'>{selectedPayment.cancelUrl}</p>
-              </div>
-            </div>
-          </div>
         </div>
       </DialogContent>
     </Dialog>
