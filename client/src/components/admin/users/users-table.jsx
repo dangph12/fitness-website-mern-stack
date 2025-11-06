@@ -106,6 +106,25 @@ const getGenderBadge = gender => {
     </Badge>
   );
 };
+const getMembershipBadge = level => {
+  const variants = {
+    normal: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
+    vip: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+    premium:
+      'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+  };
+
+  return (
+    <Badge
+      className={
+        variants[level] ||
+        'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
+      }
+    >
+      {level || 'normal'}
+    </Badge>
+  );
+};
 
 export function UsersTable() {
   const navigate = useNavigate();
@@ -130,7 +149,8 @@ export function UsersTable() {
         limit,
         search: filters.search,
         role: filters.role,
-        gender: filters.gender
+        gender: filters.gender,
+        membershipLevel: filters.membershipLevel
       })
     );
   }, [dispatch, currentPage, limit, filters]);
@@ -232,6 +252,46 @@ export function UsersTable() {
         accessorKey: 'gender',
         header: 'Gender',
         cell: ({ row }) => getGenderBadge(row.getValue('gender'))
+      },
+      {
+        accessorKey: 'membershipLevel',
+        header: 'Membership',
+        cell: ({ row }) => getMembershipBadge(row.getValue('membershipLevel'))
+      },
+      {
+        accessorKey: 'membershipExpiresAt',
+        header: 'Expires At',
+        cell: ({ row }) => {
+          const expiresAt = row.getValue('membershipExpiresAt');
+          const membershipLevel = row.original.membershipLevel;
+
+          if (!expiresAt || membershipLevel === 'normal') {
+            return <span className='text-muted-foreground'>-</span>;
+          }
+
+          const expiryDate = new Date(expiresAt);
+          const now = new Date();
+          const isExpired = expiryDate < now;
+          const daysUntilExpiry = Math.ceil(
+            (expiryDate - now) / (1000 * 60 * 60 * 24)
+          );
+
+          return (
+            <div className='flex flex-col'>
+              <span className={isExpired ? 'text-red-600' : ''}>
+                {formatDate(expiresAt)}
+              </span>
+              {!isExpired && daysUntilExpiry <= 7 && (
+                <span className='text-xs text-orange-600'>
+                  {daysUntilExpiry} day{daysUntilExpiry !== 1 ? 's' : ''} left
+                </span>
+              )}
+              {isExpired && (
+                <span className='text-xs text-red-600'>Expired</span>
+              )}
+            </div>
+          );
+        }
       },
       {
         accessorKey: 'dob',
