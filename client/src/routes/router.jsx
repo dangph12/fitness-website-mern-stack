@@ -114,6 +114,18 @@ const router = createBrowserRouter([
       {
         path: 'payments/cancel',
         Component: lazy(() => import('~/app/payment/payment-cancel/page'))
+      },
+      {
+        path: 'plan-courses/normal',
+        Component: lazy(() => import('~/app/plan-courses/normal/page'))
+      },
+      {
+        path: 'plan-courses/vip',
+        Component: lazy(() => import('~/app/plan-courses/vip/page'))
+      },
+      {
+        path: 'plan-courses/premium',
+        Component: lazy(() => import('~/app/plan-courses/premium/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
