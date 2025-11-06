@@ -1,10 +1,9 @@
 import { motion } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
 import React from 'react';
+import { Link } from 'react-router';
 
 import { Button } from '~/components/ui/button';
-
-import PayButton from './pay-button';
 
 const plans = [
   {
@@ -23,7 +22,7 @@ const plans = [
       'No AI included'
     ],
     cta: 'Start for Free',
-    link: '/'
+    link: '/plan-courses/normal'
   },
   {
     key: 'vip',
@@ -40,7 +39,8 @@ const plans = [
       'Advanced analytics & reports',
       'Priority support'
     ],
-    cta: 'Upgrade to VIP'
+    cta: 'Explore VIP',
+    link: '/plan-courses/vip'
   },
   {
     key: 'premium',
@@ -57,14 +57,10 @@ const plans = [
       '24/7 priority support',
       'API integrations & automation'
     ],
-    cta: 'Upgrade to Premium'
+    cta: 'Explore Premium',
+    link: '/plan-courses/premium'
   }
 ];
-
-const PLAN_AMOUNT = {
-  vip: 40000,
-  premium: 60000
-};
 
 export default function PlanCourses() {
   return (
@@ -83,86 +79,78 @@ export default function PlanCourses() {
         {plans.map((p, i) => {
           const isVipCard = p.key === 'vip';
           return (
-            <motion.div
-              key={p.key}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: i * 0.05 }}
-              whileHover={{ y: -6, scale: 1.01 }}
-              className={`relative rounded-2xl border bg-white p-6 shadow-sm ring-1 ring-slate-200 transition ${
-                isVipCard
-                  ? 'border-emerald-300 ring-emerald-100 shadow-md'
-                  : 'hover:shadow-md'
-              }`}
-            >
-              {p.badge && (
-                <div className='absolute -top-3 right-4'>
-                  <span className='rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow'>
-                    {p.badge}
-                  </span>
-                </div>
-              )}
-
-              <div className='mb-5'>
-                <div
-                  className={`mb-4 h-1.5 w-16 rounded-full bg-gradient-to-r ${p.accent}`}
-                />
-                <h2 className='text-xl font-semibold text-slate-900'>
-                  {p.title}
-                </h2>
-
-                <div className='mt-2 flex items-end gap-2'>
-                  <span className='text-4xl font-extrabold text-slate-900'>
-                    {p.price}
-                  </span>
-                  {p.period && (
-                    <span className='pb-1 text-sm text-slate-500'>
-                      {p.period}
+            <Link key={p.key} to={p.link} className='block'>
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.5, delay: i * 0.05 }}
+                whileHover={{ y: -6, scale: 1.01 }}
+                className={`relative rounded-2xl border bg-white p-6 shadow-sm ring-1 ring-slate-200 transition cursor-pointer ${
+                  isVipCard
+                    ? 'border-emerald-300 ring-emerald-100 shadow-md'
+                    : 'hover:shadow-md'
+                }`}
+              >
+                {p.badge && (
+                  <div className='absolute -top-3 right-4'>
+                    <span className='rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow'>
+                      {p.badge}
                     </span>
+                  </div>
+                )}
+
+                <div className='mb-5'>
+                  <div
+                    className={`mb-4 h-1.5 w-16 rounded-full bg-gradient-to-r ${p.accent}`}
+                  />
+                  <h2 className='text-xl font-semibold text-slate-900'>
+                    {p.title}
+                  </h2>
+
+                  <div className='mt-2 flex items-end gap-2'>
+                    <span className='text-4xl font-extrabold text-slate-900'>
+                      {p.price}
+                    </span>
+                    {p.period && (
+                      <span className='pb-1 text-sm text-slate-500'>
+                        {p.period}
+                      </span>
+                    )}
+                  </div>
+
+                  {p.tokensPerDay > 0 ? (
+                    <div className='mt-3 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700'>
+                      <Sparkles className='h-3.5 w-3.5' />
+                      AI Tokens: {p.tokensPerDay}/day
+                    </div>
+                  ) : (
+                    <div className='mt-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600'>
+                      No AI included
+                    </div>
                   )}
                 </div>
 
-                {p.tokensPerDay > 0 ? (
-                  <div className='mt-3 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700'>
-                    <Sparkles className='h-3.5 w-3.5' />
-                    AI Tokens: {p.tokensPerDay}/day
-                  </div>
-                ) : (
-                  <div className='mt-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600'>
-                    No AI included
-                  </div>
-                )}
-              </div>
+                <ul className='mb-6 space-y-3'>
+                  {p.features.map(f => (
+                    <li key={f} className='flex items-start gap-3'>
+                      <span className='mt-0.5 rounded-full bg-emerald-50 p-1 ring-1 ring-emerald-200'>
+                        <Check className='h-3.5 w-3.5 text-emerald-600' />
+                      </span>
+                      <span className='text-slate-600'>{f}</span>
+                    </li>
+                  ))}
+                </ul>
 
-              <ul className='mb-6 space-y-3'>
-                {p.features.map(f => (
-                  <li key={f} className='flex items-start gap-3'>
-                    <span className='mt-0.5 rounded-full bg-emerald-50 p-1 ring-1 ring-emerald-200'>
-                      <Check className='h-3.5 w-3.5 text-emerald-600' />
-                    </span>
-                    <span className='text-slate-600'>{f}</span>
-                  </li>
-                ))}
-              </ul>
+                <Button className='w-full rounded-xl px-5 py-2.5 font-semibold text-white shadow-sm bg-slate-900 hover:bg-slate-950'>
+                  {p.cta}
+                </Button>
 
-              <motion.div whileTap={{ scale: 0.98 }}>
-                {p.key === 'normal' ? (
-                  <Button
-                    className='w-full rounded-xl px-5 py-2.5 font-semibold text-white shadow-sm bg-slate-900 hover:bg-slate-950'
-                    onClick={() => (window.location.href = p.link)}
-                  >
-                    {p.cta}
-                  </Button>
-                ) : (
-                  <PayButton level={p.key} amount={PLAN_AMOUNT[p.key] || 0} />
-                )}
+                <div
+                  className={`mt-6 h-1 w-full rounded-full bg-gradient-to-r ${p.accent} opacity-80`}
+                />
               </motion.div>
-
-              <div
-                className={`mt-6 h-1 w-full rounded-full bg-gradient-to-r ${p.accent} opacity-80`}
-              />
-            </motion.div>
+            </Link>
           );
         })}
       </div>
