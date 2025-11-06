@@ -5,16 +5,26 @@ import { formatDate } from '~/lib/utils';
 
 import MembershipsRowActions from './memberships-row-actions';
 const getStatusBadge = status => {
+  // Gentle style for cancelled
+  if (status === 'cancelled') {
+    return (
+      <Badge
+        variant='outline'
+        className='text-red-700 bg-red-50 border-red-200'
+      >
+        Cancelled
+      </Badge>
+    );
+  }
+
   const variants = {
     completed: 'default',
-    pending: 'secondary',
-    cancelled: 'destructive'
+    pending: 'secondary'
   };
 
   const labels = {
     completed: 'Completed',
-    pending: 'Pending',
-    cancelled: 'Cancelled'
+    pending: 'Pending'
   };
 
   return (
