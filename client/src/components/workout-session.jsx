@@ -189,23 +189,30 @@ const WorkoutSession = () => {
         })}
       </main>
 
-      <footer className='fixed bottom-0 left-0 right-0 border-t bg-white px-6 py-4 shadow-lg'>
-        <button
-          onClick={() => {
-            const next = currentWorkout.exercises.find(ex =>
-              ex.sets.some((_, i) => !completedSets[ex.exercise._id]?.[i])
-            );
-            if (!next) return;
-            const nextExId = next.exercise._id;
-            const nextSetIndex = next.sets.findIndex(
-              (_, i) => !completedSets[nextExId]?.[i]
-            );
-            handleLogNextSet(nextExId, nextSetIndex);
-          }}
-          className='w-full rounded-xl bg-blue-600 py-3 text-lg font-semibold text-white transition hover:bg-blue-700'
-        >
-          LOG NEXT SET
-        </button>
+      <footer
+        className='fixed inset-x-0 bottom-0 z-50 border-t bg-white/95 backdrop-blur px-6 py-3 shadow-lg'
+        style={{
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)'
+        }}
+      >
+        <div className='mx-auto flex justify-center'>
+          <button
+            onClick={() => {
+              const next = currentWorkout.exercises.find(ex =>
+                ex.sets.some((_, i) => !completedSets[ex.exercise._id]?.[i])
+              );
+              if (!next) return;
+              const nextExId = next.exercise._id;
+              const nextSetIndex = next.sets.findIndex(
+                (_, i) => !completedSets[nextExId]?.[i]
+              );
+              handleLogNextSet(nextExId, nextSetIndex);
+            }}
+            className='w-full sm:w-[420px] md:w-7xl rounded-lg bg-blue-600 px-6 py-2.5 text-lg font-semibold text-white transition hover:bg-blue-700'
+          >
+            LOG NEXT SET
+          </button>
+        </div>
       </footer>
     </div>
   );
