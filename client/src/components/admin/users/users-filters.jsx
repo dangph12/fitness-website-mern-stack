@@ -23,25 +23,34 @@ export function UsersFilters() {
   const [pendingFilters, setPendingFilters] = useState({
     search: filters.search || '',
     role: filters.role || [],
-    gender: filters.gender || []
+    gender: filters.gender || [],
+    membershipLevel: filters.membershipLevel || []
   });
 
   // Track if there are unsaved changes
   const hasUnsavedChanges =
     pendingFilters.search !== filters.search ||
     JSON.stringify(pendingFilters.role) !== JSON.stringify(filters.role) ||
-    JSON.stringify(pendingFilters.gender) !== JSON.stringify(filters.gender);
+    JSON.stringify(pendingFilters.gender) !== JSON.stringify(filters.gender) ||
+    JSON.stringify(pendingFilters.membershipLevel) !==
+      JSON.stringify(filters.membershipLevel);
 
   // Sync pending filters with Redux when filters are cleared externally
   useEffect(() => {
-    if (!filters.search && !filters.role?.length && !filters.gender?.length) {
+    if (
+      !filters.search &&
+      !filters.role?.length &&
+      !filters.gender?.length &&
+      !filters.membershipLevel?.length
+    ) {
       setPendingFilters({
         search: '',
         role: [],
-        gender: []
+        gender: [],
+        membershipLevel: []
       });
     }
-  }, [filters.search, filters.role, filters.gender]);
+  }, [filters.search, filters.role, filters.gender, filters.membershipLevel]);
 
   const handleSearchChange = value => {
     setPendingFilters(prev => ({
@@ -51,45 +60,44 @@ export function UsersFilters() {
   };
 
   const handleRoleChange = (role, checked) => {
-    setPendingFilters(prev => {
-      const currentRoles = Array.isArray(prev.role) ? prev.role : [];
-      const newRoles = checked
-        ? [...currentRoles, role]
-        : currentRoles.filter(r => r !== role);
-      return { ...prev, role: newRoles };
-    });
+    setPendingFilters(prev => ({
+      ...prev,
+      role: checked ? [role] : []
+    }));
   };
 
   const handleGenderChange = (gender, checked) => {
-    setPendingFilters(prev => {
-      const currentGenders = Array.isArray(prev.gender) ? prev.gender : [];
-      const newGenders = checked
-        ? [...currentGenders, gender]
-        : currentGenders.filter(g => g !== gender);
-      return { ...prev, gender: newGenders };
-    });
+    setPendingFilters(prev => ({
+      ...prev,
+      gender: checked ? [gender] : []
+    }));
+  };
+
+  const handleMembershipLevelChange = (level, checked) => {
+    setPendingFilters(prev => ({
+      ...prev,
+      membershipLevel: checked ? [level] : []
+    }));
   };
 
   const handleApplyFilters = () => {
-    console.log('🔍 Applying filters:', pendingFilters);
-
     // Dispatch to Redux
     dispatch(
       setFilters({
         search: pendingFilters.search,
         role: pendingFilters.role,
-        gender: pendingFilters.gender
+        gender: pendingFilters.gender,
+        membershipLevel: pendingFilters.membershipLevel
       })
     );
   };
 
   const handleResetFilters = () => {
-    console.log('🔄 Resetting filters');
-
     setPendingFilters({
       search: '',
       role: [],
-      gender: []
+      gender: [],
+      membershipLevel: []
     });
 
     dispatch(clearFilters());
@@ -105,7 +113,6 @@ export function UsersFilters() {
   const handleRemoveRoleFilter = role => {
     handleRoleChange(role, false);
 
-    // Auto-apply if removing active filter
     if (filters.role?.includes(role)) {
       setTimeout(() => {
         dispatch(
@@ -121,7 +128,6 @@ export function UsersFilters() {
   const handleRemoveGenderFilter = gender => {
     handleGenderChange(gender, false);
 
-    // Auto-apply if removing active filter
     if (filters.gender?.includes(gender)) {
       setTimeout(() => {
         dispatch(
@@ -134,16 +140,36 @@ export function UsersFilters() {
     }
   };
 
+  const handleRemoveMembershipLevelFilter = level => {
+    handleMembershipLevelChange(level, false);
+
+    if (filters.membershipLevel?.includes(level)) {
+      setTimeout(() => {
+        dispatch(
+          setFilters({
+            ...filters,
+            membershipLevel: filters.membershipLevel.filter(l => l !== level)
+          })
+        );
+      }, 0);
+    }
+  };
+
   const hasActiveFilters =
     filters.search ||
     (Array.isArray(filters.role) && filters.role.length > 0) ||
-    (Array.isArray(filters.gender) && filters.gender.length > 0);
+    (Array.isArray(filters.gender) && filters.gender.length > 0) ||
+    (Array.isArray(filters.membershipLevel) &&
+      filters.membershipLevel.length > 0);
 
   const roleCount = Array.isArray(pendingFilters.role)
     ? pendingFilters.role.length
     : 0;
   const genderCount = Array.isArray(pendingFilters.gender)
     ? pendingFilters.gender.length
+    : 0;
+  const membershipLevelCount = Array.isArray(pendingFilters.membershipLevel)
+    ? pendingFilters.membershipLevel.length
     : 0;
 
   return (
@@ -255,6 +281,48 @@ export function UsersFilters() {
           </PopoverContent>
         </Popover>
 
+        {/* Membership Level Filter */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant='outline' className='border-dashed'>
+              <Filter className='mr-2 h-4 w-4' />
+              Membership
+              {membershipLevelCount > 0 && (
+                <Badge variant='secondary' className='ml-2'>
+                  {membershipLevelCount}
+                </Badge>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className='w-48' align='start'>
+            <div className='space-y-2'>
+              <h4 className='font-medium leading-none'>Filter by Membership</h4>
+              <div className='space-y-2'>
+                {['normal', 'vip', 'premium'].map(level => (
+                  <div key={level} className='flex items-center space-x-2'>
+                    <Checkbox
+                      id={`membership-${level}`}
+                      checked={
+                        Array.isArray(pendingFilters.membershipLevel) &&
+                        pendingFilters.membershipLevel.includes(level)
+                      }
+                      onCheckedChange={checked =>
+                        handleMembershipLevelChange(level, checked)
+                      }
+                    />
+                    <label
+                      htmlFor={`membership-${level}`}
+                      className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize cursor-pointer'
+                    >
+                      {level}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
         {/* Apply Button */}
         <Button
           onClick={handleApplyFilters}
@@ -330,6 +398,20 @@ export function UsersFilters() {
                 <X
                   className='h-3 w-3 cursor-pointer hover:bg-muted-foreground/20 rounded'
                   onClick={() => handleRemoveGenderFilter(gender)}
+                />
+              </Badge>
+            ))}
+          {Array.isArray(filters.membershipLevel) &&
+            filters.membershipLevel.map(level => (
+              <Badge
+                key={level}
+                variant='secondary'
+                className='flex items-center gap-1'
+              >
+                Membership: {level}
+                <X
+                  className='h-3 w-3 cursor-pointer hover:bg-muted-foreground/20 rounded'
+                  onClick={() => handleRemoveMembershipLevelFilter(level)}
                 />
               </Badge>
             ))}

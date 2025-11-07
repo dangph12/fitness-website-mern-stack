@@ -5,7 +5,14 @@ import axiosInstance from '~/lib/axios-instance';
 export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
   async (
-    { page = 1, limit = 10, search = '', role = [], gender = [] },
+    {
+      page = 1,
+      limit = 10,
+      search = '',
+      role = [],
+      gender = [],
+      membershipLevel = []
+    },
     { rejectWithValue }
   ) => {
     try {
@@ -27,6 +34,13 @@ export const fetchUsers = createAsyncThunk(
 
       if (gender && gender.length > 0) {
         params.gender = Array.isArray(gender) ? gender.join(',') : gender;
+      }
+
+      // Thêm membershipLevel filter
+      if (membershipLevel && membershipLevel.length > 0) {
+        params.membershipLevel = Array.isArray(membershipLevel)
+          ? membershipLevel.join(',')
+          : membershipLevel;
       }
 
       console.log('Fetching users with params:', params);
@@ -150,7 +164,8 @@ const initialState = {
   filters: {
     search: '',
     role: [],
-    gender: []
+    gender: [],
+    membershipLevel: []
   },
   deleteLoading: false,
   deleteError: null,
@@ -203,7 +218,8 @@ const usersSlice = createSlice({
       state.filters = {
         search: '',
         role: [],
-        gender: []
+        gender: [],
+        membershipLevel: []
       };
       state.currentPage = 1;
     },

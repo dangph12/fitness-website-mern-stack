@@ -170,7 +170,7 @@ const CreateMeal = () => {
   };
 
   return (
-    <div className='max-w-7xl mx-auto space-y-6'>
+    <div className='w-full max-w-[1600px] mx-auto space-y-6 px-6'>
       <div className='flex items-center gap-4 mb-6'>
         <Button
           variant='ghost'
@@ -184,14 +184,14 @@ const CreateMeal = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6'>
+        <div className='grid grid-cols-1 xl:grid-cols-[2fr_450px] gap-6'>
           {/* Left Column - Meal Details */}
           <div className='space-y-6'>
             {/* Basic Info Card */}
             <Card>
               <CardHeader>
                 <CardTitle className='flex items-center justify-between'>
-                  <span>Meal Information</span>
+                  <span>Create Meal</span>
                   <div className='flex items-center gap-2 text-sm'>
                     <Badge variant='secondary'>{totalFoods} foods</Badge>
                     <Badge variant='secondary'>
