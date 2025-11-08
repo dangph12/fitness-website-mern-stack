@@ -83,7 +83,22 @@ const foodSlice = createSlice({
       })
       .addCase(fetchFoods.fulfilled, (state, action) => {
         state.loading = false;
-        state.foods = action.payload;
+
+        if (action.payload.currentPage === 1) {
+          state.foods.foods = action.payload.foods;
+        } else {
+          state.foods.foods = [
+            ...state.foods.foods,
+            ...action.payload.foods.filter(
+              newItem =>
+                !state.foods.foods.some(oldItem => oldItem._id === newItem._id)
+            )
+          ];
+        }
+
+        state.foods.totalCount = action.payload.totalCount;
+        state.foods.currentPage = action.payload.currentPage;
+        state.foods.totalPages = action.payload.totalPages;
       })
       .addCase(fetchFoods.rejected, (state, action) => {
         state.loading = false;
