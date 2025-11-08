@@ -74,33 +74,11 @@ export const createBodyRecord = createAsyncThunk(
 );
 
 // Update body record
-// export const updateBodyRecord = createAsyncThunk(
-//   'bodyRecords/update',
-//   async ({ id, data }) => {
-//     const res = await axiosInstance.put(`/api/body-records/${id}`, data);
-//     return res.data.data;
-//   }
-// );
 export const updateBodyRecord = createAsyncThunk(
   'bodyRecords/update',
-  async ({ id, data }, { rejectWithValue }) => {
-    try {
-      const payload = {
-        user: String(data.user),
-        height: Number(data.height),
-        weight: Number(data.weight)
-      };
-      if (data.bmi !== undefined && data.bmi !== null && data.bmi !== '') {
-        payload.bmi = Number(data.bmi);
-      }
-
-      const res = await axiosInstance.put(`/api/body-records/${id}`, payload);
-      return res.data?.data ?? res.data;
-    } catch (err) {
-      return rejectWithValue(
-        err.response?.data || 'Failed to update body record'
-      );
-    }
+  async ({ id, data }) => {
+    const res = await axiosInstance.put(`/api/body-records/${id}`, data);
+    return res.data.data;
   }
 );
 
