@@ -3,7 +3,6 @@ import { Router } from 'express';
 import authorize from '~/middleware/authorize';
 import AIRoute from '~/modules/ai/ai-route';
 import AuthRoutes from '~/modules/auth/auth-route';
-import BodyClassificationRouter from '~/modules/body-classification/body-classification-route';
 import BodyRecordRoute from '~/modules/body-records/body-record-route';
 import EquipmentRoute from '~/modules/equipments/equipment-route';
 import ExerciseRoute from '~/modules/exercises/exercise-route';
@@ -33,9 +32,6 @@ router.use('/equipments', EquipmentRoute);
 
 // Muscle routes
 router.use('/muscles', MuscleRouter);
-
-// Body classification routes
-router.use('/body-classifications', BodyClassificationRouter);
 
 // Meal routes
 router.use('/meals', MealRoute);
