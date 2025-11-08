@@ -21,6 +21,9 @@ import { logout } from '~/store/features/auth-slice';
 import { setAvatar, updateAvatar } from '~/store/features/avatar-slice';
 import { updateUser } from '~/store/features/users-slice';
 
+import UserBodyRecordList from './body-record-list';
+import FitnessGoalCard from './fitness-goal-card';
+
 const ProfilePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -201,10 +204,18 @@ const ProfilePage = () => {
             </div>
 
             <div className='min-w-0 flex-1'>
-              <div className='flex items-center gap-2'>
+              <div className='flex items-center gap-2 flex-wrap'>
                 <h2 className='text-lg font-semibold text-slate-900 truncate'>
                   {userData?.name || '—'}
                 </h2>
+
+                {userData?.membershipLevel && (
+                  <Chip color='blue'>
+                    <ShieldCheck size={14} className='mr-1' />
+                    {userData.membershipLevel}
+                  </Chip>
+                )}
+
                 {userData?.isActive && (
                   <span className='inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200'>
                     <ShieldCheck size={14} /> Active
@@ -269,6 +280,16 @@ const ProfilePage = () => {
             icon={<Clock4 size={18} />}
             label='Last Updated'
             value={formatDateTime(userData?.updatedAt)}
+          />
+          <IconRow
+            icon={<ShieldCheck size={18} />}
+            label='Membership Level'
+            value={userData?.membershipLevel || 'normal'}
+          />
+          <IconRow
+            icon={<CheckCheck size={18} />}
+            label='AI Meal Tokens'
+            value={userData?.aiMealTokens ?? 0}
           />
         </div>
 
@@ -369,6 +390,14 @@ const ProfilePage = () => {
             </div>
           </form>
         </div>
+      </div>
+
+      <div className='sm:col-span-2'>
+        <FitnessGoalCard userId={user.id} />
+      </div>
+
+      <div className='sm:col-span-2 mt-6'>
+        <UserBodyRecordList userId={user.id} />
       </div>
     </div>
   );

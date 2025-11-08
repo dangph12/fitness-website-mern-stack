@@ -10,12 +10,17 @@ export const fetchPlans = createAsyncThunk(
     limit = 10,
     sortBy = 'createdAt',
     sortOrder = 'desc',
-    filterParams = {}
+    filterParams = {},
+    isPublic
   }) => {
     try {
-      const response = await axiosInstance.get('/api/plans', {
-        params: { page, limit, sortBy, sortOrder, ...filterParams }
-      });
+      const params = { page, limit, sortBy, sortOrder, ...filterParams };
+
+      if (typeof isPublic === 'boolean') {
+        params.isPublic = isPublic;
+      }
+
+      const response = await axiosInstance.get('/api/plans', { params });
 
       return response.data.data;
     } catch (error) {

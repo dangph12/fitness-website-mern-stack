@@ -38,7 +38,7 @@ import { calculateBMI, getBMIClassification, getBMIPosition } from '~/lib/bmi';
 import { onboardingSchema } from '~/lib/validations/onboarding';
 import { loadUser } from '~/store/features/auth-slice';
 
-const OnboardingComponent = ({ onSkip }) => {
+const OnboardingComponent = () => {
   const [step, setStep] = useState(1);
   const [bmi, setBmi] = useState(0);
   const dispatch = useDispatch();
@@ -204,17 +204,6 @@ const OnboardingComponent = ({ onSkip }) => {
               <div className='flex-1'>
                 <Progress value={progressPercentage} className='h-2' />
               </div>
-              {onSkip && (
-                <Button
-                  type='button'
-                  variant='ghost'
-                  onClick={onSkip}
-                  className='ml-4'
-                  size='sm'
-                >
-                  Skip
-                </Button>
-              )}
             </div>
             <p className='text-sm text-muted-foreground mt-2'>
               Step {step} of 4

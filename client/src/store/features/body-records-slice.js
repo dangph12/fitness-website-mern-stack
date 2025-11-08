@@ -44,7 +44,6 @@ export const createBodyRecord = createAsyncThunk(
   'bodyRecords/createBodyRecord',
   async (bodyRecordData, { rejectWithValue }) => {
     try {
-      // Validate required fields before sending
       if (!bodyRecordData.height || !bodyRecordData.weight) {
         return rejectWithValue({
           message: 'Both height and weight are required to create a body record'
@@ -57,15 +56,11 @@ export const createBodyRecord = createAsyncThunk(
         });
       }
 
-      // Ensure data types are correct for backend validation
       const payload = {
         user: bodyRecordData.user,
         height: Number(bodyRecordData.height),
         weight: Number(bodyRecordData.weight)
-        // BMI and bodyClassification will be calculated by backend
       };
-
-      console.log('Sending body record data to backend:', payload);
 
       const response = await axiosInstance.post('/api/body-records', payload);
       return response.data.data;
@@ -83,7 +78,6 @@ export const updateBodyRecord = createAsyncThunk(
   'bodyRecords/updateBodyRecord',
   async ({ id, updateData }, { rejectWithValue }) => {
     try {
-      // Ensure data types are correct if height/weight are being updated
       const payload = { ...updateData };
       if (payload.height) payload.height = Number(payload.height);
       if (payload.weight) payload.weight = Number(payload.weight);

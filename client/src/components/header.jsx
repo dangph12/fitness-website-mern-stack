@@ -67,6 +67,9 @@ export default function Header() {
         </button>
 
         <nav className='hidden items-center gap-3 lg:flex'>
+          <NavLink to='/' className={navLinkClass}>
+            Home
+          </NavLink>
           <NavLink to='/workouts' className={navLinkClass}>
             Workouts
           </NavLink>
@@ -123,9 +126,6 @@ export default function Header() {
 
           <NavLink to='/nutrition' className={navLinkClass}>
             Nutrition
-          </NavLink>
-          <NavLink to='/community' className={navLinkClass}>
-            Community
           </NavLink>
           <NavLink to='/exercise' className={navLinkClass}>
             Exercise

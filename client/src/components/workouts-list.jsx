@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { FiHome, FiLock, FiLogIn } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,6 +26,13 @@ const WorkoutList = () => {
   } = useSelector(state => state.workouts || {});
 
   const [searchQuery, setSearchQuery] = useState('');
+
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, []);
 
   useEffect(() => {
     if (userId) dispatch(fetchWorkoutsByUser(userId));
@@ -56,7 +63,7 @@ const WorkoutList = () => {
   const filteredWorkouts = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return (workoutsByUser || [])
-      .filter(w => w.title?.toLowerCase?.().includes(q))
+      .filter(w => w.isPublic === false && w.title?.toLowerCase?.().includes(q))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [workoutsByUser, searchQuery]);
 

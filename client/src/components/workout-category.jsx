@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React from 'react';
 import {
   FaDumbbell,
@@ -66,65 +67,97 @@ export default function WorkoutCategory() {
 
   return (
     <section className='relative overflow-hidden px-6 py-12'>
+      {/* background blur */}
       <div className='pointer-events-none absolute inset-0 -z-10'>
         <div className='absolute -top-24 left-1/2 h-72 w-[70rem] -translate-x-1/2 rounded-b-[3rem] bg-gradient-to-b from-sky-100 to-transparent blur-3xl dark:from-sky-400/10' />
       </div>
 
       <div className='mx-auto max-w-6xl'>
-        <h1 className='text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl'>
+        <motion.h1
+          className='text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl'
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           F-Fitness Workout Routine{' '}
           <span className='bg-gradient-to-r from-sky-600 to-teal-500 bg-clip-text text-transparent'>
             Database
           </span>
-        </h1>
-        <p className='mt-3 max-w-3xl text-slate-600 sm:text-lg'>
+        </motion.h1>
+
+        <motion.p
+          className='mt-3 max-w-3xl text-slate-600 sm:text-lg'
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
           Explore a wide library of workouts tailored to your goals. Choose a
           category to begin your fitness journey more effectively.
-        </p>
+        </motion.p>
       </div>
 
       <div className='mx-auto mt-8 max-w-6xl'>
-        <div className='mb-5'>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className='mb-5'
+        >
           <h2 className='text-2xl font-semibold text-slate-900'>
             Popular Categories
           </h2>
           <p className='text-sm text-slate-500'>
             Tap a category to view related workout routines
           </p>
-        </div>
+        </motion.div>
 
-        <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+        {/* grid items */}
+        <motion.div
+          className='grid grid-cols-2 md:grid-cols-4 gap-4'
+          initial='hidden'
+          animate='show'
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: { staggerChildren: 0.08 }
+            }
+          }}
+        >
           {CATEGORIES.map(c => (
-            <button
+            <motion.button
               key={c.name}
               onClick={() => handleCategoryClick(c.name)}
-              className='group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition hover:-translate-y-0.5 hover:shadow-md'
+              className='group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-[0_8px_30px_rgba(0,0,0,0.03)]'
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: { opacity: 1, y: 0 }
+              }}
+              transition={{ type: 'spring', stiffness: 180, damping: 14 }}
               title={c.name}
             >
               <span
                 className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${c.gradient} opacity-20 blur-2xl transition group-hover:opacity-30`}
               />
-
               <div
                 className={`mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${c.gradient} text-white shadow ring-1 ring-white/30`}
               >
                 <span className='text-xl'>{c.icon}</span>
               </div>
-
               <h3 className='truncate text-base font-semibold text-slate-900'>
                 {c.name}
               </h3>
-
               <p className='mt-1 line-clamp-2 text-sm text-slate-500'>
                 {c.hint}
               </p>
-
               <span
                 className={`pointer-events-none absolute inset-x-4 bottom-2 h-0.5 rounded-full bg-gradient-to-r ${c.gradient} opacity-0 transition-opacity group-hover:opacity-80`}
               />
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

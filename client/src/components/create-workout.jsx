@@ -27,7 +27,7 @@ const CreateWorkout = () => {
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
 
-  const [isPublic, setIsPublic] = useState(true);
+  const [isPublic, setIsPublic] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });

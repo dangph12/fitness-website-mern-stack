@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useLayoutEffect } from 'react';
+import { FaRobot } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -10,13 +11,15 @@ const NutriBanner = () => {
   const userId = useSelector(state => state.auth.user?.id);
   const navigate = useNavigate();
 
-  const handleClick = e => {
+  const handleClick = (e, path) => {
     if (!userId) {
       e.preventDefault();
       toast.error('You are not logged in, please log in to continue!');
       setTimeout(() => {
         navigate('/auth/login');
       }, 1000);
+    } else {
+      navigate(path);
     }
   };
 
@@ -50,15 +53,26 @@ const NutriBanner = () => {
             more about your habits, and achieve your goals with MyFitnessPal.
           </p>
 
-          <motion.div whileHover={{ scale: 1.02 }}>
-            <Link
-              to='/nutrition/create-meal'
-              onClick={handleClick}
-              className='inline-flex items-center justify-center rounded-xl bg-[#3067B6] px-6 py-3 text-lg font-semibold text-white shadow-sm transition hover:bg-[#275397]'
-            >
-              Start creating meals
-            </Link>
-          </motion.div>
+          <div className='flex flex-col sm:flex-row gap-4 justify-center lg:justify-start'>
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <button
+                onClick={e => handleClick(e, '/nutrition/create-meal')}
+                className='inline-flex items-center justify-center rounded-xl bg-[#3067B6] px-6 py-3 text-lg font-semibold text-white shadow-sm transition hover:bg-[#275397]'
+              >
+                Start creating meals
+              </button>
+            </motion.div>
+
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <button
+                onClick={e => handleClick(e, '/nutrition/create-ai-meal')}
+                className='inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-[#3067B6] px-6 py-3 text-lg font-semibold text-white shadow-sm transition hover:from-teal-600 hover:to-[#275397]'
+              >
+                <FaRobot className='text-xl' />
+                Create AI Meal Plan
+              </button>
+            </motion.div>
+          </div>
 
           <p className='text-xs text-slate-500'>
             No credit card required • Cancel anytime
