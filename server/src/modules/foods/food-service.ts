@@ -42,7 +42,7 @@ const FoodService = {
   },
 
   findAll: async () => {
-    return FoodModel.find().sort({ title: 1 }).limit(20).lean();
+    return FoodModel.find().sort({ title: 1 }).limit(200).lean();
   },
 
   findById: async (foodId: string) => {
