@@ -43,8 +43,6 @@ export default function MealsList() {
     }
   }, [dispatch, userId]);
 
-  console.log('Meals fetched:', mealsByUser);
-
   const fmt = n => (isFinite(n) ? Number(n).toFixed(1) : '0.0');
 
   const getTotals = foods =>

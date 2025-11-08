@@ -37,7 +37,7 @@ const PlanBanner = ({ imageUrl = DEFAULT_IMAGE }) => {
       <div className='z-10 max-w-2xl space-y-7'>
         <div className='inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-200'>
           <Sparkles size={14} />
-          <span>AI-Powered Fitness Planning</span>
+          <span>Fitness Planning</span>
         </div>
 
         <h1 className='text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl'>
