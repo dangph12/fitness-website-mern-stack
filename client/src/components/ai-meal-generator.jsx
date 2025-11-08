@@ -19,7 +19,8 @@ import { toast } from 'sonner';
 
 import {
   clearAiRecommendations,
-  fetchAiMeals
+  fetchAiMeals,
+  updateMealFoods
 } from '~/store/features/meal-ai-slice';
 import { createMultipleMeals } from '~/store/features/meal-slice';
 
@@ -360,9 +361,11 @@ export default function AiMealGenerator() {
                     {recommendedMeals.map((meal, index) => (
                       <MealCard
                         key={index}
-                        meal={{
-                          ...meal,
-                          title: meal.title || `AI Meal Plan #${index + 1}`
+                        meal={meal}
+                        onUpdateFoods={updatedFoods => {
+                          const newMeals = [...recommendedMeals];
+                          newMeals[index] = { ...meal, foods: updatedFoods };
+                          dispatch(updateMealFoods(newMeals));
                         }}
                       />
                     ))}
