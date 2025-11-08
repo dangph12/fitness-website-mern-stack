@@ -6,7 +6,7 @@ import { fetchFoods } from '~/store/features/food-slice';
 
 import { ScrollArea } from './ui/scroll-area';
 
-export default function MealCard({ meal }) {
+export default function MealCard({ meal, onUpdateFoods }) {
   const dispatch = useDispatch();
 
   const foodsSlice = useSelector(state => {
@@ -36,6 +36,7 @@ export default function MealCard({ meal }) {
         protein: foodInfo?.protein || 0,
         carb: foodInfo?.carbohydrate || 0,
         fat: foodInfo?.fat || 0,
+        quantity: Number(f.quantity) || 1,
         scheduledAt: f.scheduledAt || meal.scheduledAt
       };
     });
@@ -93,12 +94,32 @@ export default function MealCard({ meal }) {
 
               <div className='flex-1'>
                 <h4 className='font-semibold text-gray-700'>{f.name}</h4>
-                <p className='text-xs text-gray-500'>
-                  Qty: {f.quantity} •{' '}
-                  {f.scheduledAt && formatDate(f.scheduledAt)}
-                </p>
 
-                <div className='flex gap-2 mt-1 text-sm flex-wrap'>
+                <div className='flex items-center gap-2 text-xs text-gray-500 mt-1'>
+                  <span>Qty:</span>
+                  <input
+                    type='number'
+                    min={1}
+                    value={f.quantity}
+                    onChange={e => {
+                      const newQty = Math.max(1, Number(e.target.value));
+                      const newFoods = detailedFoods.map((item, idx) =>
+                        idx === i ? { ...item, quantity: newQty } : item
+                      );
+                      setDetailedFoods(newFoods);
+                      if (onUpdateFoods) onUpdateFoods(newFoods);
+                    }}
+                    className='w-14 px-2 py-1 border rounded-md text-center outline-none'
+                  />
+
+                  {f.scheduledAt && (
+                    <span className='text-gray-400'>
+                      • {formatDate(f.scheduledAt)}
+                    </span>
+                  )}
+                </div>
+
+                <div className='flex gap-2 mt-2 text-sm flex-wrap'>
                   <span className='flex items-center gap-1 bg-red-100 text-red-600 px-2 py-1 rounded-full'>
                     <FaFire /> {f.calories * f.quantity} kcal
                   </span>
@@ -108,7 +129,7 @@ export default function MealCard({ meal }) {
                   <span className='flex items-center gap-1 bg-yellow-100 text-yellow-600 px-2 py-1 rounded-full'>
                     <FaAppleAlt /> {f.carb * f.quantity}g
                   </span>
-                  <span className='flex items-center gap-1 bg-blue-100 text-blue-600 px-2 py-1 rounded-full'>
+                  <span className='flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full'>
                     <FaCheese /> {f.fat * f.quantity}g
                   </span>
                 </div>
