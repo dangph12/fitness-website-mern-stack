@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router';
@@ -12,6 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '~/components/ui/pagination';
+import { formatInstructions } from '~/lib/utils';
 import { fetchExercises } from '~/store/features/exercise-slice';
 
 import ExerciseFilterModal from './exercise-filter-modal';
@@ -38,6 +39,13 @@ export default function ExerciseList() {
     equipment: 'All',
     type: 'All'
   });
+
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, []);
 
   useEffect(() => {
     const filterParams = {};
@@ -240,10 +248,10 @@ export default function ExerciseList() {
                     </div>
 
                     <p className='line-clamp-2 text-sm text-slate-600'>
-                      {exercise.instructions
+                      {formatInstructions(exercise.instructions)
                         ? exercise.instructions.length > 200
-                          ? `${exercise.instructions.slice(0, 200)}…`
-                          : exercise.instructions
+                          ? `${formatInstructions(exercise.instructions).slice(0, 200)}…`
+                          : formatInstructions(exercise.instructions)
                         : 'No description available.'}
                     </p>
                   </div>

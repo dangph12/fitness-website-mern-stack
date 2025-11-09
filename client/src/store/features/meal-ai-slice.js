@@ -29,6 +29,9 @@ const mealAiSlice = createSlice({
     },
     clearAiRecommendations: state => {
       state.recommendedMeals = [];
+    },
+    updateMealFoods: (state, action) => {
+      state.recommendedMeals = action.payload;
     }
   },
   extraReducers: builder => {
@@ -49,5 +52,7 @@ const mealAiSlice = createSlice({
   }
 });
 
-export const { clearAiError, clearAiRecommendations } = mealAiSlice.actions;
+export const { clearAiError, clearAiRecommendations, updateMealFoods } =
+  mealAiSlice.actions;
+
 export default mealAiSlice.reducer;

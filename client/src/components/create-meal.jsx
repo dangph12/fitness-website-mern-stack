@@ -627,28 +627,26 @@ export default function CreateMealSchedule() {
                         </label>
                       </div>
 
-                      <div className='flex items-center justify-between py-2 border-y border-slate-200 mb-4'>
-                        <div className='font-bold text-2xl text-emerald-600 flex items-center gap-2'>
+                      <div className='flex items-center flex-wrap gap-x-6 gap-y-2 py-2 border-y border-slate-200 mb-4'>
+                        <span className='font-bold md:text-2xl text-xl flex items-center gap-2 text-red-600'>
                           <FaFire />
                           {mealTotalCalories.toFixed(0)} cal
-                        </div>
-                        <div className='text-sm text-slate-600 flex gap-3 sm:gap-5'>
-                          <StatPill
-                            icon={<FaDrumstickBite />}
-                            label='P'
-                            value={`${mealTotalProtein.toFixed(1)}g`}
-                          />
-                          <StatPill
-                            icon={<GiCupcake />}
-                            label='C'
-                            value={`${mealTotalCarb.toFixed(1)}g`}
-                          />
-                          <StatPill
-                            icon={<FaWeight />}
-                            label='F'
-                            value={`${mealTotalFat.toFixed(1)}g`}
-                          />
-                        </div>
+                        </span>
+
+                        <span className='font-bold md:text-2xl text-xl flex items-center gap-2 text-teal-700'>
+                          <FaDrumstickBite />
+                          P: {mealTotalProtein.toFixed(1)}g
+                        </span>
+
+                        <span className='font-bold md:text-2xl text-xl flex items-center gap-2 text-amber-700'>
+                          <GiCupcake />
+                          C: {mealTotalCarb.toFixed(1)}g
+                        </span>
+
+                        <span className='font-bold md:text-2xl text-xl flex items-center gap-2 text-indigo-700'>
+                          <FaWeight />
+                          F: {mealTotalFat.toFixed(1)}g
+                        </span>
                       </div>
 
                       <div className='mt-2 space-y-2 max-h-56 overflow-y-auto pr-1'>

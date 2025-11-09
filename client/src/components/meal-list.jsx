@@ -9,6 +9,7 @@ import {
   FaUtensils,
   FaUtensilSpoon
 } from 'react-icons/fa';
+import { FiCalendar, FiCoffee } from 'react-icons/fi';
 import { GiAvocado, GiBreadSlice } from 'react-icons/gi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
@@ -41,8 +42,6 @@ export default function MealsList() {
         .catch(() => toast.error('Failed to load meals.'));
     }
   }, [dispatch, userId]);
-
-  console.log('Meals fetched:', mealsByUser);
 
   const fmt = n => (isFinite(n) ? Number(n).toFixed(1) : '0.0');
 
@@ -172,12 +171,20 @@ export default function MealsList() {
     <div className='max-w-6xl mx-auto px-6 py-10'>
       <div className='relative mb-8'>
         <div className='text-center'>
-          <h1 className='text-4xl font-bold text-slate-900 inline-flex items-center gap-2'>
-            <FaUtensilSpoon className='text-rose-500' />
-            Your Meal Calendar
+          <h1 className='inline-flex items-center gap-3 text-4xl font-extrabold tracking-tight text-slate-900'>
+            <span className='rounded-xl p-2 ring-1 ring-emerald-200'>
+              <FiCoffee className='text-emerald-600' />
+            </span>
+            <span className='bg-gradient-to-r from-emerald-600 via-teal-500 to-sky-500 bg-clip-text text-transparent'>
+              Your Meal Calendar
+            </span>
           </h1>
-          <p className='text-slate-600 mt-2'>
-            Select a date to view scheduled meals.
+
+          <div className='mx-auto mt-3 h-[2px] w-28 rounded-full bg-gradient-to-r from-emerald-500/80 to-sky-500/80' />
+
+          <p className='mt-3 inline-flex items-center justify-center gap-2 text-base text-slate-600'>
+            <FiCalendar className='text-emerald-600' />
+            Pick a date to view your meals.
           </p>
         </div>
 
@@ -213,11 +220,21 @@ export default function MealsList() {
 
       {selectedDate && (
         <div>
-          <h2 className='text-2xl font-semibold text-slate-800 mb-4 flex items-center gap-2'>
-            <FaUtensils className='text-rose-500' />
-            Your meals on{' '}
-            <span className='text-rose-600'>
-              {new Date(`${selectedDate}T00:00:00`).toLocaleDateString('en-GB')}
+          <h2 className='mb-4 flex items-center gap-3 text-2xl font-semibold text-slate-900'>
+            <FaUtensils className='text-emerald-600' />
+            <span className='bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent'>
+              Meals for
+            </span>
+            <span className='rounded-full border border-slate-200 px-3 py-1 text-sm font-medium text-slate-700'>
+              {new Date(`${selectedDate}T00:00:00`).toLocaleDateString(
+                'en-GB',
+                {
+                  weekday: 'short',
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric'
+                }
+              )}
             </span>
           </h2>
 

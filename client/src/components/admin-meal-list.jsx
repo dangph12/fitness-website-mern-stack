@@ -10,6 +10,7 @@ import {
   FaUserShield,
   FaUtensils
 } from 'react-icons/fa';
+import { FiBookOpen } from 'react-icons/fi';
 import { GiAvocado, GiBreadSlice, GiFruitBowl } from 'react-icons/gi';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
@@ -126,81 +127,87 @@ export default function AdminMealList() {
   }
 
   return (
-    <section className='mt-5 px-10 mb-15'>
-      <div className='flex items-center justify-between mb-6'>
-        <h2 className='text-2xl font-bold text-slate-900 flex items-center gap-2'>
-          <FaUtensils className='text-rose-500' /> Admin Meal Templates
-        </h2>
-        <p className='text-sm text-slate-500'>
-          {adminMeals.length} templates available
-        </p>
-      </div>
+    <section className='mt-5 mb-16'>
+      <div className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-0'>
+        <div className='flex items-center justify-between mb-6'>
+          <h2 className='flex items-center gap-2 text-2xl font-bold'>
+            <span className='rounded-lg p-2 ring-1 ring-rose-200/60'>
+              <FiBookOpen className='text-rose-500' />
+            </span>
+            <span className='bg-gradient-to-r from-rose-500 via-fuchsia-500 to-indigo-500 bg-clip-text text-transparent'>
+              Template Library
+            </span>
+          </h2>
 
-      <ScrollArea className='w-full border border-slate-200 rounded-2xl bg-gradient-to-br from-white to-slate-50 shadow-inner'>
-        <div className='flex gap-6 p-6 w-max'>
-          {adminMeals.map((meal, idx) => {
-            const total = totalsForList[idx] || {
-              calories: 0,
-              protein: 0,
-              carbs: 0,
-              fat: 0
-            };
-            return (
-              <button
-                key={meal._id}
-                onClick={() => openMeal(meal)}
-                className='w-[280px] min-w-[280px] h-[380px] text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col'
-                aria-label={`Open ${meal.title}`}
-              >
-                {meal.image ? (
-                  <img
-                    src={meal.image}
-                    alt={meal.title}
-                    className='w-full h-40 object-cover'
-                  />
-                ) : (
-                  <div className='w-full h-40 bg-slate-100 flex items-center justify-center text-slate-400'>
-                    <FaUtensils size={28} />
-                  </div>
-                )}
+          <span className='inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-3 py-1 text-xs font-semibold text-white shadow-sm'>
+            <span className='h-2 w-2 rounded-full bg-white/80' />
+            {adminMeals.length} templates
+          </span>
+        </div>
 
-                <div className='p-4 flex-1 flex flex-col'>
-                  <div className='flex items-center justify-between'>
-                    <h3 className='font-semibold text-slate-900 text-base line-clamp-2 max-w-[70%]'>
+        <ScrollArea className='w-full border border-slate-200 rounded-2xl bg-gradient-to-br from-white to-slate-50 shadow-inner'>
+          <div className='flex gap-6 p-6 w-max'>
+            {adminMeals.map((meal, idx) => {
+              const total = totalsForList[idx] || {
+                calories: 0,
+                protein: 0,
+                carbs: 0,
+                fat: 0
+              };
+              return (
+                <button
+                  key={meal._id}
+                  onClick={() => openMeal(meal)}
+                  aria-label={`Open ${meal.title}`}
+                  className='group relative w-[290px] min-w-[290px] h-[400px] rounded-2xl overflow-hidden bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-[0_4px_24px_rgba(16,185,129,0.25)] hover:-translate-y-2 transition-all duration-300 flex flex-col'
+                >
+                  {meal.image ? (
+                    <img
+                      src={meal.image}
+                      alt={meal.title}
+                      className='w-full h-44 object-cover group-hover:scale-[1.06] transition duration-500'
+                    />
+                  ) : (
+                    <div className='w-full h-44 bg-slate-100 flex items-center justify-center text-slate-400'>
+                      <FaUtensils size={28} />
+                    </div>
+                  )}
+
+                  <span className='absolute top-3 right-3 text-[10px] px-2 py-1 rounded-full bg-white/80 backdrop-blur border border-slate-200 text-slate-600 uppercase shadow-sm'>
+                    {meal.mealType || 'Meal'}
+                  </span>
+
+                  <div className='p-4 flex-1 flex flex-col'>
+                    <h3 className='font-semibold text-slate-900 text-base line-clamp-2 max-w-[90%]'>
                       {meal.title}
                     </h3>
-                    <span className='text-[10px] px-2 py-1 rounded-full bg-slate-100 border text-slate-600 uppercase'>
-                      {meal.mealType || 'Meal'}
-                    </span>
-                  </div>
 
-                  <div className='grid grid-cols-2 gap-2 mt-4'>
-                    <div className='h-9 flex items-center justify-center text-xs text-orange-700 bg-orange-50 px-2 rounded-md border border-orange-100'>
-                      <FaFireAlt size={12} className='mr-1' />{' '}
-                      {fmt(total.calories)} kcal
+                    <div className='grid grid-cols-2 gap-2 mt-4 text-xs'>
+                      <div className='h-9 flex items-center justify-center gap-1 bg-orange-50 border border-orange-100 text-orange-700 rounded-md'>
+                        <FaFireAlt size={12} /> {fmt(total.calories)} kcal
+                      </div>
+                      <div className='h-9 flex items-center justify-center gap-1 bg-green-50 border border-green-100 text-green-700 rounded-md'>
+                        <FaLeaf size={12} /> {fmt(total.protein)} g Protein
+                      </div>
+                      <div className='h-9 flex items-center justify-center gap-1 bg-teal-50 border border-teal-100 text-teal-700 rounded-md'>
+                        <GiBreadSlice size={13} /> {fmt(total.carbs)} g Carbs
+                      </div>
+                      <div className='h-9 flex items-center justify-center gap-1 bg-yellow-50 border border-yellow-100 text-yellow-700 rounded-md'>
+                        <GiAvocado size={13} /> {fmt(total.fat)} g Fat
+                      </div>
                     </div>
-                    <div className='h-9 flex items-center justify-center text-xs text-green-700 bg-green-50 px-2 rounded-md border border-green-100'>
-                      <FaLeaf size={12} className='mr-1' /> {fmt(total.protein)}{' '}
-                      g Protein
-                    </div>
-                    <div className='h-9 flex items-center justify-center text-xs text-teal-700 bg-teal-50 px-2 rounded-md border border-teal-100'>
-                      <GiBreadSlice size={13} className='mr-1' />{' '}
-                      {fmt(total.carbs)} g Carbs
-                    </div>
-                    <div className='h-9 flex items-center justify-center text-xs text-yellow-700 bg-yellow-50 px-2 rounded-md border border-yellow-100'>
-                      <GiAvocado size={13} className='mr-1' /> {fmt(total.fat)}{' '}
-                      g Fat
+
+                    <div className='mt-auto pt-3 text-xs text-emerald-600 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition'>
+                      Click to preview & clone
                     </div>
                   </div>
-
-                  <div className='mt-auto' />
-                </div>
-              </button>
-            );
-          })}
-        </div>
-        <ScrollBar orientation='horizontal' />
-      </ScrollArea>
+                </button>
+              );
+            })}
+          </div>
+          <ScrollBar orientation='horizontal' />
+        </ScrollArea>
+      </div>
 
       {selectedMeal && (
         <div
@@ -211,7 +218,7 @@ export default function AdminMealList() {
         >
           <div
             onClick={e => e.stopPropagation()}
-            className='max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden relative flex flex-col my-auto'
+            className='max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden relative flex flex-col my-auto transition-all duration-300'
           >
             <div className='absolute top-4 right-4 flex items-center gap-2'>
               <button

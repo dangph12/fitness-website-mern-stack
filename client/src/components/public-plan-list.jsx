@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { FaEdit, FaGlobe, FaLock, FaTrash } from 'react-icons/fa';
+import { FiGlobe } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -83,7 +84,11 @@ export default function PlanListPublic() {
       <div className='mb-6 rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-slate-200 backdrop-blur'>
         <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
           <div>
-            <h2 className='text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl'>
+            <div className='inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700 ring-1 ring-sky-200'>
+              <FiGlobe size={14} />
+              Public Library
+            </div>
+            <h2 className='mt-2 text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900'>
               Public Plans
             </h2>
             <p className='mt-1 text-slate-600'>

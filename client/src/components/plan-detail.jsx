@@ -129,9 +129,9 @@ const PlanDetail = () => {
     );
 
   return (
-    <div className='bg-white min-h-screen text-black'>
-      <header className='relative pt-40 pb-16 overflow-hidden bg-gray-100'>
-        <div className='absolute inset-0 z-0 opacity-30'>
+    <div className='bg-white min-h-screen text-slate-900'>
+      <header className='relative pt-36 pb-20 bg-gradient-to-b from-slate-50 to-white border-b border-slate-200'>
+        <div className='absolute inset-0 opacity-20 pointer-events-none'>
           <img
             src={currentPlan.image || logo}
             alt='Plan Background'
@@ -139,78 +139,60 @@ const PlanDetail = () => {
           />
         </div>
 
-        <div className='relative max-w-6xl mx-auto px-6 z-20 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4'>
-          <div className='flex flex-col gap-2'>
-            <div className='flex items-center gap-3'>
-              <h1 className='text-5xl font-extrabold text-gray-900 mb-2'>
-                {currentPlan.title}
-              </h1>
-              {isPlanCompleted && (
-                <span className='inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-green-700 border border-green-200'>
-                  <FaCheckCircle /> Completed
-                </span>
-              )}
-            </div>
+        <div className='relative max-w-6xl mx-auto px-6 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-8'>
+          <div className='flex flex-col gap-4'>
+            <h1 className='text-4xl sm:text-5xl font-extrabold tracking-tight'>
+              {currentPlan.title}
+            </h1>
 
-            <p className='text-gray-700 mb-2 mt-2'>
-              Description:{' '}
-              <span className='font-medium'>{currentPlan.description}</span>
+            <p className='text-slate-600 max-w-xl leading-relaxed'>
+              {currentPlan.description}
             </p>
 
-            <div className='flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600'>
-              <p>
+            <div className='flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-500'>
+              <span>
                 Owner:{' '}
-                <span className='font-medium'>{currentPlan.user?.name}</span>
-              </p>
-              <p>
+                <b className='text-slate-700'>{currentPlan.user?.name}</b>
+              </span>
+              <span>
                 Created:{' '}
-                <span className='font-medium'>
-                  {new Date(currentPlan.createdAt).toLocaleDateString()}
-                </span>
-              </p>
-              <p>
+                <b>{new Date(currentPlan.createdAt).toLocaleDateString()}</b>
+              </span>
+              <span>
                 Updated:{' '}
-                <span className='font-medium'>
-                  {new Date(currentPlan.updatedAt).toLocaleDateString()}
-                </span>
-              </p>
+                <b>{new Date(currentPlan.updatedAt).toLocaleDateString()}</b>
+              </span>
             </div>
 
-            <div className='mt-4 w-full max-w-xl'>
-              <div className='flex items-center justify-between text-sm mb-1'>
-                <span className='text-gray-700'>
-                  Progress: <b>{completedWorkoutsCount}</b> /{' '}
-                  <b>{totalWorkouts}</b> workouts
-                </span>
-                <span className='text-gray-600'>{progressPct}%</span>
+            <div className='mt-4 max-w-lg'>
+              <div className='flex justify-between text-sm text-slate-600 mb-1'>
+                <span>Progress</span>
+                <span>{progressPct}%</span>
               </div>
-              <div className='h-2 bg-gray-200 rounded-full overflow-hidden'>
+              <div className='h-2 bg-slate-200 rounded-full overflow-hidden'>
                 <div
-                  className='h-full bg-blue-600'
+                  className='h-full bg-blue-600 rounded-full transition-all'
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
             </div>
           </div>
 
-          <div className='flex items-center gap-3'>
-            <button
-              onClick={() => navigate(`/plans/edit-plan/${planId}`)}
-              className='flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition'
-            >
-              <FaEdit className='mr-2' /> Edit Plan
-            </button>
-          </div>
+          <button
+            onClick={() => navigate(`/plans/edit-plan/${planId}`)}
+            className='flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl shadow-sm hover:bg-blue-700 transition'
+          >
+            <FaEdit className='text-sm' /> Edit Plan
+          </button>
         </div>
       </header>
 
       <main className='max-w-6xl mx-auto px-6 py-10 space-y-10'>
         <button
           onClick={handleStartPlan}
-          className='flex items-center bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-green-700 transition-all'
+          className='flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-md hover:bg-emerald-700 transition'
         >
-          <FaPlay className='mr-4 text-sm' />
-          Start Plan
+          <FaPlay className='text-sm' /> Start Plan
         </button>
 
         {currentPlan.workouts.map((workout, dayIndex) => {
@@ -220,21 +202,22 @@ const PlanDetail = () => {
           return (
             <div
               key={workout._id}
-              className={`rounded-2xl border p-5 ${
+              className={`rounded-2xl p-6 shadow-sm border transition hover:shadow-md ${
                 isDone
-                  ? 'border-emerald-300 bg-emerald-50/40'
-                  : 'border-gray-200 bg-white'
+                  ? 'border-emerald-300 bg-emerald-50/70'
+                  : 'border-slate-200 bg-white'
               }`}
             >
-              <div className='flex items-center gap-3 mb-4'>
-                <h2 className='text-2xl font-semibold text-gray-900'>
+              <div className='flex items-center gap-3 mb-5'>
+                <h2 className='text-xl font-semibold px-3 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 inline-block'>
                   Day {dayIndex + 1}: {workout.title}
                 </h2>
+
                 {isDone && (
-                  <span className='inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 border border-emerald-200 text-sm'>
-                    <FaCheckCircle />
-                    Completed
-                    {doneAt ? ` • ${new Date(doneAt).toLocaleString()}` : ''}
+                  <span className='inline-flex items-center gap-2 text-sm rounded-full bg-emerald-100 px-3 py-1 text-emerald-700 border border-emerald-200'>
+                    <FaCheckCircle className='text-sm' />
+                    Completed{' '}
+                    {doneAt ? `• ${new Date(doneAt).toLocaleString()}` : ''}
                   </span>
                 )}
               </div>
@@ -248,24 +231,20 @@ const PlanDetail = () => {
                   return (
                     <div
                       key={ex?._id || exId}
-                      className='flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-200 shadow-sm'
+                      className='flex items-start gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-300 hover:shadow-sm transition'
                     >
+                      {/* Thumbnail */}
                       <button
                         type='button'
-                        className='w-24 h-24 rounded-md overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer ring-1 ring-gray-200'
+                        className='w-20 h-20 rounded-lg overflow-hidden bg-slate-200 ring-1 ring-slate-300'
                         onClick={() => openExercise(exId)}
-                        title='View exercise'
                       >
                         {detail?.tutorial ? (
                           <img
-                            src={
-                              detail.tutorial.endsWith('.gif')
-                                ? detail.tutorial.replace(
-                                    '/upload/',
-                                    '/upload/f_jpg/so_0/'
-                                  )
-                                : detail.tutorial
-                            }
+                            src={detail.tutorial.replace(
+                              '/upload/',
+                              '/upload/f_jpg/so_0/'
+                            )}
                             onMouseEnter={e =>
                               (e.currentTarget.src = detail.tutorial)
                             }
@@ -275,34 +254,35 @@ const PlanDetail = () => {
                                 '/upload/f_jpg/so_0/'
                               ))
                             }
-                            alt={detail?.title || 'Exercise'}
                             className='w-full h-full object-cover'
+                            alt={detail?.title}
                           />
                         ) : (
-                          <FaDumbbell className='text-gray-600 text-xl' />
+                          <FaDumbbell className='text-slate-500 text-xl m-auto' />
                         )}
                       </button>
 
                       <div className='flex-1'>
-                        <h3 className='text-lg font-semibold text-black'>
+                        <h3 className='text-lg font-semibold'>
                           {detail?.title || 'Loading...'}
                         </h3>
+
                         {detail && (
                           <>
-                            <p className='text-sm text-gray-600'>
-                              Difficulty: {detail.difficulty} | Type:{' '}
+                            <p className='text-sm text-slate-600'>
+                              Difficulty: {detail.difficulty} • Type:{' '}
                               {detail.type}
                             </p>
-                            <p className='text-sm text-gray-500 mt-1'>
+                            <p className='text-xs text-slate-500 mt-1'>
                               Sets: {ex.sets.length} • Total Reps: {reps}
                             </p>
-                            <div className='flex mt-1 flex-wrap gap-1'>
+
+                            <div className='flex flex-wrap gap-1 mt-2'>
                               {detail.muscles?.map(m => (
                                 <img
                                   key={m._id}
                                   src={m.image}
                                   alt={m.title}
-                                  title={m.title}
                                   className='w-5 h-5 rounded-full border'
                                 />
                               ))}
@@ -311,7 +291,6 @@ const PlanDetail = () => {
                                   key={eq._id}
                                   src={eq.image}
                                   alt={eq.title}
-                                  title={eq.title}
                                   className='w-5 h-5 rounded border'
                                 />
                               ))}

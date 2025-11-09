@@ -75,24 +75,10 @@ export const createBodyRecord = createAsyncThunk(
 
 // Update body record
 export const updateBodyRecord = createAsyncThunk(
-  'bodyRecords/updateBodyRecord',
-  async ({ id, updateData }, { rejectWithValue }) => {
-    try {
-      const payload = { ...updateData };
-      if (payload.height) payload.height = Number(payload.height);
-      if (payload.weight) payload.weight = Number(payload.weight);
-
-      const response = await axiosInstance.put(
-        `/api/body-records/${id}`,
-        payload
-      );
-      return response.data.data;
-    } catch (error) {
-      console.error('Error updating body record:', error);
-      return rejectWithValue(
-        error.response ? error.response.data : 'Failed to update body record'
-      );
-    }
+  'bodyRecords/update',
+  async ({ id, data }) => {
+    const res = await axiosInstance.put(`/api/body-records/${id}`, data);
+    return res.data.data;
   }
 );
 

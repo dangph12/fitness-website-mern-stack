@@ -376,7 +376,7 @@ const PlanSession = () => {
         })}
       </main>
 
-      <footer className='fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-4 shadow-lg'>
+      <footer className='fixed bottom-0 z-50 left-0 right-0 bg-white border-t px-6 py-4 shadow-lg'>
         <div className='max-w-4xl mx-auto flex flex-col sm:flex-row gap-3'>
           <button
             onClick={logNextSet}

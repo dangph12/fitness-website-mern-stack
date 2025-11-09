@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FiSearch, FiUsers } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -36,7 +37,7 @@ const Badge = ({ children }) => (
 );
 
 const Skeleton = ({ className = '' }) => (
-  <div className={`bg-slate-200/70 ${className}`} />
+  <div className={`animate-pulse bg-slate-100 ${className}`} />
 );
 
 export default function WorkoutListPublic() {
@@ -85,29 +86,49 @@ export default function WorkoutListPublic() {
     return { muscles, equipment };
   };
 
+  const renderBadgesWithLimit = (items, keyPrefix, limit = 3) => {
+    const shown = items.slice(0, limit);
+    const more = items.length - shown.length;
+    return (
+      <>
+        {shown.map((txt, idx) => (
+          <Badge key={`${keyPrefix}-${idx}`}>{txt}</Badge>
+        ))}
+        {more > 0 && <Badge>+{more} more</Badge>}
+      </>
+    );
+  };
+
   return (
-    <section className='mx-auto max-w-7xl px-4 lg:px-6 pt-8 pb-10'>
-      <div className='mb-6 rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-slate-200 backdrop-blur'>
-        <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
+    <section className='mx-auto max-w-7xl px-4 pt-8 pb-10 lg:px-6'>
+      <div className='mb-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200'>
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between'>
           <div>
-            <h2 className='text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl'>
-              Public Workouts
+            <h2 className='text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900'>
+              <h2 className='text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900'>
+                <span className='text-sky-700'>Public Workouts</span>
+              </h2>
             </h2>
             <p className='mt-1 text-slate-600'>
               <b>All workouts shared publicly</b>
             </p>
           </div>
 
-          <div className='flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center'>
-            <input
-              value={search}
-              onChange={e => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              placeholder='Search public workouts...'
-              className='w-full sm:w-80 rounded-xl border border-slate-300 bg-white py-2.5 px-4 text-slate-900 shadow-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
-            />
+          <div className='flex w-full flex-col-reverse gap-3 sm:w-auto sm:flex-row sm:items-center'>
+            <div className='relative w-full sm:w-80'>
+              <span className='pointer-events-none absolute inset-y-0 left-3 grid place-items-center text-slate-400'>
+                <FiSearch size={18} />
+              </span>
+              <input
+                value={search}
+                onChange={e => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                placeholder='Search public workouts...'
+                className='w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-slate-900 shadow-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+              />
+            </div>
 
             {totalPages > 1 && (
               <div className='sm:ml-2'>
@@ -157,12 +178,12 @@ export default function WorkoutListPublic() {
               className='flex gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'
             >
               <Skeleton className='h-28 w-28 rounded-xl' />
-              <div className='flex-1 space-y-2'>
-                <Skeleton className='h-6 w-1/2 rounded' />
-                <Skeleton className='h-4 w-1/3 rounded' />
-                <Skeleton className='h-4 w-2/3 rounded' />
+              <div className='flex-1 space-y-3'>
+                <Skeleton className='h-6 w-2/3 rounded' />
+                <Skeleton className='h-4 w-1/2 rounded' />
+                <Skeleton className='h-4 w-4/5 rounded' />
               </div>
-              <div className='flex items-center gap-2'>
+              <div className='flex items-start gap-2'>
                 <Skeleton className='h-10 w-10 rounded-full' />
                 <Skeleton className='h-10 w-10 rounded-full' />
               </div>
@@ -172,7 +193,7 @@ export default function WorkoutListPublic() {
       )}
 
       {!loadingAny && publicWorkouts.length === 0 && (
-        <div className='rounded-xl border border-slate-200 bg-white p-6 text-center text-slate-500'>
+        <div className='rounded-xl border border-slate-200 bg-white p-8 text-center text-slate-600'>
           No public workouts found.
         </div>
       )}
@@ -180,6 +201,15 @@ export default function WorkoutListPublic() {
       <div className='space-y-4'>
         {!loadingAny &&
           publicWorkouts.map(w => {
+            const musclesArr = (w.exercises || [])
+              .map(row => (row.exercise?.muscles || []).map(mu => mu.title))
+              .flat()
+              .filter(Boolean);
+            const equipmentArr = (w.exercises || [])
+              .map(row => (row.exercise?.equipments || []).map(eq => eq.title))
+              .flat()
+              .filter(Boolean);
+
             return (
               <article
                 key={w._id}
@@ -193,19 +223,20 @@ export default function WorkoutListPublic() {
                   <img
                     src={w.image || logo}
                     alt={w.title}
-                    className='absolute inset-0 h-full w-full object-cover'
+                    className='absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-105'
                   />
                 </button>
 
-                <div className='flex-1'>
+                <div className='flex-1 min-w-0'>
                   <div className='flex flex-wrap items-center gap-2'>
-                    <h3 className='text-lg font-bold text-slate-900'>
+                    <h3 className='max-w-full truncate text-lg font-bold text-slate-900'>
                       {w.title}
                     </h3>
 
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${roleBadgeClass}`}
                     >
+                      <FiUsers className='mr-1' />
                       {getCreatorLabel(w.user)}
                     </span>
 
@@ -219,26 +250,22 @@ export default function WorkoutListPublic() {
                   </div>
 
                   <div className='mt-2 flex flex-wrap gap-2'>
-                    {w.exercises?.map(row => {
-                      const { muscles } = getMusclesAndEquipment(row.exercise);
-                      return (
-                        <Badge key={`${w._id}-${row._id}-m`}>{muscles}</Badge>
-                      );
-                    })}
+                    {musclesArr.length > 0 ? (
+                      renderBadgesWithLimit(musclesArr, `${w._id}-m`)
+                    ) : (
+                      <Badge>No muscles data</Badge>
+                    )}
                   </div>
                   <div className='mt-1 flex flex-wrap gap-2'>
-                    {w.exercises?.map(row => {
-                      const { equipment } = getMusclesAndEquipment(
-                        row.exercise
-                      );
-                      return (
-                        <Badge key={`${w._id}-${row._id}-e`}>{equipment}</Badge>
-                      );
-                    })}
+                    {equipmentArr.length > 0 ? (
+                      renderBadgesWithLimit(equipmentArr, `${w._id}-e`)
+                    ) : (
+                      <Badge>No equipment data</Badge>
+                    )}
                   </div>
                 </div>
 
-                <div className='flex items-center gap-2 self-start'>
+                <div className='flex items-start gap-2 self-start'>
                   <Link
                     to={`/workout/edit-workout/${w._id}`}
                     title='Edit workout'

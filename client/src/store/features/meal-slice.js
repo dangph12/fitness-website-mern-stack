@@ -226,8 +226,39 @@ export const mealSlice = createSlice({
       })
 
       // ========= Delete =========
+      .addCase(deleteMeal.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(deleteMeal.fulfilled, (state, action) => {
-        state.meals = state.meals.filter(meal => meal._id !== action.payload);
+        state.loading = false;
+
+        const deletedId =
+          action.payload?.id ||
+          action.payload?._id ||
+          action.payload ||
+          action.meta.arg;
+
+        state.meals = (state.meals || []).filter(
+          meal => meal._id !== deletedId
+        );
+
+        state.adminMeals = (state.adminMeals || []).filter(
+          meal => meal._id !== deletedId
+        );
+
+        state.mealsByUser = (state.mealsByUser || []).filter(
+          meal => meal._id !== deletedId
+        );
+
+        if (state.currentMeal?._id === deletedId) {
+          state.currentMeal = null;
+        }
+      })
+      .addCase(deleteMeal.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload || action.error?.message || 'Failed to delete meal';
       })
 
       .addCase(cloneAdminMealToUser.fulfilled, (state, action) => {
