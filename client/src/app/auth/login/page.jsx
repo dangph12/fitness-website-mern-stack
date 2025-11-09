@@ -66,21 +66,11 @@ const Login = () => {
       const { accessToken } = response.data.data;
       dispatch(loadUser({ accessToken, isRemember }));
       toast.success('Login successful!');
+      navigate('/');
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Login failed.');
     }
   };
-
-  // Navigate based on profile completion status after user state updates
-  useEffect(() => {
-    if (user) {
-      if (user.profileCompleted === false) {
-        navigate('/onboarding');
-      } else {
-        navigate('/');
-      }
-    }
-  }, [user, navigate]);
 
   return (
     <div className='flex min-h-screen items-center justify-center p-4'>

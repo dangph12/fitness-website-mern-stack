@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
-const MealValidationSchema = z.object({
+export const MealValidationSchema = z.object({
   title: z.string(),
+  image: z.string().optional(),
   mealType: z.enum([
     'Breakfast',
     'Lunch',
@@ -30,7 +31,17 @@ const MealValidationSchema = z.object({
       })
     )
   ),
-  scheduleAt: z.string()
+  scheduledAt: z.string().optional()
 });
 
-export default MealValidationSchema;
+export const MultipleMealsValidationSchema = z.object({
+  meals: z.array(MealValidationSchema)
+});
+
+export const MultipleMealsUpdateValidationSchema = z.object({
+  meals: z.array(
+    MealValidationSchema.extend({
+      _id: z.string()
+    })
+  )
+});

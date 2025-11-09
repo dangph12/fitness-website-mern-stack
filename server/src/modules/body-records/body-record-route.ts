@@ -10,12 +10,6 @@ const router: Router = express.Router();
 
 router.get('/', asyncHandler(BodyRecordController.findAll));
 
-router.post(
-  '/',
-  validate(BodyRecordValidationSchema.shape),
-  asyncHandler(BodyRecordController.create)
-);
-
 router.get('/:id', asyncHandler(BodyRecordController.findById));
 
 router.get('/user/:userId', asyncHandler(BodyRecordController.findByUser));

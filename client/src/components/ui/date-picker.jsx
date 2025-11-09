@@ -3,7 +3,7 @@ import * as React from 'react';
 import { FiCalendar } from 'react-icons/fi';
 
 import { Button } from '~/components/ui/button';
-import { Calendar } from '~/components/ui/calendar';
+import { Calendar } from '~/components/ui/calendar-for-onboarding';
 import {
   Popover,
   PopoverContent,

@@ -15,7 +15,7 @@ const FavoriteList = () => {
   const userId = useSelector(state => state.auth.user?.id);
 
   const { favorite, loading, error } = useSelector(s => s.favourites);
-  const favoritesList = favorite?.favorites || [];
+  const favoritesList = (favorite?.favorites || []).filter(f => f.workout);
 
   useEffect(() => {
     if (userId) dispatch(fetchFavorites(userId));

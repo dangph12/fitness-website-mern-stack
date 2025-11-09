@@ -10,6 +10,7 @@ import { sendMail } from '~/utils/email/mailer';
 import AuthModel from '../auth/auth-model';
 import BodyRecordModel from '../body-records/body-record-model';
 import GoalModel from '../goals/goal-model';
+import { userMembershipService } from './user-membership-service';
 import UserModel from './user-model';
 import { IUser } from './user-type';
 
@@ -53,7 +54,10 @@ const UserService = {
       throw createHttpError(400, 'Invalid ObjectId');
     }
 
+    await userMembershipService.refreshMembership(userId);
+
     const user = await UserModel.findById(userId);
+
     if (!user) {
       throw createHttpError(404, 'User not found');
     }
@@ -71,7 +75,15 @@ const UserService = {
       throw createHttpError(404, 'User not found');
     }
 
-    return user;
+    return userMembershipService.refreshMembership(user._id);
+  },
+
+  refreshMembershipTokens: async (userId: string) => {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
+    return userMembershipService.forceRefreshTokens(userId);
   },
 
   createFromSignUp: async (userData: IUser, avatar?: Express.Multer.File) => {
@@ -273,24 +285,52 @@ const UserService = {
     user.profileCompleted = true;
     await user.save();
 
-    const bodyRecord = await BodyRecordModel.create({
-      user: userId,
-      height: onboardingData.height,
-      weight: onboardingData.weight,
-      bmi: onboardingData.bmi
-    });
+    const bodyRecordExists = await BodyRecordModel.findOne({ user: userId });
+    if (!bodyRecordExists) {
+      throw createHttpError(400, 'Body record already exists');
+    }
 
-    const goal = await GoalModel.create({
-      user: userId,
-      targetWeight: onboardingData.targetWeight,
-      diet: onboardingData.diet,
-      fitnessGoal: onboardingData.fitnessGoal
-    });
+    bodyRecordExists.height = onboardingData.height;
+    bodyRecordExists.weight = onboardingData.weight;
+    bodyRecordExists.bmi = onboardingData.bmi;
+    await bodyRecordExists.save();
+
+    const existingGoal = await GoalModel.findOne({ user: userId });
+    if (!existingGoal) {
+      throw createHttpError(400, 'Goal already exists');
+    }
+
+    existingGoal.targetWeight = onboardingData.targetWeight;
+    const allowedDiets = [
+      'Mediterranean',
+      'Ketogenic (Keto)',
+      'Paleo',
+      'Vegetarian',
+      'Vegan',
+      'Gluten-Free',
+      'Low-Carb'
+    ] as const;
+    if (!allowedDiets.includes(onboardingData.diet as any)) {
+      throw createHttpError(400, 'Invalid diet type');
+    }
+    existingGoal.diet = onboardingData.diet as (typeof allowedDiets)[number];
+
+    const allowedFitnessGoals = [
+      'Lose Weight',
+      'Build Muscle',
+      'To be Healthy'
+    ] as const;
+    if (!allowedFitnessGoals.includes(onboardingData.fitnessGoal as any)) {
+      throw createHttpError(400, 'Invalid fitness goal');
+    }
+    existingGoal.fitnessGoal =
+      onboardingData.fitnessGoal as (typeof allowedFitnessGoals)[number];
+    await existingGoal.save();
 
     return {
       user,
-      bodyRecord,
-      goal
+      bodyRecordExists,
+      existingGoal
     };
   }
 };

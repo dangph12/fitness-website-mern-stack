@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaBook, FaGlobeAmericas, FaLock, FaTrash } from 'react-icons/fa';
+import { FiX } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -468,20 +469,19 @@ const EditPlan = () => {
 
               return (
                 <div key={dayIndex} className='space-y-5'>
-                  <div className='flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center'>
-                    <input
-                      type='text'
-                      value={day.dayName}
-                      onChange={e =>
-                        handleDayTitleChange(dayIndex, e.target.value)
-                      }
-                      className='w-full max-w-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-lg font-semibold outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
-                    />
+                  <div className='flex items-center justify-between rounded-xl border border-slate-200 bg-gradient-to-r from-white to-slate-50 px-5 py-3 shadow-sm'>
+                    <div className='flex items-center gap-3'>
+                      <span className='inline-flex h-7 items-center rounded-full bg-blue-600/10 px-3 text-sm font-semibold text-blue-600'>
+                        Day {dayIndex + 1}
+                      </span>
+                    </div>
+
                     <button
                       onClick={() => removeDay(dayIndex)}
-                      className='inline-flex items-center gap-2 rounded-md bg-red-500 px-3 py-2 text-white transition hover:bg-red-600'
+                      className='group flex items-center gap-1.5 rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-100 hover:border-red-400'
                     >
-                      <FaTrash /> Delete Day
+                      <FaTrash className='w-4 h-4 opacity-80 group-hover:opacity-100' />
+                      <span>Remove</span>
                     </button>
                   </div>
 
@@ -497,17 +497,7 @@ const EditPlan = () => {
                           key={workoutIndex}
                           className='relative rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm'
                         >
-                          <button
-                            onClick={() =>
-                              handleRemoveWorkout(dayIndex, workoutIndex)
-                            }
-                            className='absolute right-3 top-3 rounded-md bg-red-500 p-2 text-white hover:bg-red-600'
-                            title='Remove workout'
-                          >
-                            <FaTrash />
-                          </button>
-
-                          <div className='mb-3 flex flex-col gap-3 sm:flex-row sm:items-center'>
+                          <div className='mb-4 flex items-center justify-between'>
                             <input
                               type='text'
                               value={workout.title}
@@ -518,24 +508,19 @@ const EditPlan = () => {
                                   e.target.value
                                 )
                               }
-                              className='flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 font-medium outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200'
+                              className='flex-1 rounded-lg bg-slate-100/60 px-4 py-2 text-sm font-semibold text-slate-800 border border-transparent outline-none focus:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition'
+                              placeholder='Workout title...'
                             />
 
-                            <label className='inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50'>
-                              <input
-                                type='file'
-                                accept='image/*'
-                                className='hidden'
-                                onChange={e =>
-                                  handleWorkoutImageChange(
-                                    dayIndex,
-                                    workoutIndex,
-                                    e.target.files?.[0] || null
-                                  )
-                                }
-                              />
-                              Upload Image
-                            </label>
+                            <button
+                              onClick={() =>
+                                handleRemoveWorkout(dayIndex, workoutIndex)
+                              }
+                              className='ml-2 flex items-center justify-center rounded-full p-2 text-red-500 hover:bg-red-100 transition'
+                              title='Remove workout'
+                            >
+                              <FiX className='w-4 h-4' />
+                            </button>
                           </div>
 
                           <div className='space-y-3'>

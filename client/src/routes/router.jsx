@@ -34,6 +34,10 @@ const router = createBrowserRouter([
         Component: lazy(() => import('~/app/nutrition/create-meal/page'))
       },
       {
+        path: 'nutrition/create-ai-meal',
+        Component: lazy(() => import('~/app/nutrition/create-ai-meal/page'))
+      },
+      {
         path: 'nutrition/food/:foodId',
         Component: lazy(() => import('~/app/nutrition/food/[id]/page'))
       },
@@ -76,6 +80,10 @@ const router = createBrowserRouter([
         Component: lazy(() => import('~/app/plans/rountine-builder/page'))
       },
       {
+        path: 'plans/routine-database',
+        Component: lazy(() => import('~/app/plans/rountine-database/page'))
+      },
+      {
         path: 'workout/edit-workout/:workoutId',
         Component: lazy(() => import('~/app/workouts/edit-workout/page'))
       },
@@ -98,6 +106,26 @@ const router = createBrowserRouter([
       {
         path: 'about',
         Component: lazy(() => import('~/app/about/page'))
+      },
+      {
+        path: 'payments/success',
+        Component: lazy(() => import('~/app/payment/payment-success/page'))
+      },
+      {
+        path: 'payments/cancel',
+        Component: lazy(() => import('~/app/payment/payment-cancel/page'))
+      },
+      {
+        path: 'plan-courses/normal',
+        Component: lazy(() => import('~/app/plan-courses/normal/page'))
+      },
+      {
+        path: 'plan-courses/vip',
+        Component: lazy(() => import('~/app/plan-courses/vip/page'))
+      },
+      {
+        path: 'plan-courses/premium',
+        Component: lazy(() => import('~/app/plan-courses/premium/page'))
       }
     ],
     ErrorBoundary: ErrorComponent
@@ -143,17 +171,16 @@ const router = createBrowserRouter([
       },
       {
         path: '',
-        // Component: () => (
-        //   <PrivateRoute allowedRoles={['admin']}>
-        //     <AdminLayout />
-        //   </PrivateRoute>
-        // ),
-        Component: AdminLayout,
+        Component: () => (
+          <PrivateRoute allowedRoles={['admin']}>
+            <AdminLayout />
+          </PrivateRoute>
+        ),
 
         children: [
           {
             index: true,
-            Component: lazy(() => import('~/app/admin/page'))
+            Component: lazy(() => import('~/app/admin/dashboard/page'))
           },
           {
             path: 'manage-users',
@@ -236,6 +263,58 @@ const router = createBrowserRouter([
               () =>
                 import('~/app/admin/manage-equipments/update-equipment/page')
             )
+          },
+          {
+            path: 'manage-workouts',
+            Component: lazy(() => import('~/app/admin/manage-workouts/page'))
+          },
+          {
+            path: 'manage-workouts/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-workouts/create-workout/page')
+            )
+          },
+          {
+            path: 'manage-workouts/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-workouts/update-workout/page')
+            )
+          },
+          {
+            path: 'manage-plans',
+            Component: lazy(() => import('~/app/admin/manage-plans/page'))
+          },
+          {
+            path: 'manage-plans/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-plans/create-plan/page')
+            )
+          },
+          {
+            path: 'manage-plans/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-plans/update-plan/page')
+            )
+          },
+          {
+            path: 'manage-meals',
+            Component: lazy(() => import('~/app/admin/manage-meals/page'))
+          },
+          {
+            path: 'manage-meals/create',
+            Component: lazy(
+              () => import('~/app/admin/manage-meals/create-meal/page')
+            )
+          },
+          {
+            path: 'manage-meals/update/:id',
+            Component: lazy(
+              () => import('~/app/admin/manage-meals/update-meal/page')
+            )
+          },
+          {
+            path: 'memberships',
+            Component: lazy(() => import('~/app/admin/memberships/page'))
           }
         ]
       }

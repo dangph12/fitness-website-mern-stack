@@ -277,6 +277,81 @@ const WorkoutService = {
     if (!workout) {
       throw createHttpError(404, 'Workout not found');
     }
+  },
+
+  shareWorkout: async (workoutId: string) => {
+    if (!Types.ObjectId.isValid(workoutId)) {
+      throw createHttpError(400, 'Invalid ObjectId');
+    }
+
+    const updatedWorkout = await WorkoutModel.findByIdAndUpdate(
+      workoutId,
+      { isPublic: true },
+      { new: true }
+    )
+      .populate('user')
+      .populate({
+        path: 'exercises.exercise',
+        populate: [{ path: 'muscles' }, { path: 'equipments' }]
+      });
+
+    if (!updatedWorkout) {
+      throw createHttpError(404, 'Workout not found');
+    }
+
+    return {
+      workout: updatedWorkout
+    };
+  },
+
+  cloneWorkout: async (workoutId: string, userId: string) => {
+    if (!Types.ObjectId.isValid(workoutId)) {
+      throw createHttpError(400, 'Invalid workout ID');
+    }
+
+    if (!Types.ObjectId.isValid(userId)) {
+      throw createHttpError(400, 'Invalid user ID');
+    }
+
+    const originalWorkout = await WorkoutModel.findById(workoutId);
+
+    if (!originalWorkout) {
+      throw createHttpError(404, 'Workout not found');
+    }
+
+    if (!originalWorkout.isPublic) {
+      throw createHttpError(403, 'This workout is not shared');
+    }
+
+    if (userId === originalWorkout.user.toString()) {
+      throw createHttpError(400, 'Cannot clone your own workout');
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw createHttpError(404, 'User not found');
+    }
+
+    const clonedWorkout = await WorkoutModel.create({
+      title: originalWorkout.title,
+      image: originalWorkout.image,
+      isPublic: false,
+      user: userId,
+      exercises: originalWorkout.exercises
+    });
+
+    const populatedWorkout = await WorkoutModel.findById(clonedWorkout._id)
+      .populate('user')
+      .populate({
+        path: 'exercises.exercise',
+        populate: [{ path: 'muscles' }, { path: 'equipments' }]
+      });
+
+    if (!populatedWorkout) {
+      throw createHttpError(500, 'Failed to clone workout');
+    }
+
+    return populatedWorkout;
   }
 };
 

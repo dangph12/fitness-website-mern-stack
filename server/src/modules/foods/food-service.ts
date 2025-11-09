@@ -41,6 +41,10 @@ const FoodService = {
     };
   },
 
+  findAll: async () => {
+    return FoodModel.find().sort({ title: 1 }).limit(200).lean();
+  },
+
   findById: async (foodId: string) => {
     if (!Types.ObjectId.isValid(foodId)) {
       throw createHttpError(400, 'Invalid ObjectId');

@@ -41,7 +41,17 @@ const AdminLayout = () => {
       'create-muscle': 'Create Muscle',
       'manage-equipments': 'Equipment Management',
       'create-equipment': 'Create Equipment',
-      'update-equipment': 'Update Equipment'
+      'update-equipment': 'Update Equipment',
+      'manage-workouts': 'Workouts Management',
+      'create-workout': 'Create Workout',
+      'update-workout': 'Update Workout',
+      'manage-plans': 'Plans Management',
+      'create-plan': 'Create Plan',
+      'update-plan': 'Update Plan',
+      'manage-meals': 'Meals Management',
+      'create-meal': 'Create Meal',
+      'update-meal': 'Update Meal',
+      memberships: 'Membership Payments'
     };
 
     const items = [];

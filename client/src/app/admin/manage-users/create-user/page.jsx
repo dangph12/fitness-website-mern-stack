@@ -26,7 +26,7 @@ import {
 import { Separator } from '~/components/ui/separator';
 import { Switch } from '~/components/ui/switch';
 import axiosInstance from '~/lib/axios-instance';
-import { createBodyRecord } from '~/store/features/body-records';
+import { createBodyRecord } from '~/store/features/body-records-slice';
 import { fetchUsers } from '~/store/features/users-slice';
 
 export default function AddUserPage() {

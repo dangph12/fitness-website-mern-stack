@@ -18,7 +18,7 @@ const MealSchema = new Schema<IMeal>(
         quantity: { type: Number, required: true }
       }
     ],
-    scheduleAt: { type: Date, required: true }
+    scheduledAt: { type: Date }
   },
   { timestamps: true }
 );

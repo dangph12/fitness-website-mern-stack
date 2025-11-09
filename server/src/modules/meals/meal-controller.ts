@@ -35,12 +35,45 @@ const MealController = {
       .json(ApiResponse.success('Meal retrieved successfully', meal));
   },
 
+  findByUser: async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    const meals = await MealService.findByUser(userId);
+    return res
+      .status(200)
+      .json(ApiResponse.success('Meals retrieved successfully', meals));
+  },
+
+  findByAdmin: async (req: Request, res: Response) => {
+    const meals = await MealService.findByAdmin();
+    return res
+      .status(200)
+      .json(ApiResponse.success('Meals retrieved successfully', meals));
+  },
+
+  cloneAdminMealToUser: async (req: Request, res: Response) => {
+    const mealId = req.params.id;
+    const userId = req.body.userId;
+    const clonedMeal = await MealService.cloneAdminMealToUser(mealId, userId);
+    return res
+      .status(201)
+      .json(ApiResponse.success('Meal cloned successfully', clonedMeal));
+  },
+
   create: async (req: Request, res: Response) => {
     const mealData = req.body;
     const newMeal = await MealService.create(mealData, req.file);
     return res
       .status(201)
       .json(ApiResponse.success('Meal created successfully', newMeal));
+  },
+
+  createMultiple: async (req: Request, res: Response) => {
+    const mealsData = req.body;
+    const files = req.files as Express.Multer.File[];
+    const newMeals = await MealService.createMultiple(mealsData, files);
+    return res
+      .status(201)
+      .json(ApiResponse.success('Meals created successfully', newMeals));
   },
 
   update: async (req: Request, res: Response) => {
@@ -50,6 +83,15 @@ const MealController = {
     return res
       .status(200)
       .json(ApiResponse.success('Meal updated successfully', updatedMeal));
+  },
+
+  updateMultiple: async (req: Request, res: Response) => {
+    const mealsData = req.body;
+    const files = req.files as Express.Multer.File[];
+    const updatedMeals = await MealService.updateMultiple(mealsData, files);
+    return res
+      .status(200)
+      .json(ApiResponse.success('Meals updated successfully', updatedMeals));
   },
 
   remove: async (req: Request, res: Response) => {

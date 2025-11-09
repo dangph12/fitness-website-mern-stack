@@ -15,7 +15,7 @@ const CreatePlan = () => {
   const [planTitle, setPlanTitle] = useState('');
   const [planDescription, setPlanDescription] = useState('');
 
-  const [isPublic, setIsPublic] = useState(true);
+  const [isPublic, setIsPublic] = useState(false);
 
   const userId = useSelector(state => state.auth.user.id);
   const { loading } = useSelector(state => state.plans);

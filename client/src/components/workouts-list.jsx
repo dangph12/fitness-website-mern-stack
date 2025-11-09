@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { FiHome, FiLock, FiLogIn } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,6 +26,13 @@ const WorkoutList = () => {
   } = useSelector(state => state.workouts || {});
 
   const [searchQuery, setSearchQuery] = useState('');
+
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, []);
 
   useEffect(() => {
     if (userId) dispatch(fetchWorkoutsByUser(userId));
@@ -56,7 +63,7 @@ const WorkoutList = () => {
   const filteredWorkouts = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return (workoutsByUser || [])
-      .filter(w => w.title?.toLowerCase?.().includes(q))
+      .filter(w => w.isPublic === false && w.title?.toLowerCase?.().includes(q))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [workoutsByUser, searchQuery]);
 
@@ -105,11 +112,11 @@ const WorkoutList = () => {
   return (
     <div className='min-h-screen w-full bg-gradient-to-b from-slate-50 via-white to-slate-50 py-10'>
       <div className='mx-auto w-full max-w-7xl px-4 lg:px-6'>
-        <div className='mb-6 rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-slate-200'>
-          <h4 className='text-3xl font-extrabold tracking-tight text-slate-900'>
+        <div className='mb-6 rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-6 shadow-sm'>
+          <h4 className='text-3xl font-extrabold tracking-tight text-emerald-700'>
             My Workout List
           </h4>
-          <p className='mt-2 max-w-2xl text-slate-600'>
+          <p className='mt-2 max-w-2xl text-slate-700'>
             Your created workout routines, sorted from newest to oldest.
           </p>
         </div>

@@ -90,6 +90,25 @@ const WorkoutController = {
     return res
       .status(200)
       .json(ApiResponse.success('Workout deleted successfully'));
+  },
+
+  shareWorkout: async (req: Request, res: Response) => {
+    const workoutId = req.params.id;
+    const shareData = await WorkoutService.shareWorkout(workoutId);
+
+    return res
+      .status(200)
+      .json(ApiResponse.success('Workout shared successfully', shareData));
+  },
+
+  cloneWorkout: async (req: Request, res: Response) => {
+    const workoutId = req.params.id;
+    const userId = req.body.userId;
+    const clonedWorkout = await WorkoutService.cloneWorkout(workoutId, userId);
+
+    return res
+      .status(200)
+      .json(ApiResponse.success('Workout cloned successfully', clonedWorkout));
   }
 };
 

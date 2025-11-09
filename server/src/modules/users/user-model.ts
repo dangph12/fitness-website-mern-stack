@@ -1,8 +1,8 @@
 import { Document, model, Schema } from 'mongoose';
 
+import BodyRecordModel from '../body-records/body-record-model';
 import FavoriteModel from '../favorites/favorite-model';
 import GoalModel from '../goals/goal-model';
-import HistoryModel from '../histories/history-model';
 import { IUser } from './user-type';
 
 export interface IUserDocument extends IUser, Document {}
@@ -19,6 +19,14 @@ const UserSchema = new Schema<IUserDocument>(
       enum: ['user', 'admin'],
       default: 'user'
     },
+    membershipLevel: {
+      type: String,
+      enum: ['normal', 'vip', 'premium'],
+      default: 'normal'
+    },
+    membershipExpiresAt: { type: Date },
+    aiMealTokens: { type: Number, default: 0 },
+    aiMealTokensLastReset: { type: Date },
     dob: { type: Date },
     isActive: { type: Boolean, default: true },
     profileCompleted: { type: Boolean, default: false }
@@ -37,6 +45,20 @@ UserSchema.post('save', async (doc: IUserDocument, next) => {
             targetWeight: 0,
             diet: '',
             fitnessGoal: ''
+          }
+        },
+        { upsert: true }
+      );
+
+      await BodyRecordModel.updateOne(
+        { user: doc._id },
+        {
+          $setOnInsert: {
+            user: doc._id,
+            height: 0,
+            weight: 0,
+            bmi: 0,
+            bodyClassification: null
           }
         },
         { upsert: true }

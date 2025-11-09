@@ -7,13 +7,14 @@ export const fetchWorkouts = createAsyncThunk(
   'workouts/fetchWorkouts',
   async ({
     page = 1,
-    limit = 4,
+    limit = 10,
     sortBy = 'createdAt',
     sortOrder = 'desc',
-    title = ''
+    title = '',
+    isPublic = ''
   }) => {
     const res = await axiosInstance.get('/api/workouts', {
-      params: { page, limit, sortBy, sortOrder, title }
+      params: { page, limit, sortBy, sortOrder, title, isPublic }
     });
     return res.data.data;
   }
@@ -86,6 +87,43 @@ export const deleteWorkout = createAsyncThunk(
   }
 );
 
+// Share (public) a workout
+export const shareWorkout = createAsyncThunk(
+  'workouts/shareWorkout',
+  async ({ workoutId, body }, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post(
+        `/api/workouts/${workoutId}/share`,
+        body
+      );
+      return res.data?.data?.workout;
+    } catch (err) {
+      return rejectWithValue(
+        err?.response?.data?.message || 'Failed to share workout'
+      );
+    }
+  }
+);
+
+export const cloneWorkoutToUser = createAsyncThunk(
+  'workouts/cloneWorkoutToUser',
+  async ({ workoutId, userId }, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post(`/api/workouts/${workoutId}/clone`, {
+        userId
+      });
+      const cloned =
+        res?.data?.data?.workout || res?.data?.data || res?.data?.workout;
+      if (!cloned?._id) throw new Error('Unexpected clone response');
+      return cloned;
+    } catch (err) {
+      return rejectWithValue(
+        err?.response?.data?.message || err.message || 'Clone failed'
+      );
+    }
+  }
+);
+
 const upsertById = (arr, item) => {
   const i = arr.findIndex(x => x._id === item._id);
   if (i === -1) arr.unshift(item);
@@ -100,19 +138,15 @@ export const workoutSlice = createSlice({
     totalWorkouts: 0,
     totalPages: 1,
 
-    // current detail
     currentWorkout: null,
 
-    // loading/error paged
     loading: false,
     error: null,
 
-    // ALL (no pagination)
     allWorkouts: [],
     loadingAll: false,
     errorAll: null,
 
-    //(no pagination)
     workoutsByUser: [],
     loadingByUser: false,
     errorByUser: null
@@ -225,6 +259,46 @@ export const workoutSlice = createSlice({
         state.workoutsByUser = removeById(state.workoutsByUser, id);
 
         if (state.currentWorkout?._id === id) state.currentWorkout = null;
+      })
+
+      /* ---- Share ---- */
+      .addCase(shareWorkout.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(shareWorkout.fulfilled, (state, action) => {
+        state.loading = false;
+        const w = action.payload;
+        upsertById(state.workouts, w);
+
+        upsertById(state.allWorkouts, w);
+        upsertById(state.workoutsByUser, w);
+
+        if (state.currentWorkout?._id === w._id) state.currentWorkout = w;
+      })
+      .addCase(shareWorkout.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload || action.error.message || 'Failed to share workout';
+      })
+
+      /** Clone fulfilled: nhét vào các list */
+      .addCase(cloneWorkoutToUser.fulfilled, (state, action) => {
+        const w = action.payload;
+        const i = state.workouts.findIndex(x => x._id === w._id);
+        if (i === -1) state.workouts.unshift(w);
+        else state.workouts[i] = w;
+
+        const upsert = (arr, item) => {
+          const idx = arr.findIndex(x => x._id === item._id);
+          if (idx === -1) arr.unshift(item);
+          else arr[idx] = item;
+        };
+        upsert(state.allWorkouts, w);
+        upsert(state.workoutsByUser, w);
+      })
+      .addCase(cloneWorkoutToUser.rejected, (state, action) => {
+        state.error = action.payload || 'Clone failed';
       });
   }
 });

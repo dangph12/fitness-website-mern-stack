@@ -1,37 +1,29 @@
 import React from 'react';
 
-import AdminLayout from '../../../layouts/admin-layout';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 
-const Page = () => {
+import Overview from './overview/page';
+import Revenue from './revenue/page';
+
+const DashboardLayout = () => {
   return (
-    <div className='space-y-6'>
-      <div>
-        <h2 className='text-3xl font-bold'>Dashboard</h2>
-        <p className='text-muted-foreground'>
-          Welcome to your fitness admin dashboard
-        </p>
-      </div>
+    <div className='flex-1 space-y-4 p-4 md:p-8 pt-6'>
+      <Tabs defaultValue='overview' className='space-y-4'>
+        <TabsList>
+          <TabsTrigger value='overview'>Overview</TabsTrigger>
+          <TabsTrigger value='revenue'>Revenue</TabsTrigger>
+        </TabsList>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-        <div className='bg-card p-6 rounded-lg border'>
-          <h3 className='text-lg font-semibold mb-2'>Total Users</h3>
-          <p className='text-2xl font-bold text-primary'>1,234</p>
-        </div>
-        <div className='bg-card p-6 rounded-lg border'>
-          <h3 className='text-lg font-semibold mb-2'>Active Sessions</h3>
-          <p className='text-2xl font-bold text-primary'>89</p>
-        </div>
-        <div className='bg-card p-6 rounded-lg border'>
-          <h3 className='text-lg font-semibold mb-2'>Workouts</h3>
-          <p className='text-2xl font-bold text-primary'>456</p>
-        </div>
-        <div className='bg-card p-6 rounded-lg border'>
-          <h3 className='text-lg font-semibold mb-2'>Revenue</h3>
-          <p className='text-2xl font-bold text-primary'>$12,345</p>
-        </div>
-      </div>
+        <TabsContent value='overview' className='space-y-4'>
+          <Overview />
+        </TabsContent>
+
+        <TabsContent value='revenue' className='space-y-4'>
+          <Revenue />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
 
-export default Page;
+export default DashboardLayout;

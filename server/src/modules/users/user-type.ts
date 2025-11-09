@@ -1,3 +1,5 @@
+export type MembershipLevel = 'normal' | 'vip' | 'premium';
+
 export interface IUser {
   name: string;
   email: string;
@@ -7,4 +9,8 @@ export interface IUser {
   gender?: string;
   isActive?: boolean;
   profileCompleted?: boolean;
+  membershipLevel?: MembershipLevel;
+  membershipExpiresAt?: Date | null;
+  aiMealTokens?: number;
+  aiMealTokensLastReset?: Date | null;
 }
