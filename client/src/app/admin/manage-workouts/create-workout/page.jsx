@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ArrowLeft, GripVertical, Trash2, Upload, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
@@ -49,7 +49,9 @@ const CreateWorkout = () => {
   }, []);
 
   // Get selected exercise IDs for library
-  const selectedExerciseIds = exercises.map(ex => ex.exercise);
+  const selectedExerciseIds = useMemo(() => {
+    return exercises.map(ex => ex.exercise);
+  }, [exercises]);
 
   const handleAddExercise = exercise => {
     const exists = exercises.some(ex => ex.exercise === exercise._id);
@@ -176,7 +178,7 @@ const CreateWorkout = () => {
   };
 
   return (
-    <div className='max-w-7xl mx-auto space-y-6'>
+    <div className='w-full max-w-[1600px] mx-auto space-y-6 px-6'>
       <div className='flex items-center gap-4 mb-6'>
         <Button
           variant='ghost'
@@ -190,13 +192,19 @@ const CreateWorkout = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6'>
+        <div className='grid grid-cols-1 xl:grid-cols-[2fr_450px] gap-6'>
           {/* Left Column - Workout Details */}
           <div className='space-y-6'>
             {/* Basic Info Card */}
             <Card>
               <CardHeader>
                 <CardTitle className='flex items-center justify-between'>
+                  <div>
+                    <h2 className='text-2xl font-bold'>Create New Workout</h2>
+                    <p className='text-sm text-muted-foreground mt-1'>
+                      Add workout details and exercises
+                    </p>
+                  </div>
                   <Badge variant='secondary' className='text-sm'>
                     {exercises.length} exercises
                   </Badge>

@@ -1,7 +1,22 @@
 import * as React from 'react';
 import * as RechartsPrimitive from 'recharts';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
 import { cn } from '~/lib/utils';
+
+const Chart = ({ data }) => {
+  return (
+    <ResponsiveContainer width='100%' height={300}>
+      <BarChart data={data}>
+        <XAxis dataKey='name' stroke='#888888' />
+        <YAxis stroke='#888888' />
+        <Bar dataKey='total' fill='currentColor' />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+};
+
+export default Chart;
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = {

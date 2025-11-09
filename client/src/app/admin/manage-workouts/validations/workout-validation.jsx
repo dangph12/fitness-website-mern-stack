@@ -5,38 +5,37 @@ export const workoutValidationSchema = yup.object().shape({
     .string()
     .required('Workout title is required')
     .min(3, 'Title must be at least 3 characters')
-    .max(100, 'Title must not exceed 100 characters')
-    .trim(),
+    .max(100, 'Title must not exceed 100 characters'),
 
   isPublic: yup.boolean().required('Status is required'),
 
   image: yup
     .mixed()
     .nullable()
-    .test('fileSize', 'Image must be less than 10MB', value => {
-      if (!value || typeof value === 'string') return true;
-      return value.size <= 10 * 1024 * 1024;
+    .test('fileType', 'Invalid file type', value => {
+      if (!value) return true;
+      return value instanceof File && value.type.startsWith('image/');
     })
-    .test('fileType', 'Only image files are allowed', value => {
-      if (!value || typeof value === 'string') return true;
-      return value.type?.startsWith('image/');
+    .test('fileSize', 'File too large (max 10MB)', value => {
+      if (!value) return true;
+      return value instanceof File && value.size <= 10 * 1024 * 1024;
     }),
 
   exercises: yup
     .array()
     .of(
       yup.object().shape({
-        exercise: yup.object().shape({
-          _id: yup.string().required(),
-          title: yup.string().required(),
-          tutorial: yup.string()
-        }),
+        exercise: yup.string().required('Exercise ID is required'),
+        exerciseTitle: yup.string(),
+        exerciseImage: yup.string(),
+        exerciseDifficulty: yup.string(),
+        exerciseType: yup.string(),
         sets: yup
           .array()
-          .of(yup.number().min(1, 'Reps must be at least 1').required())
+          .of(yup.number().positive('Reps must be positive').required())
           .min(1, 'At least one set is required')
       })
     )
-    .min(1, 'Please add at least one exercise')
+    .min(1, 'At least one exercise is required')
     .required('Exercises are required')
 });
