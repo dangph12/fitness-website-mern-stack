@@ -180,7 +180,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            Component: lazy(() => import('~/app/admin/page'))
+            Component: lazy(() => import('~/app/admin/dashboard/page'))
           },
           {
             path: 'manage-users',
@@ -311,6 +311,10 @@ const router = createBrowserRouter([
             Component: lazy(
               () => import('~/app/admin/manage-meals/update-meal/page')
             )
+          },
+          {
+            path: 'memberships',
+            Component: lazy(() => import('~/app/admin/memberships/page'))
           }
         ]
       }

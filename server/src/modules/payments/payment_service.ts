@@ -5,6 +5,7 @@ import {
 import createHttpError from 'http-errors';
 import { Types } from 'mongoose';
 
+import { sendMail } from '~/utils/email/mailer';
 import { payOS } from '~/utils/payos';
 
 import { userMembershipService } from '../users/user-membership-service';
@@ -233,6 +234,80 @@ export const paymentService = {
           userId,
           targetMembershipLevel
         );
+
+        const user = payment.user as any;
+        await sendMail({
+          to: user.email,
+          subject: `🎉 Chúc mừng! Bạn đã nâng cấp lên ${targetMembershipLevel.toUpperCase()}`,
+          html: `
+            <div style="font-family: 'Segoe UI', Arial, sans-serif; padding: 0; margin: 0; background-color: #f4f4f4;">
+              <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+                
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 35px 20px; text-align: center;">
+                  <div style="font-size: 50px; margin-bottom: 10px;">🎊</div>
+                  <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: bold;">
+                    Chúc Mừng Nâng Cấp!
+                  </h1>
+                </div>
+                
+                <div style="padding: 35px 30px;">
+                  <h2 style="color: #333; font-size: 20px; margin-bottom: 15px;">
+                    Xin chào ${user.name}! 👋
+                  </h2>
+                  
+                  <p style="font-size: 16px; line-height: 1.7; color: #555; margin-bottom: 25px;">
+                    Chúc mừng bạn đã <strong>nâng cấp thành công</strong> lên hạng thành viên 
+                    <strong style="color: #667eea;">${targetMembershipLevel.toUpperCase()}</strong>! 
+                    Bạn sẽ được tận hưởng nhiều quyền lợi đặc biệt dành riêng cho hạng này.
+                  </p>
+                  
+                  <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); 
+                              border-left: 4px solid #667eea; 
+                              padding: 20px; 
+                              border-radius: 8px; 
+                              margin: 25px 0;">
+                    <p style="margin: 8px 0; font-size: 15px; color: #333;">
+                      <span style="display: inline-block; width: 130px; font-weight: bold;">🏆 Hạng thành viên:</span>
+                      <span style="color: #667eea; font-weight: bold;">${targetMembershipLevel.toUpperCase()}</span>
+                    </p>
+                    <p style="margin: 8px 0; font-size: 15px; color: #333;">
+                      <span style="display: inline-block; width: 130px; font-weight: bold;">📅 Ngày kích hoạt:</span>
+                      <span>${new Date().toLocaleDateString('vi-VN')}</span>
+                    </p>
+                    <p style="margin: 8px 0; font-size: 15px; color: #333;">
+                      <span style="display: inline-block; width: 130px; font-weight: bold;">✨ Quyền lợi:</span>
+                      <span>Ưu đãi độc quyền, Hỗ trợ ưu tiên</span>
+                    </p>
+                  </div>
+                  
+                  <div style="background-color: #f9f9f9; 
+                              padding: 18px; 
+                              border-radius: 8px; 
+                              margin: 25px 0;
+                              text-align: center;">
+                    <p style="font-size: 15px; color: #666; margin: 0; line-height: 1.6;">
+                      💜 <strong>Cảm ơn bạn</strong> đã tin tưởng và đồng hành cùng chúng tôi!
+                    </p>
+                  </div>
+                  
+                  <p style="font-size: 14px; color: #888; margin-top: 20px;">
+                    Nếu có câu hỏi, vui lòng liên hệ với chúng tôi. Đội ngũ hỗ trợ luôn sẵn sàng giúp đỡ!
+                  </p>
+                </div>
+                
+                <div style="background-color: #f8f8f8; padding: 25px; text-align: center; border-top: 1px solid #eee;">
+                  <p style="font-size: 12px; color: #999; margin: 8px 0;">
+                    📧 Email này được gửi tự động, vui lòng không trả lời trực tiếp.
+                  </p>
+                  <p style="font-size: 11px; color: #aaa; margin: 5px 0;">
+                    © 2025 F-Fitness. All rights reserved.
+                  </p>
+                </div>
+                
+              </div>
+            </div>
+          `
+        });
       }
     } else if (status === 'cancelled') {
       payment.cancellationReason = cancellationReason?.trim();

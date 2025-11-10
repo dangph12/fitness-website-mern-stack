@@ -1,6 +1,6 @@
 'use client';
 
-import { Crown, UserCheck, Users, UserX } from 'lucide-react';
+import { Crown, Star, UserCheck, Users, UserX } from 'lucide-react';
 import React from 'react';
 import { useSelector } from 'react-redux';
 
@@ -14,8 +14,12 @@ export function UsersStats() {
     const active = users.filter(user => user.isActive !== false).length;
     const inactive = users.filter(user => user.isActive === false).length;
     const admins = users.filter(user => user.role === 'admin').length;
+    const premium = users.filter(
+      user => user.membershipLevel === 'premium'
+    ).length;
+    const vip = users.filter(user => user.membershipLevel === 'vip').length;
 
-    return { total, active, inactive, admins };
+    return { total, active, inactive, admins, premium, vip };
   }, [users, totalUsers]);
 
   const statCards = [
@@ -34,18 +38,18 @@ export function UsersStats() {
       bgColor: 'bg-green-100'
     },
     {
-      title: 'Inactive Users',
-      value: stats.inactive,
-      icon: UserX,
-      color: 'text-red-600',
-      bgColor: 'bg-red-100'
-    },
-    {
-      title: 'Admins',
-      value: stats.admins,
+      title: 'Premium Members',
+      value: stats.premium,
       icon: Crown,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100'
+    },
+    {
+      title: 'VIP Members',
+      value: stats.vip,
+      icon: Star,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-100'
     }
   ];
 

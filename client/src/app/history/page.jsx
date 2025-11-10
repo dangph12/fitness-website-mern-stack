@@ -58,6 +58,7 @@ function Page() {
 
   return (
     <div className='space-y-10'>
+      <UserStreak />
       <HistoryChart />
       <HistoryList />
     </div>
