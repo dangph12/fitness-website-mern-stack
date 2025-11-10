@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 import HistoryChart from '~/components/history-chart';
 import HistoryList from '~/components/history-list';
 import { Button } from '~/components/ui/button';
+import UserStreak from '~/components/user-streak';
 
 function Page() {
   const userId = useSelector(state => state?.auth?.user?.id);
