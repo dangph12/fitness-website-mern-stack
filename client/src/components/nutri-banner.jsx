@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import nutri from '../assets/nutri.webp';
 
 const NutriBanner = () => {
-  const userId = useSelector(state => state.auth.user?.id);
+  const userId = useSelector(state => state?.auth?.user?.id);
   const navigate = useNavigate();
 
   const handleClick = (e, path) => {
