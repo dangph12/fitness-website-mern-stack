@@ -125,6 +125,7 @@ const foodSlice = createSlice({
         state.foods.foods = state.foods.foods.filter(
           f => f._id !== action.payload
         );
+
         state.foods.totalCount--;
       });
   }
