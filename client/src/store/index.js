@@ -17,6 +17,7 @@ import plansReducer from '~/store/features/plan-slice';
 import usersReducer from '~/store/features/users-slice';
 import workoutsReducer from '~/store/features/workout-slice';
 
+import adminMealReducer from './features/admin-meal-slice';
 export default configureStore({
   reducer: {
     auth: authReducer,
@@ -34,6 +35,7 @@ export default configureStore({
     goals: goalsReducer,
     mealAi: mealAisReducer,
     bodyRecords: bodyRecordsReducer,
-    payments: paymentsReducer
+    payments: paymentsReducer,
+    adminMealReducer: adminMealReducer
   }
 });
