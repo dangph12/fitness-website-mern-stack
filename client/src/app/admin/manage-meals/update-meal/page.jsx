@@ -21,7 +21,7 @@ import {
   SelectValue
 } from '~/components/ui/select';
 import { Skeleton } from '~/components/ui/skeleton';
-import { fetchMealById, updateMeal } from '~/store/features/meal-slice';
+import { fetchMealById, updateMeal } from '~/store/features/admin-meal-slice';
 
 const UpdateMeal = () => {
   const dispatch = useDispatch();
@@ -29,8 +29,9 @@ const UpdateMeal = () => {
   const { id } = useParams();
 
   const userId = useSelector(state => state.auth.user.id);
-  const { currentMeal, loading } = useSelector(state => state.meals);
+  const { currentMeal } = useSelector(state => state.adminMealReducer);
 
+  const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
   const [isImageChanged, setIsImageChanged] = useState(false);
   const [isLoadingMeal, setIsLoadingMeal] = useState(true);
@@ -44,7 +45,7 @@ const UpdateMeal = () => {
     reset,
     formState: { errors }
   } = useForm({
-    resolver: yupResolver(singleMealValidationSchema), // Đổi sang singleMealValidationSchema
+    resolver: yupResolver(singleMealValidationSchema),
     defaultValues: {
       title: '',
       mealType: 'Breakfast',
@@ -71,7 +72,7 @@ const UpdateMeal = () => {
           foods:
             result.foods?.map(item => ({
               food: item.food?._id || item.food,
-              foodName: item.food?.title || item.food?.name || '',
+              foodTitle: item.food?.title || '',
               quantity: item.quantity || 1,
               foodData: item.food || {} // Store full food data for display
             })) || []
@@ -118,7 +119,7 @@ const UpdateMeal = () => {
 
     const foodItem = {
       food: food._id,
-      foodName: food.title || food.name,
+      foodTitle: food.title,
       quantity: 1,
       foodData: food // Store full food data for display
     };
@@ -161,45 +162,55 @@ const UpdateMeal = () => {
   };
 
   const onSubmit = async data => {
-    console.log('Update form data:', data);
-
-    const mealData = new FormData();
-    mealData.append('title', data.title.trim());
-    mealData.append('mealType', data.mealType);
-    mealData.append('user', userId);
-
-    // Tự động thêm scheduleAt (giữ nguyên hoặc ngày hiện tại)
-    const scheduleDate = currentMeal?.scheduleAt || new Date().toISOString();
-    mealData.append('scheduleAt', scheduleDate);
-
-    // Only append image if changed
-    if (isImageChanged) {
-      if (data.image && typeof data.image !== 'string') {
-        mealData.append('image', data.image);
-      } else if (!data.image) {
-        mealData.append('image', ''); // Remove image
-      }
-    }
-
-    // Append foods array
-    data.foods.forEach((foodItem, index) => {
-      mealData.append(`foods[${index}][food]`, foodItem.food);
-      mealData.append(`foods[${index}][quantity]`, String(foodItem.quantity));
-    });
-
-    // Debug FormData
-    console.log('FormData entries:');
-    for (const pair of mealData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
+    setLoading(true);
 
     try {
+      console.log('Update form data:', data);
+
+      const mealData = new FormData();
+      mealData.append('title', data.title.trim());
+      mealData.append('mealType', data.mealType);
+      mealData.append('user', userId);
+
+      // Tự động thêm scheduleAt (giữ nguyên hoặc ngày hiện tại)
+      const scheduleDate = currentMeal?.scheduleAt || new Date().toISOString();
+      mealData.append('scheduleAt', scheduleDate);
+
+      // Only append image if changed
+      if (isImageChanged) {
+        if (data.image && typeof data.image !== 'string') {
+          mealData.append('image', data.image);
+        } else if (!data.image) {
+          mealData.append('image', ''); // Remove image
+        }
+      }
+
+      // Append foods array
+      data.foods.forEach((foodItem, index) => {
+        mealData.append(`foods[${index}][food]`, foodItem.food);
+        mealData.append(`foods[${index}][quantity]`, String(foodItem.quantity));
+      });
+
+      // Debug FormData
+      console.log('FormData entries:');
+      for (const pair of mealData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      // Await the dispatch and unwrap to catch errors
       const result = await dispatch(
         updateMeal({ id, updateData: mealData })
       ).unwrap();
-      console.log('Update result:', result);
+
+      console.log('Update result:', result); // Debug log
+
+      // Show success toast
       toast.success('Meal updated successfully!');
-      navigate('/admin/manage-meals');
+
+      // Navigate back to meals list
+      setTimeout(() => {
+        navigate('/admin/manage-meals');
+      }, 500); // Small delay to ensure toast is visible
     } catch (error) {
       console.error('Update error:', error);
       const errorMessage =
@@ -207,6 +218,8 @@ const UpdateMeal = () => {
         error?.message ||
         'Failed to update meal';
       toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -226,9 +239,9 @@ const UpdateMeal = () => {
   // Loading skeleton
   if (isLoadingMeal) {
     return (
-      <div className='max-w-7xl mx-auto space-y-6'>
+      <div className='w-full max-w-[1600px] mx-auto space-y-6 px-6'>
         <Skeleton className='h-10 w-48' />
-        <div className='grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6'>
+        <div className='grid grid-cols-1 xl:grid-cols-[2fr_450px] gap-6'>
           <div className='space-y-6'>
             <Card>
               <CardHeader>
@@ -255,7 +268,7 @@ const UpdateMeal = () => {
   }
 
   return (
-    <div className='max-w-7xl mx-auto space-y-6'>
+    <div className='w-full max-w-[1600px] mx-auto space-y-6 px-6'>
       <div className='flex items-center gap-4 mb-6'>
         <Button
           variant='ghost'
@@ -269,14 +282,14 @@ const UpdateMeal = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6'>
+        <div className='grid grid-cols-1 xl:grid-cols-[2fr_450px] gap-6'>
           {/* Left Column - Meal Details */}
           <div className='space-y-6'>
             {/* Basic Info Card */}
             <Card>
               <CardHeader>
                 <CardTitle className='flex items-center justify-between'>
-                  <span>Meal Information</span>
+                  <span>Update Meal</span>
                   <div className='flex items-center gap-2 text-sm'>
                     <Badge variant='secondary'>{totalFoods} foods</Badge>
                     <Badge variant='secondary'>
@@ -483,7 +496,7 @@ const UpdateMeal = () => {
                                 {food?.image ? (
                                   <img
                                     src={food.image}
-                                    alt={food.title || food.name || 'Food'}
+                                    alt={food.title || 'Food'}
                                     className='h-full w-full object-cover'
                                   />
                                 ) : (
@@ -497,7 +510,7 @@ const UpdateMeal = () => {
                               <div className='flex-1 min-w-0'>
                                 <h4 className='font-semibold'>
                                   {foodIndex + 1}.{' '}
-                                  {food?.title || food?.name || 'Food'}
+                                  {food?.title || 'Unnamed Food'}
                                 </h4>
                                 <div className='flex flex-wrap gap-1 mt-1'>
                                   <Badge
