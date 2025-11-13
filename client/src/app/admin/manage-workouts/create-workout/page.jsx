@@ -63,7 +63,7 @@ const CreateWorkout = () => {
     const exerciseData = {
       exercise: exercise._id,
       exerciseTitle: exercise.title,
-      exerciseImage: exercise.image,
+      exerciseImage: exercise.tutorial,
       exerciseDifficulty: exercise.difficulty,
       exerciseType: exercise.type,
       sets: [8] // Default sets

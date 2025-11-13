@@ -123,7 +123,7 @@ export const membershipsColumns = [
     ),
     cell: ({ row }) => {
       const amount = row.getValue('amount');
-      return <div className='font-medium'>${amount.toLocaleString()}</div>;
+      return <div className='font-medium'>{amount.toLocaleString()} VND</div>;
     }
   },
 

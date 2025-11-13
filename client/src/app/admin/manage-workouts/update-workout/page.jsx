@@ -25,8 +25,7 @@ const UpdateWorkout = () => {
   const navigate = useNavigate();
 
   const userId = useSelector(state => state.auth.user.id);
-  const { currentWorkout, loading } = useSelector(state => state.workouts);
-
+  const { currentWorkout } = useSelector(state => state.workouts);
   // React Hook Form
   const {
     register,
@@ -34,7 +33,7 @@ const UpdateWorkout = () => {
     watch,
     setValue,
     reset,
-    formState: { errors }
+    formState: { errors, isSubmitting }
   } = useForm({
     resolver: yupResolver(workoutValidationSchema),
     defaultValues: {
@@ -78,7 +77,7 @@ const UpdateWorkout = () => {
           return {
             exercise: exerciseObj?._id || ex.exercise,
             exerciseTitle: exerciseObj?.title || 'Unknown Exercise',
-            exerciseImage: exerciseObj?.image || '',
+            exerciseImage: exerciseObj?.tutorial || '',
             exerciseDifficulty: exerciseObj?.difficulty || '',
             exerciseType: exerciseObj?.type || '',
             sets: ex.sets && ex.sets.length > 0 ? ex.sets : [8]
@@ -113,7 +112,7 @@ const UpdateWorkout = () => {
     const exerciseData = {
       exercise: exercise._id,
       exerciseTitle: exercise.title,
-      exerciseImage: exercise.image,
+      exerciseImage: exercise.tutorial,
       exerciseDifficulty: exercise.difficulty,
       exerciseType: exercise.type,
       sets: [8] // Default sets
@@ -532,12 +531,12 @@ const UpdateWorkout = () => {
                 type='button'
                 variant='outline'
                 onClick={handleGoBack}
-                disabled={loading}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button type='submit' disabled={loading} className='flex-1'>
-                {loading ? 'Updating...' : 'Update Workout'}
+              <Button type='submit' disabled={isSubmitting} className='flex-1'>
+                {isSubmitting ? 'Updating...' : 'Update Workout'}
               </Button>
             </div>
           </div>

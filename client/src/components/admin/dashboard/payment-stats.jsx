@@ -7,7 +7,7 @@ const PaymentStats = ({ stats }) => {
   const statCards = [
     {
       title: 'Total Revenue',
-      value: `$${stats.totalRevenue.toLocaleString()}`,
+      value: `${stats.totalRevenue.toLocaleString()} VND`,
       description: 'From completed payments',
       icon: DollarSign,
       color: 'text-green-600',
