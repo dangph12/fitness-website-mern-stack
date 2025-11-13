@@ -184,7 +184,11 @@ export function MealsTable() {
         </Table>
       </div>
 
-      <DataTablePagination table={table} loading={loading} showSelection />
+      <DataTablePagination
+        table={table}
+        loading={loading}
+        showSelection={true}
+      />
     </div>
   );
 }
