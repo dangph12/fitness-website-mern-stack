@@ -13,17 +13,6 @@ export const fetchMeals = createAsyncThunk(
   }
 );
 
-// FETCH MEALS WITH PAGINATION
-export const fetchMealsWithPagination = createAsyncThunk(
-  'meals/fetchMealsWithPagination',
-  async ({ page, limit, sortBy, sortOrder, filterParams }) => {
-    const response = await axiosInstance.get('/api/meals', {
-      params: { page, limit, sortBy, sortOrder, ...filterParams }
-    });
-    return response.data.data; // Trả về toàn bộ data object
-  }
-);
-
 // FETCH ADMIN MEALS
 export const fetchAdminMeals = createAsyncThunk(
   'meals/fetchAdminMeals',
@@ -153,9 +142,7 @@ export const mealSlice = createSlice({
     mealsByUser: [],
     currentMeal: null,
     loading: false,
-    error: null,
-    totalPages: 0,
-    totalMeals: 0
+    error: null
   },
   reducers: {
     setMeals: (state, action) => {
@@ -164,8 +151,6 @@ export const mealSlice = createSlice({
     clearMeals: state => {
       state.meals = [];
       state.currentMeal = null;
-      state.totalPages = 0;
-      state.totalMeals = 0;
     }
   },
   extraReducers: builder => {
@@ -180,22 +165,6 @@ export const mealSlice = createSlice({
         state.meals = action.payload || [];
       })
       .addCase(fetchMeals.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Failed to fetch meals';
-      })
-
-      //Fetch meals with pagination
-      .addCase(fetchMealsWithPagination.pending, state => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchMealsWithPagination.fulfilled, (state, action) => {
-        state.loading = false;
-        state.meals = action.payload?.meals || [];
-        state.totalPages = action.payload?.totalPages || 0;
-        state.totalMeals = action.payload?.totalMeals || 0;
-      })
-      .addCase(fetchMealsWithPagination.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Failed to fetch meals';
       })
