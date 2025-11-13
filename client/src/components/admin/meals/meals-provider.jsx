@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchMeals } from '~/store/features/meal-slice';
+import { fetchMealsWithPagination } from '~/store/features/meal-slice';
 
 const MealsContext = createContext(undefined);
 
@@ -15,7 +15,9 @@ export const useMeals = () => {
 
 export const MealsProvider = ({ children }) => {
   const dispatch = useDispatch();
-  const { meals, loading } = useSelector(state => state.meals);
+  const { meals, loading, totalPages, totalMeals } = useSelector(
+    state => state.meals
+  );
 
   const [selectedMeals, setSelectedMeals] = useState([]);
   const [filters, setFilters] = useState({
@@ -27,14 +29,19 @@ export const MealsProvider = ({ children }) => {
     search: ''
   });
 
-  const totalPages = Math.ceil((meals?.length || 0) / filters.limit);
-  const totalMeals = meals?.length || 0;
-
+  // Load meals whenever filters change
   useEffect(() => {
-    loadMeals();
-  }, []);
+    loadMealsWithCurrentFilters();
+  }, [
+    filters.page,
+    filters.limit,
+    filters.sortBy,
+    filters.sortOrder,
+    filters.mealType,
+    filters.search
+  ]);
 
-  const loadMeals = () => {
+  const loadMealsWithCurrentFilters = () => {
     const filterParams = {};
 
     if (filters.search) {
@@ -46,7 +53,7 @@ export const MealsProvider = ({ children }) => {
     }
 
     dispatch(
-      fetchMeals({
+      fetchMealsWithPagination({
         page: filters.page,
         limit: filters.limit,
         sortBy: filters.sortBy,
@@ -57,38 +64,12 @@ export const MealsProvider = ({ children }) => {
   };
 
   const refreshData = () => {
-    loadMeals();
+    loadMealsWithCurrentFilters();
     setSelectedMeals([]);
   };
 
   const updateFilters = newFilters => {
-    setFilters(prev => {
-      const updated = { ...prev, ...newFilters };
-
-      setTimeout(() => {
-        const filterParams = {};
-
-        if (updated.search) {
-          filterParams.title = updated.search;
-        }
-
-        if (updated.mealType && updated.mealType !== 'all') {
-          filterParams.mealType = updated.mealType;
-        }
-
-        dispatch(
-          fetchMeals({
-            page: updated.page,
-            limit: updated.limit,
-            sortBy: updated.sortBy,
-            sortOrder: updated.sortOrder,
-            filterParams
-          })
-        );
-      }, 0);
-
-      return updated;
-    });
+    setFilters(prev => ({ ...prev, ...newFilters }));
   };
 
   return (
