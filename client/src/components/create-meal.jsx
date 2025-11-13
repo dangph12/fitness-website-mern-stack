@@ -287,6 +287,7 @@ export default function CreateMealSchedule() {
             const newFood = {
               food: foodItem._id,
               title: foodItem.title || foodItem.name || '',
+              image: foodItem.image || null,
               calories: foodItem.calories ?? 0,
               protein: foodItem.protein ?? 0,
               fat: foodItem.fat ?? 0,
@@ -658,9 +659,7 @@ export default function CreateMealSchedule() {
                           </div>
                         ) : (
                           meal.foods.map(f => {
-                            const imgSrc =
-                              globalFoods.find(g => g._id === f.food)?.image ||
-                              '/placeholder-food.png';
+                            const imgSrc = f.image || '/placeholder-food.png';
                             const kcal = (
                               (f.calories ?? 0) * (f.quantity ?? 0)
                             ).toFixed(0);
