@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchMealsWithPagination } from '~/store/features/meal-slice';
+import { fetchMeals } from '~/store/features/admin-meal-slice';
 
 const MealsContext = createContext(undefined);
 
@@ -16,7 +16,7 @@ export const useMeals = () => {
 export const MealsProvider = ({ children }) => {
   const dispatch = useDispatch();
   const { meals, loading, totalPages, totalMeals } = useSelector(
-    state => state.meals
+    state => state.adminMealReducer
   );
 
   const [selectedMeals, setSelectedMeals] = useState([]);
@@ -52,8 +52,16 @@ export const MealsProvider = ({ children }) => {
       filterParams.mealType = filters.mealType;
     }
 
+    console.log('Loading meals with filters:', {
+      page: filters.page,
+      limit: filters.limit,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder,
+      filterParams
+    });
+
     dispatch(
-      fetchMealsWithPagination({
+      fetchMeals({
         page: filters.page,
         limit: filters.limit,
         sortBy: filters.sortBy,
@@ -69,7 +77,11 @@ export const MealsProvider = ({ children }) => {
   };
 
   const updateFilters = newFilters => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters(prev => {
+      const updated = { ...prev, ...newFilters };
+      console.log('Filters updated:', updated);
+      return updated;
+    });
   };
 
   return (
