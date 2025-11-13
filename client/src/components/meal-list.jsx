@@ -23,7 +23,8 @@ import { ScrollArea } from './ui/scroll-area';
 export default function MealsList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userId = useSelector(state => state.auth.user.id);
+  const userId = useSelector(state => state?.auth?.user?.id);
+
   const {
     mealsByUser = [],
     loadingByUser,
