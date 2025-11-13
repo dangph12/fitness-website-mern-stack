@@ -9,7 +9,7 @@ export const fetchMeals = createAsyncThunk(
     const response = await axiosInstance.get('/api/meals', {
       params: { page, limit, sortBy, sortOrder, ...filterParams }
     });
-    return response.data.data.meals;
+    return response.data.data;
   }
 );
 
@@ -142,7 +142,9 @@ export const mealSlice = createSlice({
     mealsByUser: [],
     currentMeal: null,
     loading: false,
-    error: null
+    error: null,
+    totalPages: 0,
+    totalMeals: 0
   },
   reducers: {
     setMeals: (state, action) => {
@@ -151,6 +153,8 @@ export const mealSlice = createSlice({
     clearMeals: state => {
       state.meals = [];
       state.currentMeal = null;
+      state.totalPages = 0;
+      state.totalMeals = 0;
     }
   },
   extraReducers: builder => {
@@ -162,7 +166,9 @@ export const mealSlice = createSlice({
       })
       .addCase(fetchMeals.fulfilled, (state, action) => {
         state.loading = false;
-        state.meals = action.payload || [];
+        state.meals = action.payload?.meals || [];
+        state.totalPages = action.payload?.totalPages || 0;
+        state.totalMeals = action.payload?.totalMeals || 0;
       })
       .addCase(fetchMeals.rejected, (state, action) => {
         state.loading = false;
