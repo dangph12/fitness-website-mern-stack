@@ -6,7 +6,7 @@ import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
-import { fetchFoods } from '~/store/features/food-slice';
+import { clearFoods, fetchFoods } from '~/store/features/food-slice';
 
 export function FoodLibrary({ onAddFood, selectedFoodIds = [] }) {
   const dispatch = useDispatch();
@@ -25,6 +25,7 @@ export function FoodLibrary({ onAddFood, selectedFoodIds = [] }) {
 
   // Fetch foods when appliedQuery or page changes
   useEffect(() => {
+    dispatch(clearFoods());
     loadFoods();
   }, [appliedQuery, currentPage]);
 

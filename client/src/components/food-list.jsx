@@ -19,7 +19,7 @@ import {
   PaginationPrevious
 } from '~/components/ui/pagination';
 import { ScrollArea } from '~/components/ui/scroll-area';
-import { fetchFoods } from '~/store/features/food-slice';
+import { clearFoods, fetchFoods } from '~/store/features/food-slice';
 
 const FoodLibrary = ({ handleAddFood }) => {
   const dispatch = useDispatch();
@@ -43,11 +43,16 @@ const FoodLibrary = ({ handleAddFood }) => {
   }, [searchText]);
 
   useEffect(() => {
+    // Clear foods before fetching new page
+    dispatch(clearFoods());
+
     dispatch(fetchFoods({ page, limit, filterParams: { title: query } }));
   }, [dispatch, page, query]);
 
   const handlePageChange = newPage => {
     if (newPage > 0 && newPage <= totalPages) {
+      // Clear foods before changing page
+
       setPage(newPage);
     }
   };
@@ -60,7 +65,7 @@ const FoodLibrary = ({ handleAddFood }) => {
   }, [foodList, query]);
 
   return (
-    <div className='h-[80vh] flex flex-col border rounded-2xl bg-gradient-to-b from-white  shadow-md overflow-hidden'>
+    <div className='h-[80vh] flex flex-col border rounded-2xl bg-gradient-to-b from-white shadow-md overflow-hidden'>
       <div className='flex items-center justify-between p-4 border-b bg-emerald-100/80'>
         <h3 className='flex items-center gap-2 text-lg font-semibold text-emerald-800'>
           <FaUtensils className='text-emerald-700 text-xl' />
@@ -104,6 +109,9 @@ const FoodLibrary = ({ handleAddFood }) => {
             {error && (
               <p className='text-red-500 text-center font-medium'>{error}</p>
             )}
+            {!loading && filtered.length === 0 && (
+              <p className='text-center text-slate-500 py-8'>No foods found</p>
+            )}
             {!loading &&
               filtered.map(food => (
                 <div
@@ -115,6 +123,9 @@ const FoodLibrary = ({ handleAddFood }) => {
                       src={food.image}
                       className='w-16 h-16 rounded-lg border border-emerald-200 object-cover shadow-sm'
                       alt={food.title}
+                      onError={e => {
+                        e.target.src = '/placeholder-food.png';
+                      }}
                     />
                     <div>
                       <p className='font-medium text-emerald-800'>
@@ -153,19 +164,21 @@ const FoodLibrary = ({ handleAddFood }) => {
       </div>
 
       {totalPages > 1 && (
-        <Pagination className='p-3 border-t '>
+        <Pagination className='p-3 border-t'>
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => handlePageChange(page - 1)}
-                className='hover:text-emerald-600'
+                className={`hover:text-emerald-600 ${
+                  page === 1 ? 'pointer-events-none opacity-50' : ''
+                }`}
               />
             </PaginationItem>
             {[...Array(totalPages)].map((_, i) => (
               <PaginationItem key={i}>
                 <PaginationLink
                   isActive={page === i + 1}
-                  onClick={() => setPage(i + 1)}
+                  onClick={() => handlePageChange(i + 1)}
                   className={`${
                     page === i + 1
                       ? 'bg-emerald-600 text-white'
@@ -179,7 +192,9 @@ const FoodLibrary = ({ handleAddFood }) => {
             <PaginationItem>
               <PaginationNext
                 onClick={() => handlePageChange(page + 1)}
-                className='hover:text-emerald-600'
+                className={`hover:text-emerald-600 ${
+                  page === totalPages ? 'pointer-events-none opacity-50' : ''
+                }`}
               />
             </PaginationItem>
           </PaginationContent>

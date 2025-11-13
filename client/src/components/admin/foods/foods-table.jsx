@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { fetchFoods } from '../../../store/features/food-slice';
+import { clearFoods, fetchFoods } from '../../../store/features/food-slice';
 import {
   Table,
   TableBody,
@@ -49,12 +49,14 @@ export function FoodsTable() {
 
   // Fetch foods when pagination, sorting, or filters change
   useEffect(() => {
+    dispatch(clearFoods());
+
     dispatch(
       fetchFoods({
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
         sortBy: sorting[0]?.id || 'createdAt',
-        sortOrder: sorting[0]?.desc ? 'desc' : 'asc',
+        sortOrder: sorting[0]?.desc ? 'asc' : 'desc',
         filterParams: filters
       })
     );

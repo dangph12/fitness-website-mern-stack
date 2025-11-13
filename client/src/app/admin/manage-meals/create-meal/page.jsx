@@ -20,14 +20,14 @@ import {
   SelectTrigger,
   SelectValue
 } from '~/components/ui/select';
-import { createMeal } from '~/store/features/meal-slice';
+import { createMeal } from '~/store/features/admin-meal-slice';
 
 const CreateMeal = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const userId = useSelector(state => state.auth.user.id);
-  const { loading } = useSelector(state => state.meals);
+  const [loading, setLoading] = useState(false);
 
   // React Hook Form
   const {
@@ -37,7 +37,7 @@ const CreateMeal = () => {
     setValue,
     formState: { errors }
   } = useForm({
-    resolver: yupResolver(singleMealValidationSchema), // Đổi schema
+    resolver: yupResolver(singleMealValidationSchema),
     defaultValues: {
       title: '',
       mealType: 'Breakfast',
@@ -73,7 +73,7 @@ const CreateMeal = () => {
 
     const foodItem = {
       food: food._id,
-      foodName: food.name,
+      foodTitle: food.title,
       quantity: 1,
       foodData: food // Store full food data for display
     };
@@ -114,36 +114,37 @@ const CreateMeal = () => {
   };
 
   const onSubmit = async data => {
-    console.log('Form data:', data);
-
-    const mealData = new FormData();
-    mealData.append('title', data.title.trim());
-    mealData.append('mealType', data.mealType);
-    mealData.append('user', userId);
-
-    // Tự động thêm scheduleAt (ngày hiện tại)
-    const currentDate = new Date().toISOString();
-    mealData.append('scheduleAt', currentDate);
-
-    if (data.image) {
-      mealData.append('image', data.image);
-    }
-
-    // Append foods array properly
-    data.foods.forEach((foodItem, index) => {
-      mealData.append(`foods[${index}][food]`, foodItem.food);
-      mealData.append(`foods[${index}][quantity]`, String(foodItem.quantity));
-    });
-
-    // Debug FormData
-    console.log('FormData entries:');
-    for (const pair of mealData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
+    setLoading(true);
 
     try {
-      const result = await dispatch(createMeal(mealData)).unwrap();
-      console.log('Create result:', result);
+      console.log('Form data:', data);
+
+      const mealData = new FormData();
+      mealData.append('title', data.title.trim());
+      mealData.append('mealType', data.mealType);
+      mealData.append('user', userId);
+
+      // Tự động thêm scheduleAt (ngày hiện tại)
+      const currentDate = new Date().toISOString();
+      mealData.append('scheduleAt', currentDate);
+
+      if (data.image) {
+        mealData.append('image', data.image);
+      }
+
+      // Append foods array properly
+      data.foods.forEach((foodItem, index) => {
+        mealData.append(`foods[${index}][food]`, foodItem.food);
+        mealData.append(`foods[${index}][quantity]`, String(foodItem.quantity));
+      });
+
+      // Debug FormData
+      console.log('FormData entries:');
+      for (const pair of mealData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      await dispatch(createMeal(mealData)).unwrap();
       toast.success('Meal created successfully!');
       navigate('/admin/manage-meals');
     } catch (error) {
@@ -153,6 +154,8 @@ const CreateMeal = () => {
         error?.message ||
         'Failed to create meal';
       toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -398,7 +401,7 @@ const CreateMeal = () => {
                                 {food?.image ? (
                                   <img
                                     src={food.image}
-                                    alt={food.name || 'Food'}
+                                    alt={food.title || 'Food'}
                                     className='h-full w-full object-cover'
                                   />
                                 ) : (
@@ -411,7 +414,8 @@ const CreateMeal = () => {
                               </div>
                               <div className='flex-1 min-w-0'>
                                 <h4 className='font-semibold'>
-                                  {foodIndex + 1}. {food?.name || 'Food'}
+                                  {foodIndex + 1}.{' '}
+                                  {food?.title || 'Unnamed Food'}
                                 </h4>
                                 <div className='flex flex-wrap gap-1 mt-1'>
                                   <Badge
