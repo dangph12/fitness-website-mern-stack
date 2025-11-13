@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '~/components/ui/dialog';
-import { deleteMeal } from '~/store/features/meal-slice';
+import { deleteMeal } from '~/store/features/admin-meal-slice';
 
 import { useMeals } from './meals-provider';
 
